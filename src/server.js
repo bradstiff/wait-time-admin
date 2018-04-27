@@ -20,7 +20,7 @@ import { setTimeout } from 'timers';
 const db = new sql.ConnectionPool(process.env.CONNECTION_STRING);
 db.on('error', err => console.log(err));
 
-const schemaFile = path.join(__dirname, 'schema.graphql');
+const schemaFile = path.join(__dirname, 'schema.graphQL');
 const typeDefs = fs.readFileSync(schemaFile, 'utf8');
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
@@ -37,7 +37,7 @@ const app = express()
 if (process.env.NODE_ENV === 'development') {
     app.use('graphiql', graphiqlExpress({ endpointURL: config.app.graphqlPath }));
 } else if (process.env.NODE_ENV === 'production') {
-    const staticPath = path.join(__dirname, '/client');
+    const staticPath = path.join(__dirname, 'client');
     app.use(express.static(staticPath));
     app.get('*', (req, res) => res.sendFile(`${staticPath}/index.html`));
 }
@@ -49,14 +49,15 @@ db.connect()
     .catch(err => console.log(err))
     .finally(() => {
         const port = process.env.PORT || config.app.port;
-        const engine = new ApolloEngine({
-            apiKey: config.app.apolloEngineApiKey
-        });
+        //const engine = new ApolloEngine({
+        //    apiKey: config.app.apolloEngineApiKey
+        //});
 
-        engine.listen({
-            port,
-            expressApp: app
-        });
+        //engine.listen({
+        //    port,
+        //    expressApp: app
+        //});
 
+        app.listen(port);
         console.log(`Express server running in ${process.env.NODE_ENV} mode.`);
     });
