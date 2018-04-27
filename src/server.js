@@ -37,7 +37,7 @@ const app = express()
 if (process.env.NODE_ENV === 'development') {
     app.use('graphiql', graphiqlExpress({ endpointURL: config.app.graphqlPath }));
 } else if (process.env.NODE_ENV === 'production') {
-    const staticPath = path.join(__dirname, '/client/build');
+    const staticPath = path.join(__dirname, '/client');
     app.use(express.static(staticPath));
     app.get('*', (req, res) => res.sendFile(`${staticPath}/index.html`));
 }
