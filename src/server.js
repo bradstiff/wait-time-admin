@@ -25,18 +25,19 @@ const typeDefs = fs.readFileSync(schemaFile, 'utf8');
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express()
-    .use(cors())
     .use(config.app.graphqlPath, bodyParser.json(), graphqlExpress(req => ({
         schema,
         context: { db, dataLoaders: makeDataLoaders(db) },
         tracing: true,
         cacheControl: true
     })
-    ));
+));
 
 if (process.env.NODE_ENV === 'development') {
+    app.use(cors());
     app.use('graphiql', graphiqlExpress({ endpointURL: config.app.graphqlPath }));
-} else if (process.env.NODE_ENV === 'production') {
+}
+else if (process.env.NODE_ENV === 'production') {
     const staticPath = path.join(__dirname, 'client');
     app.use(express.static(staticPath));
     app.get('*', (req, res) => res.sendFile(`${staticPath}/index.html`));

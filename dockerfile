@@ -1,19 +1,22 @@
 # client build
-FROM node as client-builder
-ENV CLIENT_APP=/client/app
-ENV PATH $CLIENT_APP/node_modules/.bin:$PATH
-WORKDIR $CLIENT_APP
+FROM node as client-build
+WORKDIR /app
 COPY ./client ./
 RUN npm install --silent
 RUN npm run build
 
-# production environment
+# server build
 FROM node
-ENV APP=/app
-WORKDIR $APP
+WORKDIR /app
 COPY . ./
 RUN npm install --silent
-RUN mkdir $APP/client/build
-COPY --from=client-builder /client/app/build $APP/client/build
+RUN npm run build
+RUN mkdir ./build/client
+COPY --from=client-build /app/build ./build/client/
+
+# production environment
+ENV PATH /app/node_modules/.bin:$PATH
+ENV NODE_ENV=production
+ENV PORT=80
 EXPOSE 80
-CMD ["node", "./server.js", "--exec babel-node"]
+ENTRYPOINT ["node","./build/server.js"]

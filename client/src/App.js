@@ -6,7 +6,6 @@ import { ApolloProvider } from "react-apollo";
 import WaitTime from './containers/WaitTime';
 
 const client = new ApolloClient({
-    uri: 'http://localhost:5000/graphql',
     clientState: {
         resolvers: {
             Mutation: {

@@ -46,9 +46,9 @@ export default ({ dates, date, displayFormat, style, selectDate }) => {
     }
 
     const selectedDate = moment.utc(date);
-    const selectedDateDisplay = dates.length ?
-        selectedDate.format(displayFormat) :
-        'NO DATES AVAILABLE';
+    const selectedDateDisplay = dates.length === 0 ? 'NO DATES AVAILABLE' :
+        date === null ? '' :
+            selectedDate.format(displayFormat);
 
     const availableDates = dates.map(waitTimeDate => moment.utc(waitTimeDate.date));
     const selectedDateIndex = availableDates.findIndex(date => date.isSame(selectedDate));
