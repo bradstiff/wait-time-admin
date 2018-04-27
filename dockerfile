@@ -14,6 +14,6 @@ WORKDIR $APP
 COPY . ./
 RUN npm install --silent
 RUN mkdir $APP/client/build
-COPY --from=client-builder $CLIENT_APP/build $APP/client/build
+COPY --from=client-builder /client/app/build $APP/client/build
 EXPOSE 80
 CMD ["node", "./server.js", "--exec babel-node"]
