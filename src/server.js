@@ -46,8 +46,7 @@ if (process.env.NODE_ENV === 'development') {
 //If we make requests before the probe connection completes, it will cause errors.
 //Bring the server online after the ConnectionPool is ready for requests.
 db.connect()
-    .catch(err => console.log(err))
-    .finally(() => {
+    .then(() => {
         const port = process.env.PORT || config.app.port;
         //const engine = new ApolloEngine({
         //    apiKey: config.app.apolloEngineApiKey
@@ -60,4 +59,5 @@ db.connect()
 
         app.listen(port);
         console.log(`Express server running in ${process.env.NODE_ENV} mode.`);
-    });
+    })
+    .catch(err => console.log(err));
