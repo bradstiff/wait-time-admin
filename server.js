@@ -36,6 +36,10 @@ const app = express()
 
 if (process.env.NODE_ENV === 'development') {
     app.use('graphiql', graphiqlExpress({ endpointURL: config.app.graphqlPath }));
+} else if (process.env.NODE_ENV === 'production') {
+    const staticPath = path.join(__dirname, '/client/build');
+    app.use(express.static(staticPath));
+    app.get('*', (req, res) => res.sendFile(`${staticPath}/index.html`));
 }
 
 //MSSQL ConnectionPool establishes a 'probe connection' to verify the config. This is asynchronous.

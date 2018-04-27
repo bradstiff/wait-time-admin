@@ -2,7 +2,7 @@
 import { withRouter } from 'react-router-dom';
 import Responsive from 'react-responsive';
 import styled from 'styled-components';
-import { Navbar, Nav, Alert } from 'react-bootstrap';
+import { Navbar, Nav } from 'react-bootstrap';
 
 import ResortNav from '../components/ResortNav';
 import ResortPicker from '../components/ResortPicker';
@@ -32,7 +32,7 @@ class WaitTimeNav extends Component {
     }
 
     render() {
-        const { resortSlug, resort, date, warning } = this.props;
+        const { resortSlug, resort, date } = this.props;
         const resortName = resort ? resort.name : 'Loading';
         const dateDisplayFormat = window.screen.width >= DESKTOP_BREAKPOINT ? 'dddd, MMMM DD, YYYY' : 'ddd, MMMM DD, YYYY';
 
@@ -73,11 +73,6 @@ class WaitTimeNav extends Component {
                         selectDate={this.handleSelectDate}
                     />
                 </Mobile>
-                {warning &&
-                    <Alert bsStyle='danger'>
-                        <h5>{warning}</h5>
-                    </Alert>
-                }
             </header>
         );
     };

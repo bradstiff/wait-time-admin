@@ -4,16 +4,12 @@ import DataLoader from 'dataloader';
 const resortQuery = 'select ResortID as id, name, logoFilename, trailMapFilename from Resort';
 const liftQuery = 'select LiftID as id, name, resortID from Lift';
 
-const resolveSlug = slug => {
-    return slug == 'steamboat' ? 1 :
-        slug == 'winter-park' ? 2 :
-        4;
-};
-
 const Resort = {
-    getBySlug: (_, { slug }, context) => {
-        const id = resolveSlug(slug);
-        return Resort.getByID(_, { id }, context);
+    getBySlug: async (_, { slug }, context) => {
+        const result = await context.db.request()
+            .input('slug', mssql.NVarChar, slug)
+            .query(`${resortQuery} where Slug = @slug`);
+        return result.recordset[0];
     },
     getByID: async (_, args, context) => {
         const id = args.id || args.resortID;
@@ -27,10 +23,17 @@ const Resort = {
             .query(`${resortQuery} order by SortOrder`);
         return result.recordset;
     },
-    getWaitTimeDate: (_, { resortSlug, date }, context) => {
+    getIDBySlug: async (_, { slug }, context) => {
+        const result = await context.db.request()
+            .input('slug', mssql.NVarChar, slug)
+            .query(`select ResortID from Resort where Slug = @slug`);
+        return result.recordset[0].ResortID;
+    },
+    getWaitTimeDate: async (_, { resortSlug, date }, context) => {
+        const resortID = await Resort.getIDBySlug(_, { slug: resortSlug }, context);
         return {
-            date: date,
-            resortID: resolveSlug(resortSlug)
+            date,
+            resortID
         };
     },
     getLastWaitTimeDate: async (resort, _, context) => {

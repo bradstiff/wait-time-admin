@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import styled from 'styled-components';
-import qs from 'query-string';
+import qs from 'querystringify';
 import moment from 'moment';
 import { Query } from "react-apollo";
 import gql from 'graphql-tag';
@@ -43,12 +43,6 @@ class WaitTime extends Component {
 
     render() {
         const { date: searchDate } = this.props.location.search ? qs.parse(this.props.location.search) : {};
-        if (searchDate && !moment.utc(searchDate).isValid()) {
-            return (<Alert bsStyle='danger'>
-                <h5>'Date must be entered as YYYY-MM-DD'</h5>
-            </Alert>);
-        }
-
         const resortQuery = gql`
             query ResortBySlug($slug: String!) {
                 resort: resortBySlug(slug: $slug) { 
@@ -82,16 +76,27 @@ class WaitTime extends Component {
                             <h5>{JSON.stringify(error)}</h5>
                         </Alert>);
                     }
+
                     const { resort } = data;
                     const date = searchDate ||
-                        (resort && resort.slug === this.resortSlug ?
-                        resort.lastDate.date :
-                        null);
+                        (resort && resort.slug === this.resortSlug && resort.lastDate ?
+                            resort.lastDate.date :
+                            null);
+
+                    const validationError = loading ? null :
+                        this.resortSlug && resort === null ? 'The resort name in the address bar does not exist.' :
+                            searchDate && !moment.utc(searchDate).isValid() ? 'The date in the address bar is invalid. Date must be entered as YYYY-MM-DD.' :
+                                !resort.dates.length ? 'No wait time data exists for the selected resort. Please select either Steamboat or Winter Park.' :
+                                    searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate)) ? 'No wait time data exists for the selected date.' :
+                                        null;
                     return (
                         <Background>
                             <Flex>
                                 <WaitTimeNav resortSlug={this.resortSlug} resort={resort} date={date} />
-                                <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} />
+                                {validationError === null ?
+                                    <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} /> : 
+                                    <Alert bsStyle='danger'><h5>{validationError}</h5></Alert>
+                                }
                             </Flex>
                         </Background>
                     );

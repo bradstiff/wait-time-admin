@@ -1,7 +1,6 @@
 import React from 'react';
 import { Query } from "react-apollo";
 import gql from 'graphql-tag';
-import { Alert } from 'react-bootstrap';
 
 import WaitTimeMap from './WaitTimeMap';
 import TimePicker from '../components/TimePicker';
@@ -38,11 +37,6 @@ export default ({ resortSlug, resort, date }) => {
                     return null;
                 }
                 const { waitTimeDate } = data;
-                if (waitTimeDate && waitTimeDate.timePeriods && waitTimeDate.timePeriods.length === 0) {
-                    return (<Alert bsStyle='danger'>
-                        <h5>No wait time data exists for the selected date.</h5>
-                    </Alert>);
-                }
                 return (
                     <main>
                         <div style={{ minHeight: '40px' }}>
