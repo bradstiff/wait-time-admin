@@ -1,0 +1,41 @@
+type Query {
+    resorts: [Resort!]!
+    resort(id: Int!): Resort
+    resortBySlug(slug: String!): Resort
+    waitTimeDate(resortSlug: String!, date: Date!): WaitTimeDate
+}
+type Resort {
+    id: Int!
+    name: String!
+    slug: String!
+    logoFilename: String
+    trailMapFilename: String
+    sortOrder: Int!
+    dates: [WaitTimeDate!]
+	lastDate: WaitTimeDate
+    lifts: [Lift!]
+}
+type Lift {
+    id: Int!
+    name: String
+    resortID: Int
+    resort: Resort
+}
+type WaitTimeDate {
+	id: String!
+    resortID: Int!
+    resort: Resort!
+    date: Date!
+    timePeriods: [WaitTimePeriod!]
+}
+type WaitTimePeriod {
+    timestamp: Int!
+    resortID: Int!
+    waitTimes: [WaitTime!]!
+}
+type WaitTime {
+    liftID: Int!
+    seconds: Int!
+} 
+
+scalar Date
