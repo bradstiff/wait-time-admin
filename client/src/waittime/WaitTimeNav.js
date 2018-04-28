@@ -4,9 +4,9 @@ import Responsive from 'react-responsive';
 import styled from 'styled-components';
 import { Navbar, Nav } from 'react-bootstrap';
 
-import ResortNav from '../components/ResortNav';
-import ResortPicker from '../components/ResortPicker';
-import DateNav from '../components/DateNav';
+import ResortNavDesktop from './ResortNavDesktop';
+import ResortNavMobile from './ResortNavMobile';
+import DateNav from './DateNav';
 
 const DESKTOP_BREAKPOINT = 780;
 const Desktop = props => <Responsive {...props} minWidth={DESKTOP_BREAKPOINT} />;
@@ -39,7 +39,7 @@ class WaitTimeNav extends Component {
         return (
             <header>
                 <Desktop>
-                    <ResortNav selectedResortSlug={resortSlug} />
+                    <ResortNavDesktop selectedResortSlug={resortSlug} />
                     <Centered>
                         <ResortName>{resortName} Wait Times</ResortName>
                         <DateNav
@@ -61,7 +61,7 @@ class WaitTimeNav extends Component {
                         </Navbar.Header>
                         <Navbar.Collapse>
                             <Nav>
-                                <ResortPicker />
+                                <ResortNavMobile />
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>

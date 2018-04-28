@@ -3,7 +3,7 @@ import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import WaitTimeMap from './WaitTimeMap';
-import TimePicker from '../components/TimePicker';
+import TimeSlider from './TimeSlider';
 
 const waitTimeDateQuery = gql`
     query WaitTimeDate($resortSlug: String!, $date: Date!) {
@@ -40,7 +40,7 @@ export default ({ resortSlug, resort, date }) => {
                 return (
                     <main>
                         <div style={{ minHeight: '40px' }}>
-                            <TimePicker waitTimeDate={waitTimeDate} />
+                            <TimeSlider waitTimeDate={waitTimeDate} />
                         </div>
                         <WaitTimeMap resort={resort} waitTimeDate={waitTimeDate} />
                     </main>

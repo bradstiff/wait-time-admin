@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 
 import 'rc-slider/assets/index.css';
 
-class TimePicker extends Component {
+class TimeSlider extends Component {
     handleSelectedTimePeriodChange = timestamp => {
         this.props.selectTimePeriod(this.props.waitTimeDate, timestamp);
     }
@@ -101,4 +101,4 @@ export default graphql(selectTimePeriodMutation, {
     props: ({ mutate }) => ({
         selectTimePeriod: (waitTimeDate, timestamp) => mutate({ variables: { waitTimeDateID: waitTimeDate.id, timestamp} }),
     }),
-})(TimePicker);
+})(TimeSlider);

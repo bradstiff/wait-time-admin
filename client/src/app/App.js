@@ -3,7 +3,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 
-import WaitTime from './containers/WaitTime';
+import WaitTime from '../waittime/WaitTime';
 
 const client = new ApolloClient({
     clientState: {
