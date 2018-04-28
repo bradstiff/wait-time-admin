@@ -2,13 +2,13 @@
 import styled from 'styled-components';
 import qs from 'querystringify';
 import moment from 'moment';
-import { Query } from "react-apollo";
+import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Alert } from 'react-bootstrap';
 
 import WaitTimeNav from './WaitTimeNav';
 import WaitTimeView from './WaitTimeView';
-import BackgroundImage from '../assets/resort-carousel-bg.jpg'
+import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
 const Background = styled.div`
     background-image: url(${BackgroundImage});
@@ -94,7 +94,7 @@ class WaitTime extends Component {
                             <Flex>
                                 <WaitTimeNav resortSlug={this.resortSlug} resort={resort} date={date} />
                                 {validationError === null ?
-                                    <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} /> : 
+                                    <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} /> :
                                     <Alert bsStyle='danger'><h5>{validationError}</h5></Alert>
                                 }
                             </Flex>

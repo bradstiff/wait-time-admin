@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import gql from 'graphql-tag';
-import { Query } from "react-apollo";
+import { Query } from 'react-apollo';
 
 import styled from 'styled-components';
 
@@ -50,7 +50,7 @@ export default ({ selectedResortSlug }) => (
                                     selected={slug === selectedResortSlug}
                                 />
                             </Link>
-                        )
+                        );
                     })}
                 </ResortCarousel>
             );

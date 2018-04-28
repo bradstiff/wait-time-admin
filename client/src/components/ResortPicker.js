@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { NavItem } from 'react-bootstrap';
 import gql from 'graphql-tag';
-import { Query } from "react-apollo";
+import { Query } from 'react-apollo';
 
 const resortsQuery = gql`
     query Resorts {

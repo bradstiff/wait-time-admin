@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "strongloop",
+    "plugin:react/recommended"
+  ],
+  "parser": "babel-eslint",
+  "rules": {
+    "indent": "off",
+    "max-len": "off",
+    "react/prop-types": "off",
+    "react/display-name": "off"
+  },
+  "plugins": [
+    "react"
+  ]
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-import ApolloClient from "apollo-boost";
-import { ApolloProvider } from "react-apollo";
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from 'react-apollo';
 
 import WaitTime from './containers/WaitTime';
 
@@ -10,20 +10,20 @@ const client = new ApolloClient({
         resolvers: {
             Mutation: {
                 selectTimePeriod: (_, { waitTimeDateID, timestamp}, { cache, getCacheKey }) => {
-                    const id = getCacheKey({ __typename: 'WaitTimeDate', id: waitTimeDateID })
+                    const id = getCacheKey({ __typename: 'WaitTimeDate', id: waitTimeDateID });
                     const data = {
                         __typename: 'WaitTimeDate',
-                        selectedTimestamp: timestamp
+                        selectedTimestamp: timestamp,
                     };
                     cache.writeData({ id, data });
                     return null;
-                }
+                },
             },
             WaitTimeDate: {
-                selectedTimestamp: (waitTimeDate) => waitTimeDate.timePeriods && waitTimeDate.timePeriods.length && waitTimeDate.timePeriods[0].timestamp
-            }
-        }
-    }
+                selectedTimestamp: (waitTimeDate) => waitTimeDate.timePeriods && waitTimeDate.timePeriods.length && waitTimeDate.timePeriods[0].timestamp,
+            },
+        },
+    },
 });
 
 const DefaultResort = () => <Redirect to='/resorts/steamboat' />;

@@ -82,5 +82,5 @@ export default ({ dates, date, displayFormat, style, selectDate }) => {
             />
             <GlyphiconButton glyphicon='chevron-right' onClick={makeScrollDateHandler(nextDate)} />
         </FlexContainer>
-    )
-}
+    );
+};

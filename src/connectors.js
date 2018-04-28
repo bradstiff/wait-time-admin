@@ -5,38 +5,38 @@ const resortQuery = 'select ResortID as id, name, logoFilename, trailMapFilename
 const liftQuery = 'select LiftID as id, name, resortID from Lift';
 
 const Resort = {
-    getBySlug: async (_, { slug }, context) => {
+    getBySlug: async(_, { slug }, context) => {
         const result = await context.db.request()
             .input('slug', mssql.NVarChar, slug)
             .query(`${resortQuery} where Slug = @slug`);
         return result.recordset[0];
     },
-    getByID: async (_, args, context) => {
+    getByID: async(_, args, context) => {
         const id = args.id || args.resortID;
         const result = await context.db.request()
             .input('id', mssql.Int, id)
             .query(`${resortQuery} where ResortID = @id`);
         return result.recordset[0];
     },
-    getAll: async (_, args, context) => {
+    getAll: async(_, args, context) => {
         const result = await context.db.request()
             .query(`${resortQuery} order by SortOrder`);
         return result.recordset;
     },
-    getIDBySlug: async (_, { slug }, context) => {
+    getIDBySlug: async(_, { slug }, context) => {
         const result = await context.db.request()
             .input('slug', mssql.NVarChar, slug)
-            .query(`select ResortID from Resort where Slug = @slug`);
+            .query('select ResortID from Resort where Slug = @slug');
         return result.recordset[0].ResortID;
     },
-    getWaitTimeDate: async (_, { resortSlug, date }, context) => {
+    getWaitTimeDate: async(_, { resortSlug, date }, context) => {
         const resortID = await Resort.getIDBySlug(_, { slug: resortSlug }, context);
         return {
             date,
-            resortID
+            resortID,
         };
     },
-    getLastWaitTimeDate: async (resort, _, context) => {
+    getLastWaitTimeDate: async(resort, _, context) => {
         const result = await context.db.request()
             .input('resortID', mssql.Int, resort.id)
             .query(`
@@ -47,7 +47,7 @@ const Resort = {
             `);
         return result.recordset[0];
     },
-    getWaitTimePeriods: async (waitTimeDate, args, context) => {
+    getWaitTimePeriods: async(waitTimeDate, args, context) => {
         const result = await context.db.request()
             .input('resortID', mssql.Int, waitTimeDate.resortID)
             .input('date', mssql.Date, waitTimeDate.date)
@@ -67,36 +67,36 @@ const Resort = {
         return result.recordset.reduce((waitTimePeriods, waitTime) => {
             let timePeriod = waitTimePeriods.find(waitTimePeriod => waitTimePeriod.timestamp === waitTime.timestamp);
             if (!timePeriod) {
-                timePeriod =  {
+                timePeriod = {
                     timestamp: waitTime.timestamp,
-                    waitTimes: []
-                }
+                    waitTimes: [],
+                };
                 waitTimePeriods.push(timePeriod);
             }
             timePeriod.waitTimes.push({
                 liftID: waitTime.liftID,
-                seconds: waitTime.seconds
+                seconds: waitTime.seconds,
             });
             return waitTimePeriods;
         }, []);
     },
     getWaitTimeDates: (resort, args, context) => context.dataLoaders.waitTimeDatesByResortIDs.load(resort.id),
-    getLifts: (resort, args, context) => context.dataLoaders.liftsByResortIDs.load(resort.id)
-}
+    getLifts: (resort, args, context) => context.dataLoaders.liftsByResortIDs.load(resort.id),
+};
 
 const Lift = {
-    getByResortID: async (lift, args, context) => {
+    getByResortID: async(lift, args, context) => {
         const result = await context.db.request()
             .input('resortID', mssql.Int, lift.resortID)
             .query(`${resortQuery} where ResortID = @resortID`);
         return result.recordset[0];
-    }
+    },
 };
 
 export { Resort, Lift };
 
 export const makeDataLoaders = (db) => ({
-    waitTimeDatesByResortIDs: new DataLoader(async (resortIDs) => {
+    waitTimeDatesByResortIDs: new DataLoader(async(resortIDs) => {
         const result = await db.request().query(`
                 select distinct resortID, convert(date, LocalDateTime) as date
                 from Uplift u join Lift l on u.LiftID = l.LiftID
@@ -106,12 +106,12 @@ export const makeDataLoaders = (db) => ({
             const resortDates = result.recordset.filter(resortDate => resortDate.resortID === resortID);
             return resortDates ? resortDates.map(resortDate => ({
                 resortID: resortDate.resortID,
-                date: resortDate.date
+                date: resortDate.date,
             })) : null;
         });
     }),
-    liftsByResortIDs: new DataLoader(async (resortIDs) => {
+    liftsByResortIDs: new DataLoader(async(resortIDs) => {
         const result = await db.request().query(`${liftQuery} where ResortID in (${resortIDs.join()})`);
         return resortIDs.map(resortID => result.recordset.filter(lift => lift.resortID === resortID));
-    })
+    }),
 });

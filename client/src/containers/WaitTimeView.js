@@ -1,5 +1,5 @@
 import React from 'react';
-import { Query } from "react-apollo";
+import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import WaitTimeMap from './WaitTimeMap';
@@ -24,11 +24,11 @@ const waitTimeDateQuery = gql`
 
 export default ({ resortSlug, resort, date }) => {
     if (!resort || !date) {
-        //No search date entered and resort.lastDate not available because Resort query still loading at parent
+        // No search date entered and resort.lastDate not available because Resort query still loading at parent
         return null;
     }
 
-    //This will either request the WaitTimeDate for the search date, or retrieve last WaitTimeDate from the cache.
+    // This will either request the WaitTimeDate for the search date, or retrieve last WaitTimeDate from the cache.
     return (
         <Query query={waitTimeDateQuery} variables={{ resortSlug: resortSlug, date }}>
             {({ loading, error, data }) => {

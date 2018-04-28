@@ -5,30 +5,30 @@ import { Resort, Lift } from './connectors';
 
 const validateDate = value => {
     if (isNaN(Date.parse(value))) {
-        throw new GraphQLError(`Query error: not a valid date`, [value]);
+        throw new GraphQLError('Query error: not a valid date', [value]);
     };
-}
+};
 
 const resolvers = {
     Query: {
         resort: Resort.getByID,
         resortBySlug: Resort.getBySlug,
         resorts: Resort.getAll,
-        waitTimeDate: Resort.getWaitTimeDate
+        waitTimeDate: Resort.getWaitTimeDate,
     },
     Resort: {
         slug: resort => slugify(resort.name).toLowerCase(),
         dates: Resort.getWaitTimeDates,
         lastDate: Resort.getLastWaitTimeDate,
-        lifts: Resort.getLifts
+        lifts: Resort.getLifts,
     },
     Lift: {
-        resort: Lift.getByResortID
+        resort: Lift.getByResortID,
     },
     WaitTimeDate: {
         id: (waitTimeDate) => `${waitTimeDate.resortID.toString()}:${waitTimeDate.date.toISOString()}`,
         timePeriods: Resort.getWaitTimePeriods,
-        resort: (waitTimeDate, args, context) => Resort.getByID(null, { id: waitTimeDate.resortID }, context)
+        resort: (waitTimeDate, args, context) => Resort.getByID(null, { id: waitTimeDate.resortID }, context),
     },
     Date: new GraphQLScalarType({
             name: 'Date',
@@ -50,7 +50,7 @@ const resolvers = {
                 // value comes from resolvers
                 return value.toISOString(); // sent to the client
             },
-    })
+    }),
 };
 
 export default resolvers;
