@@ -15,6 +15,8 @@ import sql from 'mssql';
 import resolvers from './resolvers';
 import { makeDataLoaders } from './connectors';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 // .env file required with environment-specific connection string, e.g, for MSSQL:
 // CONNECTION_STRING=Server=<server>,<port>;Database=<db>;UID=<username>;PWD=<password>;encrypt=true
 const db = new sql.ConnectionPool(process.env.CONNECTION_STRING);
@@ -29,19 +31,18 @@ const app = express()
     .use(config.app.graphqlPath, bodyParser.json(), graphqlExpress(req => ({
         schema,
         context: { db, dataLoaders: makeDataLoaders(db) },
-        tracing: true,
-        cacheControl: true,
-    })
-));
+        tracing: !isProduction,
+        cacheControl: !isProduction,
+    })));
 
-if (process.env.NODE_ENV === 'development') {
-    app.use(cors());
-    app.use('graphiql', graphiqlExpress({ endpointURL: config.app.graphqlPath }));
-} else if (process.env.NODE_ENV === 'production') {
-    const staticPath = path.join(__dirname, 'client');
-    app.use(express.static(staticPath));
+if (isProduction) {
+    app.use(express.static(path.join(__dirname, 'client')));
     app.get('*', (req, res) => res.sendFile(`${staticPath}/index.html`));
 }
+else {
+    app.use(cors());
+    app.use('graphiql', graphiqlExpress({ endpointURL: config.app.graphqlPath }));
+} 
 
 // MSSQL ConnectionPool establishes a 'probe connection' to verify the config. This is asynchronous.
 // If we make requests before the probe connection completes, it will cause errors.
