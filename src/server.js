@@ -36,7 +36,8 @@ const app = express()
     })));
 
 if (isProduction) {
-    app.use(express.static(path.join(__dirname, 'client')));
+    const staticPath = path.join(__dirname, 'client');
+    app.use(express.static(staticPath));
     app.get('*', (req, res) => res.sendFile(`${staticPath}/index.html`));
 }
 else {
