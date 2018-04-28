@@ -52,21 +52,16 @@ const Resort = {
             .input('resortID', mssql.Int, waitTimeDate.resortID)
             .input('date', mssql.Date, waitTimeDate.date)
             .query(`
-                select  resortID, convert(date, LocalDateTime) as date, (datepart(hh, convert(time, LocalDateTime)) * 60 + datepart(mi, convert(time, LocalDateTime))) / 15 * 15 * 60 as timestamp, u.LiftID as liftID, avg(WaitSeconds) as seconds
-                from	Uplift u
-                join	Lift l on l.LiftID = u.LiftID
+                select  timestamp, liftID, seconds
+                from	WaitTimeDateUplift
                 where	ResortID = @resortID 
-                and     convert(date, LocalDateTime) = @date
-                group by 
-		                ResortID, 
-		                convert(date, LocalDateTime), (datepart(hh, convert(time, LocalDateTime)) * 60 + datepart(mi, convert(time, LocalDateTime))) / 15, 
-		                u.LiftID
-                order by 
-	                convert(date, LocalDateTime), (datepart(hh, convert(time, LocalDateTime)) * 60 + datepart(mi, convert(time, LocalDateTime))) / 15
+                and     WaitTimeDate = @date
+                order by timestamp
             `);
+        let timePeriod = null;
         return result.recordset.reduce((waitTimePeriods, waitTime) => {
-            let timePeriod = waitTimePeriods.find(waitTimePeriod => waitTimePeriod.timestamp === waitTime.timestamp);
-            if (!timePeriod) {
+            if (!timePeriod || timePeriod.timestamp != waitTime.timestamp) {
+                //depends on a pre-ordered list of waitTimes
                 timePeriod = {
                     timestamp: waitTime.timestamp,
                     waitTimes: [],
