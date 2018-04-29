@@ -47,7 +47,7 @@ const Resort = {
             `);
         return result.recordset[0];
     },
-    getWaitTimePeriods: async(waitTimeDate, args, context) => {
+    getWaitTimePeriods: async (waitTimeDate, args, context) => {
         const result = await context.db.request()
             .input('resortID', mssql.Int, waitTimeDate.resortID)
             .input('date', mssql.Date, waitTimeDate.date)
@@ -57,9 +57,10 @@ const Resort = {
                 where	ResortID = @resortID 
                 and     WaitTimeDate = @date
                 order by timestamp
+                OPTION (RECOMPILE)
             `);
         let timePeriod = null;
-        return result.recordset.reduce((waitTimePeriods, waitTime) => {
+        const data = result.recordset.reduce((waitTimePeriods, waitTime) => {
             if (!timePeriod || timePeriod.timestamp != waitTime.timestamp) {
                 //depends on a pre-ordered list of waitTimes
                 timePeriod = {
@@ -74,6 +75,7 @@ const Resort = {
             });
             return waitTimePeriods;
         }, []);
+        return data;
     },
     getWaitTimeDates: (resort, args, context) => context.dataLoaders.waitTimeDatesByResortIDs.load(resort.id),
     getLifts: (resort, args, context) => context.dataLoaders.liftsByResortIDs.load(resort.id),

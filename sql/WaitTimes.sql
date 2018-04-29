@@ -1,11 +1,19 @@
+--This works, but it takes 250ms on average. Probably going to refactor to accumulate wait times in javascript
+
+if exists (select 1 from sysobjects where id = object_id('WaitTimeDateUplift'))
+begin
+	drop view WaitTimeDateUplift
+end
+go
+
 create view WaitTimeDateUplift as 
 --Uplifts are allocated to 15 minute time periods
 WITH TimePeriodRange AS (
 	--establish start and end time period
-	select  ResortID, convert(date, LocalDateTime) as WaitTimeDate, min(datediff(mi, convert(date,LocalDateTime), LocalDateTime) / 15) as StartTimePeriod, max(datediff(mi, convert(date,LocalDateTime), LocalDateTime) / 15) as EndTimePeriod
-	from	Uplift u
+	select  ResortID, LocalDate as WaitTimeDate, min(LocalMinutes / 15) as StartTimePeriod, max(LocalMinutes / 15) as EndTimePeriod
+	from	Uplift u 
 	join	Lift l on l.LiftID = u.LiftID
-	group by ResortID, convert(date, LocalDateTime)
+	group by ResortID, LocalDate
 ),
 TimePeriod AS (
 	--fill the gaps between the start and end, since there may be time periods where a lift wasn't taken
@@ -22,7 +30,7 @@ WaitTimePeriod as (
 	select	p.ResortID, WaitTimeDate, TimePeriod, u.LiftID, avg(u.WaitSeconds) as Seconds
 	from	TimePeriod p 
 	join	Lift l on l.ResortID = p.ResortID
-	join	Uplift u on u.LiftID = l.LiftID and convert(date, u.LocalDateTime) = p.WaitTimeDate and datediff(mi, convert(date,LocalDateTime), LocalDateTime) / 15 = p.TimePeriod
+	join	Uplift u on u.LiftID = l.LiftID and u.LocalDate = p.WaitTimeDate and u.LocalMinutes / 15 = p.TimePeriod
 	group by p.ResortID, WaitTimeDate, TimePeriod, u.LiftID
 ),
 CumulativeWaitTimePeriod as (
