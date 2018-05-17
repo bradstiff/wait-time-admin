@@ -19,7 +19,13 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 // .env file required with environment-specific connection string, e.g, for MSSQL:
 // CONNECTION_STRING=Server=<server>,<port>;Database=<db>;UID=<username>;PWD=<password>;encrypt=true
-const db = new sql.ConnectionPool(process.env.CONNECTION_STRING);
+const db = new sql.ConnectionPool({
+    server: process.env.DB_SERVER,
+    database: process.env.DB_NAME,
+    user: process.env.DB_UID,
+    password: process.env.DB_PWD,
+    port: process.env.DB_PORT,
+});
 db.on('error', err => console.log(err));
 
 const schemaFile = path.join(__dirname, 'schema.graphQL');

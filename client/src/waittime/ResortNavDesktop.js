@@ -41,17 +41,20 @@ export default ({ selectedResortSlug }) => (
             }
             return (
                 <ResortCarousel>
-                    {data.resorts.map(({ id, logoFilename, name, slug }) => {
-                        return (
-                            <Link key={id} to={`/resorts/${slug}`}>
-                                <ResortLogo
-                                    src={`${process.env.PUBLIC_URL}/logos/${logoFilename}`}
-                                    alt={name}
-                                    selected={slug === selectedResortSlug}
-                                />
-                            </Link>
-                        );
-                    })}
+                    {data.resorts
+                        .filter(({ slug }) => slug !== 'serre-chevalier-vallee')
+                        .map(({ id, logoFilename, name, slug }) => {
+                            return (
+                                <Link key={id} to={`/resorts/${slug}`}>
+                                    <ResortLogo
+                                        src={`${process.env.PUBLIC_URL}/logos/${logoFilename}`}
+                                        alt={name}
+                                        selected={slug === selectedResortSlug}
+                                    />
+                                </Link>
+                            );
+                        })
+                    }
                 </ResortCarousel>
             );
         }}

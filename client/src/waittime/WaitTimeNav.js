@@ -39,7 +39,7 @@ class WaitTimeNav extends Component {
         return (
             <header>
                 <Desktop>
-                    <ResortNavDesktop selectedResortSlug={resortSlug} />
+                    {resortSlug !== 'serre-chevalier-vallee' && <ResortNavDesktop selectedResortSlug={resortSlug} />}
                     <Centered>
                         <ResortName>{resortName} Wait Times</ResortName>
                         <DateNav
