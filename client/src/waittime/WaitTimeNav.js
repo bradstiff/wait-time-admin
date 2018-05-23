@@ -34,7 +34,7 @@ class WaitTimeNav extends Component {
     render() {
         const { resortSlug, resort, date } = this.props;
         const resortName = resort ? resort.name : 'Loading';
-        const dateDisplayFormat = window.screen.width >= DESKTOP_BREAKPOINT ? 'dddd, MMMM DD, YYYY' : 'ddd, MMMM DD, YYYY';
+        const dateDisplayFormat = window.screen.width >= DESKTOP_BREAKPOINT ? 'dddd, LL' : 'ddd, LL';
 
         return (
             <header>

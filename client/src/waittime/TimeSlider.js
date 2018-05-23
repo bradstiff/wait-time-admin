@@ -21,27 +21,27 @@ class TimeSlider extends Component {
         const widthPerTimePeriod = window.innerWidth / timePeriods.length;
         switch (true) {
             case widthPerTimePeriod > 50:
-                timeFormat = 'h:mm A';
+                timeFormat = 'LT';
                 minutesPerMark = 15;
                 break;
             case widthPerTimePeriod > 40:
-                timeFormat = 'h:mm';
+                timeFormat = 'LT';
                 minutesPerMark = 15;
                 break;
             case widthPerTimePeriod > 30:
-                timeFormat = 'h:mm A';
+                timeFormat = 'LT';
                 minutesPerMark = 30;
                 break;
             case widthPerTimePeriod > 20:
-                timeFormat = 'h:mm';
+                timeFormat = 'LT';
                 minutesPerMark = 30;
                 break;
             case widthPerTimePeriod > 10:
-                timeFormat = 'h:mm';
+                timeFormat = 'LT';
                 minutesPerMark = 45;
                 break;
             default:
-                timeFormat = 'h:mm';
+                timeFormat = 'LT';
                 minutesPerMark = 60;
                 break;
         };
