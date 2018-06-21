@@ -15,20 +15,33 @@ const resolvers = {
         resortBySlug: Resort.getBySlug,
         resorts: Resort.getAll,
         waitTimeDate: Resort.getWaitTimeDate,
+        //uplifts: Uplifts.get,
+    },
+    Mutation: {
+        createResort: Resort.create,
+        updateResort: Resort.update,
     },
     Resort: {
-        slug: resort => slugify(resort.name).toLowerCase(),
         dates: Resort.getWaitTimeDates,
         lastDate: Resort.getLastWaitTimeDate,
         lifts: Resort.getLifts,
     },
     Lift: {
-        resort: Lift.getByResortID,
+        resort: (child, args, context) => Resort.getByID(null, { id: child.resortID }, context),
+        upliftSummaries: Lift.getUpliftSummaries,
     },
     WaitTimeDate: {
         id: (waitTimeDate) => `${waitTimeDate.resortID.toString()}:${waitTimeDate.date.toISOString()}`,
         timePeriods: Resort.getWaitTimePeriods,
         resort: (waitTimeDate, args, context) => Resort.getByID(null, { id: waitTimeDate.resortID }, context),
+    },
+    UpliftSummary: {
+        season: upliftSummary => ({
+            year: upliftSummary.year
+        })
+    },
+    Season: {
+        description: season => `${season.year} - ${season.year + 1}`,
     },
     Date: new GraphQLScalarType({
             name: 'Date',

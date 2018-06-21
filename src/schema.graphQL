@@ -3,13 +3,21 @@ type Query {
     resort(id: Int!): Resort
     resortBySlug(slug: String!): Resort
     waitTimeDate(resortSlug: String!, date: Date!): WaitTimeDate
+	uplifts(resortID: Int!, liftID: Int!, seasonStartYear: Int!): Uplift
+}
+type Mutation {
+	createResort(name: String!, slug: String!) : Resort
+	updateResort(id: Int!, name: String!, slug: String!) : Resort
 }
 type Resort {
     id: Int!
     name: String!
     slug: String!
-    logoFilename: String
-    trailMapFilename: String
+    logoFilename: String!
+    trailMapFilename: String!
+	timezone: String!
+	latitude: Float
+	longitude: Float
     sortOrder: Int!
     dates: [WaitTimeDate!]
 	lastDate: WaitTimeDate
@@ -18,12 +26,12 @@ type Resort {
 type Lift {
     id: Int!
     name: String
-    resortID: Int
     resort: Resort
+	uplifts: [Uplift!]
+	upliftSummaries: [UpliftSummary!]
 }
 type WaitTimeDate {
 	id: String!
-    resortID: Int!
     resort: Resort!
     date: Date!
     timePeriods: [WaitTimePeriod!]
@@ -37,5 +45,24 @@ type WaitTime {
     liftID: Int!
     seconds: Int!
 } 
-
+type Uplift {
+	id: Int!
+	trackID: Int!
+	liftID: Int!
+	lift: Lift!
+	season: Season!
+	date: Date!
+	waitSeconds: Int!
+}
+type UpliftSummary {
+	liftID: Int!
+	lift: Lift!
+	season: Season!
+    upliftCount: Int!
+	waitTimeAverage: Int!
+}
+type Season {
+	year: Int!
+	description: String!
+}
 scalar Date

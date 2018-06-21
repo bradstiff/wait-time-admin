@@ -3,7 +3,11 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
 import WaitTime from '../waittime/WaitTime';
+import Admin from '../admin/Admin';
 
 const client = new ApolloClient({
     clientState: {
@@ -26,14 +30,25 @@ const client = new ApolloClient({
     },
 });
 
+const theme = createMuiTheme({
+    palette: {
+        type: 'dark'
+    }
+});
+
 const DefaultResort = () => <Redirect to='/resorts/steamboat' />;
 
 const App = () => (
     <ApolloProvider client={client}>
-        <Switch>
-            <Route exact path='/' component={DefaultResort} />
-            <Route exact path='/resorts/:resort?' component={WaitTime} />
-        </Switch>
+        <CssBaseline>
+            <MuiThemeProvider theme={theme}>
+                <Switch>
+                    <Route path='/admin' component={Admin} />
+                    <Route exact path='/resorts/:resort?' component={WaitTime} />
+                    <Route exact path='/' component={DefaultResort} />
+                </Switch>
+            </MuiThemeProvider>
+        </CssBaseline>
     </ApolloProvider>
 );
 

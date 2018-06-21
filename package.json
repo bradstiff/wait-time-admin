@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "client": "cd client && npm run start",
-    "server": "cross-env NODE_ENV=development nodemon ./src/server.js --exec babel-node\"",
+    "server": "cross-env NODE_ENV=development nodemon ./src/server.js --inspect --exec babel-node\"",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "build": "babel src -d build -s inline --copy-files",
     "prod": "cross-env NODE_ENV=production node ./build/server.js",

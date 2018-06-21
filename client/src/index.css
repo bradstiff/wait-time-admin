@@ -1,13 +1,16 @@
 body {
-  margin: 0;
-  padding: 0;
   font-family: sans-serif;
+}
+
+html, body {
+    height: 100%;
 }
 
 .rc-slider-mark-text-active {
     color: #D44126 !important;
 }
 
-html, body {
-    height: 100%;
+.leaflet-container {
+    height: 300px;
+    width: 300px;
 }

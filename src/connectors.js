@@ -1,7 +1,7 @@
 import mssql from 'mssql';
 import DataLoader from 'dataloader';
 
-const resortQuery = 'select ResortID as id, name, logoFilename, trailMapFilename from Resort';
+const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude from Resort';
 const liftQuery = 'select LiftID as id, name, resortID from Lift';
 
 const Resort = {
@@ -104,8 +104,7 @@ const Resort = {
                     liftID: waitTime.liftID,
                     seconds: waitTime.seconds,
                 }));
-            //accumulate wait times, favoring the most recent one for a lift: reload cumulative wait times 
-            //with the most recent lift times, plus any previous lift times not found in the specific period
+            //wait time for a lift is carried forward to the next period if the period has no wait time for the lift
             cumulativeWaitTimes = specificWaitTimes
                 .concat(cumulativeWaitTimes.filter(cumulativeWaitTime =>
                     !specificWaitTimes.find(specificWaitTime => specificWaitTime.liftID === cumulativeWaitTime.liftID)));
@@ -118,15 +117,38 @@ const Resort = {
     },
     getWaitTimeDates: (resort, args, context) => context.dataLoaders.waitTimeDatesByResortIDs.load(resort.id),
     getLifts: (resort, args, context) => context.dataLoaders.liftsByResortIDs.load(resort.id),
+    create: async (_, args, context) => {
+        const request = context.db.request()
+            .input('name', mssql.NVarChar, args.name)
+            .input('slug', mssql.NVarChar, args.slug)
+            .input('logoFilename', mssql.NVarChar, args.slug)
+            .input('trailMapFilename', mssql.NVarChar, args.slug)
+        const result = await request.query(`
+            insert Resort (Name, Slug, LogoFilename, TrailMapFilename, Latitude, Longitude) values (@name, @slug, '', '', 0, 0); 
+            select scope_identity() as id;
+        `);
+
+        const id = result.recordset[0]['id'];
+        return Resort.getByID(null, { id }, context);
+    },
+    update: async (_, args, context) => {
+        const result = await context.db.request()
+            .input('id', mssql.Int, args.id)
+            .input('name', mssql.NVarChar, args.name)
+            .input('slug', mssql.NVarChar, args.slug)
+            .query('update Resort set Name = @name, Slug = @slug where ResortID = @id');
+        return Resort.getByID(null, args, context);
+    }
 };
 
 const Lift = {
-    getByResortID: async(lift, args, context) => {
+    getResort: async(lift, args, context) => {
         const result = await context.db.request()
             .input('resortID', mssql.Int, lift.resortID)
             .query(`${resortQuery} where ResortID = @resortID`);
         return result.recordset[0];
     },
+    getUpliftSummaries: (lift, args, context) => context.dataLoaders.upliftSummariesByLiftIDs.load(lift.id),
 };
 
 export { Resort, Lift };
@@ -149,5 +171,16 @@ export const makeDataLoaders = (db) => ({
     liftsByResortIDs: new DataLoader(async(resortIDs) => {
         const result = await db.request().query(`${liftQuery} where ResortID in (${resortIDs.join()})`);
         return resortIDs.map(resortID => result.recordset.filter(lift => lift.resortID === resortID));
+    }),
+    upliftSummariesByLiftIDs: new DataLoader(async liftIDs => {
+        const result = await db.request().query(`
+            select	u.LiftID as liftID, Season as year, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+            from	Uplift u 
+            join    Lift l on u.LiftID = l.LiftID
+            where	u.LiftID in (${liftIDs.join()})
+            group by Season, u.LiftID, l.Name
+            order by Season, l.Name
+        `);
+        return liftIDs.map(liftID => result.recordset.filter(summary => summary.liftID === liftID));
     }),
 });

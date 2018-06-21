@@ -63,7 +63,7 @@ export default ({ dates, date, displayFormat, style, selectDate }) => {
         availableDates[previousDateIndex] :
         null;
 
-    const makeScrollDateHandler = (date) => {
+    const makeScrollDateHandler = date => {
         return date ?
             () => selectDate(date) :
             null;
