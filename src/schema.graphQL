@@ -30,6 +30,7 @@ type Lift {
     resort: Resort
 	upliftList(offset: Int!, limit: Int!, orderBy: String!, order: String!, seasonYear: Int, month: Int, day: Int, hour: Int): UpliftList!
 	upliftSummaries: [UpliftSummary!]
+	upliftGroupings(groupBy: String!, seasonYear: Int, month: Int, day: Int, hour: Int): [UpliftGrouping!]
 }
 type WaitTimeDate {
 	id: String!
@@ -46,6 +47,12 @@ type WaitTime {
     liftID: Int!
     seconds: Int!
 } 
+type UpliftGrouping {
+	groupKey: Int!
+	groupDescription: String!
+	upliftCount: Int!
+	waitTimeAverage: Int!
+}
 type UpliftList {
 	count: Int!,
 	uplifts: [Uplift!]!

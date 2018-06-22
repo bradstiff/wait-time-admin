@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import moment from 'moment';
 
 import { withStyles } from '@material-ui/core/styles';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
@@ -13,31 +12,24 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
+import TableHead from '@material-ui/core/TableHead';
 
-import SortEnabledTableHead, { makeCompareFn } from '../app/SortEnabledTableHead';
 import SelectMenu from '../app/SelectMenu';
 
 const upliftsQuery = gql`
-    query UpliftsByLift($liftID: Int!, $offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
+    query UpliftStatsByLift($liftID: Int!, $groupBy: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
         lift(id: $liftID) { 
             id,
             name,
-            upliftList(offset: $offset, limit: $limit, orderBy: $orderBy, order: $order, seasonYear: $seasonYear, month: $month, day: $day, hour: $hour) {
-                count,
-                uplifts {
-                    id,
-                    date,
-                    waitSeconds
-                }
+            upliftGroupings(groupBy: $groupBy, seasonYear: $seasonYear, month: $month, day: $day, hour: $hour) {
+                groupKey,
+                groupDescription,
+                upliftCount,
+                waitTimeAverage
             }
         }
     }
 `;
-
-const columnData = [
-    { field: 'date', numeric: false, disablePadding: true, label: 'Date' },
-    { field: 'waitSeconds', numeric: true, disablePadding: false, label: 'Wait Time (s)' },
-];
 
 const toolbarStyles = theme => ({
     root: {
@@ -65,19 +57,20 @@ const toolbarStyles = theme => ({
     },
 });
 
-class LiftUplifts extends Component {
-    rowsPerPage = 100;
-
+class LiftStats extends Component {
     state = {
-        page: 0,
-        rowsPerPage: 50,
-        order: 'asc',
-        orderByCol: columnData[0],
+        groupBy: 'Season',
         seasonYear: null,
         month: null,
         day: null,
         hour: null,
     };
+
+    handleSelectGroupBy = groupBy => {
+        this.setState({
+            groupBy,
+        });
+    }
 
     handleSelectSeason = seasonYear => {
         this.setState({
@@ -103,36 +96,15 @@ class LiftUplifts extends Component {
         });
     };
 
-    handleChangePage = (event, page) => {
-        this.setState({ page });
-    };
-
-    handleChangeRowsPerPage = event => {
-        this.setState({ rowsPerPage: event.target.value });
-    };
-
-    handleRequestSort = (event, column) => {
-        let order = 'desc';
-
-        if (this.state.orderByCol === column && this.state.order === 'desc') {
-            order = 'asc';
-        }
-
-        this.setState({ order, orderByCol: column });
-    };
-
     render() {
         const { classes, match } = this.props;
-        const { page, rowsPerPage, order, orderByCol, seasonYear, month, day, hour } = this.state;
+        const { groupBy, seasonYear, month, day, hour } = this.state;
         const id = parseInt(match.params.id);
         return <Query
             query={upliftsQuery}
             variables={{
                 liftID: id,
-                offset: page * rowsPerPage,
-                limit: rowsPerPage,
-                orderBy: orderByCol.field,
-                order,
+                groupBy,
                 seasonYear,
                 month,
                 day,
@@ -151,17 +123,28 @@ class LiftUplifts extends Component {
                     return <p>Lift not found</p>;
                 }
 
-                const { lift, lift: { upliftList } } = data;
+                const { lift, lift: { upliftGroupings } } = data;
                 return (
                     <Paper>
                         <Toolbar>
                             <div className={classes.title}>
                                 <Typography variant="subheading" gutterBottom>
-                                    {lift.name} Uplifts
+                                    {lift.name} Stats
                                 </Typography>
                             </div>
                             <div className={classes.spacer} />
                             <div className={classes.actions}>
+                                <SelectMenu
+                                    id='groupBy'
+                                    options={[
+                                        { text: 'Cross-tab by season', value: 'Season' },
+                                        { text: 'Cross-tab by month', value: 'Month' },
+                                        { text: 'Cross-tab by day', value: 'Day' },
+                                        { text: 'Cross-tab by hour', value: 'Hour' },
+                                    ]}
+                                    onSelect={this.handleSelectGroupBy}
+                                    initialValue={groupBy}
+                                />
                                 <SelectMenu
                                     id='season'
                                     options={[
@@ -224,42 +207,26 @@ class LiftUplifts extends Component {
                                 />
                             </div>
                         </Toolbar>
-                        {upliftList.count && (
+                        {upliftGroupings && (
                             <div>
                                 <Table>
-                                    <SortEnabledTableHead
-                                        order={order}
-                                        orderByCol={orderByCol}
-                                        onRequestSort={this.handleRequestSort}
-                                        columns={columnData}
-                                    />
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>{groupBy}</TableCell>
+                                            <TableCell>Uplifts</TableCell>
+                                            <TableCell>Avg Wait (s)</TableCell>
+                                        </TableRow>
+                                    </TableHead>
                                     <TableBody>
-                                        {upliftList.uplifts
-                                            .slice()
-                                            .map(uplift => (
-                                                <TableRow key={uplift.id}>
-                                                    <TableCell component="th" scope="row">{moment.utc(uplift.date).format('llll')}</TableCell>
-                                                    <TableCell numeric>{uplift.waitSeconds}</TableCell>
-                                                </TableRow>
-                                            ))
-                                        }
+                                        {upliftGroupings.map(grouping => (
+                                            <TableRow key={grouping.groupKey}>
+                                                <TableCell component="th" scope="row">{grouping.groupDescription}</TableCell>
+                                                <TableCell numeric>{grouping.upliftCount}</TableCell>
+                                                <TableCell numeric>{grouping.waitTimeAverage}</TableCell>
+                                            </TableRow>
+                                        ))}
                                     </TableBody>
                                 </Table>
-                                <TablePagination
-                                    component="div"
-                                    count={upliftList.count}
-                                    rowsPerPage={rowsPerPage}
-                                    rowsPerPageOptions={[25, 50, 100, 200]}
-                                    page={page}
-                                    backIconButtonProps={{
-                                        'aria-label': 'Previous Page',
-                                    }}
-                                    nextIconButtonProps={{
-                                        'aria-label': 'Next Page',
-                                    }}
-                                    onChangePage={this.handleChangePage}
-                                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                                />
                             </div>
                         )}
                     </Paper>
@@ -269,4 +236,4 @@ class LiftUplifts extends Component {
     };
 }
 
-export default withStyles(toolbarStyles)(LiftUplifts);
+export default withStyles(toolbarStyles)(LiftStats);

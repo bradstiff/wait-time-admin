@@ -20,6 +20,7 @@
     "express": "^4.16.3",
     "graphql": "^0.13.2",
     "graphql-tools": "^2.24.0",
+    "moment": "^2.22.2",
     "mssql": "^4.1.0",
     "slugify": "^1.2.9"
   },

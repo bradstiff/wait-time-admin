@@ -1,6 +1,7 @@
 import { GraphQLScalarType, GraphQLError } from 'graphql';
 import { Kind } from 'graphql/language';
 import slugify from 'slugify';
+import moment from 'moment';
 import { Resort, Lift } from './connectors';
 
 const validateDate = value => {
@@ -31,6 +32,31 @@ const resolvers = {
         resort: (child, args, context) => Resort.getByID(null, { id: child.resortID }, context),
         upliftSummaries: Lift.getUpliftSummaries,
         upliftList: Lift.getUpliftList,
+        upliftGroupings: async (lift, args, context) => {
+            const groupings = await Lift.getUpliftGroupings(lift, args, context);
+            let groupDescription;
+            switch (args.groupBy.toLowerCase()) {
+                case 'season':
+                    groupDescription = key => `${key} - ${key + 1}`;
+                    break;
+                case 'month':
+                    groupDescription = key => moment().month(key - 1).format('MMMM');
+                    break;
+                case 'day':
+                    groupDescription = key => moment().day(key - 1).format('dddd');
+                    break;
+                case 'hour':
+                    groupDescription = key => `${moment().hour(key).format('hA')} - ${moment().hour(key + 1).format('hA')}`;
+                    break;
+                default:
+                    throw new error('Invalid groupBy');
+            }
+            return groupings.map(grouping => Object.assign(
+                {},
+                { groupDescription: groupDescription(grouping['groupKey']) },
+                grouping
+            ));
+        },
     },
     WaitTimeDate: {
         id: (waitTimeDate) => `${waitTimeDate.resortID.toString()}:${waitTimeDate.date.toISOString()}`,

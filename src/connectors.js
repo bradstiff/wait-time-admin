@@ -1,5 +1,6 @@
 import mssql from 'mssql';
 import DataLoader from 'dataloader';
+import { error } from 'util';
 
 const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude from Resort';
 const liftQuery = 'select LiftID as id, name, resortID from Lift';
@@ -124,7 +125,8 @@ const Resort = {
             .input('logoFilename', mssql.NVarChar, args.slug)
             .input('trailMapFilename', mssql.NVarChar, args.slug)
         const result = await request.query(`
-            insert Resort (Name, Slug, LogoFilename, TrailMapFilename, Latitude, Longitude) values (@name, @slug, '', '', 0, 0); 
+            insert Resort (Name, Slug, LogoFilename, TrailMapFilename, Latitude, Longitude) 
+                values (@name, @slug, '', '', 0, 0); 
             select scope_identity() as id;
         `);
 
@@ -136,7 +138,12 @@ const Resort = {
             .input('id', mssql.Int, args.id)
             .input('name', mssql.NVarChar, args.name)
             .input('slug', mssql.NVarChar, args.slug)
-            .query('update Resort set Name = @name, Slug = @slug where ResortID = @id');
+            .query(`
+                update Resort set 
+                    Name = @name, 
+                    Slug = @slug 
+                where ResortID = @id
+            `);
         return Resort.getByID(null, args, context);
     }
 };
@@ -157,25 +164,41 @@ const Lift = {
     },
     getUpliftList: async (lift, args, context) => {
         const orderBy = args.orderBy.toLowerCase();
-        const translatedOrderBy = orderBy === 'date'
+        const aliasedOrderBy = orderBy === 'date'
             ? 'LocalDateTime'
             : orderBy;
         const upliftsPromise = context.db.request()
             .input('liftID', mssql.Int, lift.id)
+            .input('seasonYear', mssql.Int, args.seasonYear)
+            .input('month', mssql.Int, args.month)
+            .input('day', mssql.Int, args.day)
+            .input('hour', mssql.Int, args.hour)
             .query(`
-                select UpliftID as id, Season as seasonYear, LocalDateTime as date, waitSeconds 
+                select UpliftID as id, seasonYear, LocalDateTime as date, waitSeconds 
                 from Uplift
                 where LiftID = @liftID
-                order by ${translatedOrderBy} ${args.order}
+                and SeasonYear = isnull(@seasonYear, SeasonYear)
+                and Month = isnull(@month, Month)
+                and Day = isnull(@day, Day)
+                and Hour = isnull(@hour, Hour)
+                order by ${aliasedOrderBy} ${args.order}
                 offset ${args.offset} rows
                 fetch next ${args.limit} rows only
             `);
         const upliftCountPromise = context.db.request()
             .input('liftID', mssql.Int, lift.id)
+            .input('seasonYear', mssql.Int, args.seasonYear)
+            .input('month', mssql.Int, args.month)
+            .input('day', mssql.Int, args.day)
+            .input('hour', mssql.Int, args.hour)
             .query(`
                 select cast(count(*) as int) as count
                 from Uplift
                 where LiftID = @liftID
+                and SeasonYear = isnull(@seasonYear, SeasonYear)
+                and Month = isnull(@month, Month)
+                and Day = isnull(@day, Day)
+                and Hour = isnull(@hour, Hour)
             `);
         return Promise.all([upliftsPromise, upliftCountPromise])
             .then(([uplifts, upliftCount]) => ({
@@ -183,6 +206,30 @@ const Lift = {
                 uplifts: uplifts.recordset
             })
         );
+    },
+    getUpliftGroupings: async (lift, args, context) => {
+        let groupBy = args.groupBy.toLowerCase();
+        if (groupBy === 'season') {
+            groupBy = 'seasonYear'
+        };
+        const result = await context.db.request()
+            .input('liftID', mssql.Int, lift.id)
+            .input('seasonYear', mssql.Int, args.seasonYear)
+            .input('month', mssql.Int, args.month)
+            .input('day', mssql.Int, args.day)
+            .input('hour', mssql.Int, args.hour)
+            .query(`
+                select	u.LiftID as liftID, ${groupBy} as groupKey, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+                from Uplift u
+                where LiftID = @liftID
+                and SeasonYear = isnull(@seasonYear, SeasonYear)
+                and Month = isnull(@month, Month)
+                and Day = isnull(@day, Day)
+                and Hour = isnull(@hour, Hour)
+                group by liftID, ${groupBy}
+                order by ${groupBy} asc
+            `);
+        return result.recordset;
     },
     getUpliftSummaries: (lift, args, context) => context.dataLoaders.upliftSummariesByLiftIDs.load(lift.id),
 };
@@ -210,12 +257,12 @@ export const makeDataLoaders = (db) => ({
     }),
     upliftSummariesByLiftIDs: new DataLoader(async liftIDs => {
         const result = await db.request().query(`
-            select	u.LiftID as liftID, Season as seasonYear, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+            select	u.LiftID as liftID, seasonYear, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
             from	Uplift u 
             join    Lift l on u.LiftID = l.LiftID
             where	u.LiftID in (${liftIDs.join()})
-            group by Season, u.LiftID, l.Name
-            order by Season, l.Name
+            group by SeasonYear, u.LiftID, l.Name
+            order by SeasonYear, l.Name
         `);
         return liftIDs.map(liftID => result.recordset.filter(summary => summary.liftID === liftID));
     }),
