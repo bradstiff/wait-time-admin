@@ -15,6 +15,7 @@ const resolvers = {
         resortBySlug: Resort.getBySlug,
         resorts: Resort.getAll,
         waitTimeDate: Resort.getWaitTimeDate,
+        lift: Lift.getByID,
         //uplifts: Uplifts.get,
     },
     Mutation: {
@@ -29,15 +30,22 @@ const resolvers = {
     Lift: {
         resort: (child, args, context) => Resort.getByID(null, { id: child.resortID }, context),
         upliftSummaries: Lift.getUpliftSummaries,
+        upliftList: Lift.getUpliftList,
     },
     WaitTimeDate: {
         id: (waitTimeDate) => `${waitTimeDate.resortID.toString()}:${waitTimeDate.date.toISOString()}`,
         timePeriods: Resort.getWaitTimePeriods,
         resort: (waitTimeDate, args, context) => Resort.getByID(null, { id: waitTimeDate.resortID }, context),
     },
+    Uplift: {
+        lift: (child, args, context) => Lift.getByID(null, { id: child.liftID }, context),
+        season: uplift => ({
+            year: uplift.seasonYear
+        }),
+    },
     UpliftSummary: {
         season: upliftSummary => ({
-            year: upliftSummary.year
+            year: upliftSummary.seasonYear
         })
     },
     Season: {

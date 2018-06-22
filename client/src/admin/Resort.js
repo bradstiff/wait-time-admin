@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Query } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { withStyles } from '@material-ui/core/styles';
@@ -13,9 +13,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import SortEnabledTableHead from '../app/SortEnabledTableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+
+import SortEnabledTableHead, { makeCompareFn } from '../app/SortEnabledTableHead';
 
 const resortQuery = gql`
     query Resort($id: Int!) {
@@ -63,167 +64,150 @@ const styles = theme => ({
     },
 });
 
-const getCompareFn = (order, orderBy) => {
-    return (a, b) => {
-        const stableCompare = (val1, val2) => {
-            const isUncomparable = val => orderBy.numeric
-                ? isNaN(val)
-                : val === undefined || val === null;
-
-            if (isUncomparable(val1) && isUncomparable(val2)) {
-                return 0; //stable sort
-            } else if (isUncomparable(val1)) {
-                return -1;
-            } else if (isUncomparable(val2)) {
-                return 1;
-            } else {
-                return orderBy.numeric
-                    ? val1 - val2
-                    : val1.localeCompare(val2);
-            }
-        }
-        return order === 'asc'
-            ? stableCompare(a[orderBy.property], b[orderBy.property])
-            : stableCompare(b[orderBy.property], a[orderBy.property]);
-    };
-}
-
 const columnData = [
-    { property: 'lift', numeric: false, disablePadding: true, label: 'Lift' },
-    { property: 'upliftCount', numeric: true, disablePadding: false, label: 'Uplifts' },
-    { property: 'waitTimeAverage', numeric: true, disablePadding: false, label: 'Avg Wait (s)' },
+    { field: 'lift', numeric: false, disablePadding: true, label: 'Lift' },
+    { field: 'upliftCount', numeric: true, disablePadding: false, label: 'Uplifts' },
+    { field: 'waitTimeAverage', numeric: true, disablePadding: false, label: 'Avg Wait (s)' },
 ];
 
 class Resort extends Component {
     state = {
         selectedYear: null,
         order: 'asc',
-        orderBy: columnData[0],
+        orderByCol: columnData[0],
     };
 
-    handleSelectSeason = year => (event, expanded) => {
-        this.setState({
-            selectedYear: expanded ? year : null
-        });
+    handleSelectSeason = selectedYear => (event, expanded) => {
+        if (expanded) {
+            //select the uplift summaries for the selected season
+            const upliftSummaries = this.props.data.resort.lifts
+                .map(lift => {
+                    const upliftSummary = lift.upliftSummaries.find(summary => summary.season.year === selectedYear) || {};
+                    return {
+                        liftID: lift.id,
+                        lift: lift.name,
+                        upliftCount: upliftSummary.upliftCount,
+                        waitTimeAverage: upliftSummary.waitTimeAverage,
+                    };
+                });
+            this.setState({
+                selectedYear,
+                upliftSummaries,
+            });
+        } else {
+            this.setState({
+                selectedYear: null,
+                upliftSummaries: null,
+            });
+        }
     };
 
     handleRequestSort = (event, column) => {
-        const orderBy = column;
         let order = 'desc';
 
-        if (this.state.orderBy === column && this.state.order === 'desc') {
+        if (this.state.orderByCol === column && this.state.order === 'desc') {
             order = 'asc';
         }
 
-        this.setState({ order, orderBy });
+        this.setState({ order, orderByCol: column});
     };
 
     render() {
-        const { match, classes } = this.props;
-        const id = parseInt(match.params.id);
-        const { selectedYear } = this.state;
-        return <Query query={resortQuery} variables={{ id }}>
-            {({ loading, error, data }) => {
-                if (error) {
-                    console.log(error);
-                    return null;
-                }
-                if (loading) {
-                    return null;
-                }
-                const { resort } = data;
-                const location = [resort.latitude, resort.longitude];
-                const { order, orderBy } = this.state;
+        const { classes, data: { loading, error, resort } } = this.props;
+        if (error) {
+            console.log(error);
+            return null;
+        }
+        if (loading) {
+            return null;
+        }
 
-                //flatten summaries
-                const allUpliftSummaries = resort.lifts.reduce((acc, lift) => acc.concat(lift.upliftSummaries), []);
-                //extract seasons, e.g., ['2014-2015', '2015-2016']
-                const seasons = allUpliftSummaries.reduce((acc, summary) => {
-                        if (!acc.some(season => season.year === summary.season.year)) {
-                            acc.push({
-                                year: summary.season.year,
-                                description: summary.season.description
-                            });
-                        }
-                        return acc;
-                }, []);
-                //calculate stats by season
-                seasons.forEach(season => {
-                    const seasonUpliftSummaries = allUpliftSummaries.filter(summary => summary.season.year === season.year);
-                    season.upliftCount = seasonUpliftSummaries.reduce((acc, summary) => acc + summary.upliftCount, 0);
-                    season.waitTimeAverage = Math.round(seasonUpliftSummaries.reduce((acc, summary) => acc + summary.waitTimeAverage * summary.upliftCount, 0) / season.upliftCount);
+        const { selectedYear, upliftSummaries, order, orderByCol } = this.state;
+
+        //flatten summaries
+        const allUpliftSummaries = resort.lifts.reduce((acc, lift) => acc.concat(lift.upliftSummaries), []);
+        //extract seasons, e.g., ['2014-2015', '2015-2016']
+        const seasons = allUpliftSummaries.reduce((acc, summary) => {
+            if (!acc.some(season => season.year === summary.season.year)) {
+                acc.push({
+                    year: summary.season.year,
+                    description: summary.season.description
                 });
-                //select the data that should be displayed in the visible ExpansionPanelDetails
-                const upliftSummariesForSelectedSeason = resort.lifts
-                    .map(lift => {
-                        const upliftSummary = lift.upliftSummaries.find(summary => summary.season.year === selectedYear) || {};
-                        return {
-                            liftID: lift.id,
-                            lift: lift.name,
-                            upliftCount: upliftSummary.upliftCount,
-                            waitTimeAverage: upliftSummary.waitTimeAverage,
-                        };
-                    })
-                    .sort(getCompareFn(order, orderBy));
+            }
+            return acc;
+        }, []);
+        //calculate stats by season
+        seasons.forEach(season => {
+            const seasonUpliftSummaries = allUpliftSummaries.filter(summary => summary.season.year === season.year);
+            season.upliftCount = seasonUpliftSummaries.reduce((acc, summary) => acc + summary.upliftCount, 0);
+            season.waitTimeAverage = Math.round(seasonUpliftSummaries.reduce((acc, summary) => acc + summary.waitTimeAverage * summary.upliftCount, 0) / season.upliftCount);
+        });
 
-                return (
-                    <Paper>
-                        <ResortLogo alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} />
-                        <Typography variant="display3" gutterBottom>
-                            {resort.name}
-                        </Typography>
-                        <div style={{ display: 'flex' }}>
+        return (
+            <Paper>
+                <ResortLogo alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} />
+                <Typography variant="display3" gutterBottom>
+                    {resort.name}
+                </Typography>
+                <div style={{ display: 'flex' }}>
+                    <div className={classes.rowHeadingColumn}>
+                        <Typography className={classes.rowHeading}>Season</Typography>
+                    </div>
+                    <div className={classes.valueColumn}>
+                        <Typography className={classes.value}>Uplifts</Typography>
+                    </div>
+                    <div className={classes.valueColumn}>
+                        <Typography className={classes.value}>Avg Wait (s)</Typography>
+                    </div>
+                </div>
+                {seasons.map(season => (
+                    <ExpansionPanel key={season.year} expanded={selectedYear === season.year} onChange={this.handleSelectSeason(season.year)}>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                             <div className={classes.rowHeadingColumn}>
-                                <Typography className={classes.rowHeading}>Season</Typography>
+                                <Typography className={classes.rowHeading}>{season.description}</Typography>
                             </div>
                             <div className={classes.valueColumn}>
-                                <Typography className={classes.value}>Uplifts</Typography>
+                                <Typography className={classes.value}>{season.upliftCount}</Typography>
                             </div>
                             <div className={classes.valueColumn}>
-                                <Typography className={classes.value}>Avg Wait (s)</Typography>
+                                <Typography className={classes.value}>{season.waitTimeAverage}</Typography>
                             </div>
-                        </div>
-                        {seasons.map(season => (
-                            <ExpansionPanel key={season.year} expanded={selectedYear === season.year} onChange={this.handleSelectSeason(season.year)}>
-                                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                                    <div className={classes.rowHeadingColumn}>
-                                        <Typography className={classes.rowHeading}>{season.description}</Typography>
-                                    </div>
-                                    <div className={classes.valueColumn}>
-                                        <Typography className={classes.value}>{season.upliftCount}</Typography>
-                                    </div>
-                                    <div className={classes.valueColumn}>
-                                        <Typography className={classes.value}>{season.waitTimeAverage}</Typography>
-                                    </div>
-                                </ExpansionPanelSummary>
-                                {selectedYear === season.year && (
-                                    <ExpansionPanelDetails>
-                                        <Table>
-                                            <SortEnabledTableHead
-                                                order={order}
-                                                orderBy={orderBy}
-                                                onRequestSort={this.handleRequestSort}
-                                                columns={columnData}
-                                            />
-                                            <TableBody>
-                                                {upliftSummariesForSelectedSeason.map(summary => (
-                                                    <TableRow key={summary.liftID}>
-                                                        <TableCell component="th" scope="row">{summary.lift}</TableCell>
-                                                        <TableCell numeric>{summary.upliftCount}</TableCell>
-                                                        <TableCell numeric>{summary.waitTimeAverage}</TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </ExpansionPanelDetails>
-                                )}
-                            </ExpansionPanel>
-                        ))}
-                    </Paper>
-                );
-            }}
-        </Query>
+                        </ExpansionPanelSummary>
+                        {selectedYear === season.year && (
+                            <ExpansionPanelDetails>
+                                <Table>
+                                    <SortEnabledTableHead
+                                        order={order}
+                                        orderByCol={orderByCol}
+                                        onRequestSort={this.handleRequestSort}
+                                        columns={columnData}
+                                    />
+                                    <TableBody>
+                                        {upliftSummaries
+                                            .sort(makeCompareFn(order, orderByCol, 'liftID'))
+                                            .map(summary => (
+                                                <TableRow key={summary.liftID}>
+                                                    <TableCell component="th" scope="row">
+                                                        <Link to={`/admin/lifts/${summary.liftID}/uplifts`}>{summary.lift}</Link>
+                                                    </TableCell>
+                                                    <TableCell numeric>{summary.upliftCount}</TableCell>
+                                                    <TableCell numeric>{summary.waitTimeAverage}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                    </TableBody>
+                                </Table>
+                            </ExpansionPanelDetails>
+                        )}
+                    </ExpansionPanel>
+                ))}
+            </Paper>
+        );
     };
 }
 
-export default withStyles(styles)(Resort);
+export default compose(
+    withStyles(styles),
+    graphql(resortQuery, {
+        options: ({ match }) => ({ variables: { id: parseInt(match.params.id) } })
+    })
+)(Resort);

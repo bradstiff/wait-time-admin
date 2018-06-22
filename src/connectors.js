@@ -142,11 +142,47 @@ const Resort = {
 };
 
 const Lift = {
+    getByID: async (_, args, context) => {
+        const id = args.id || args.liftID;
+        const result = await context.db.request()
+            .input('id', mssql.Int, id)
+            .query(`${liftQuery} where LiftID = @id`);
+        return result.recordset[0];
+    },
     getResort: async(lift, args, context) => {
         const result = await context.db.request()
             .input('resortID', mssql.Int, lift.resortID)
             .query(`${resortQuery} where ResortID = @resortID`);
         return result.recordset[0];
+    },
+    getUpliftList: async (lift, args, context) => {
+        const orderBy = args.orderBy.toLowerCase();
+        const translatedOrderBy = orderBy === 'date'
+            ? 'LocalDateTime'
+            : orderBy;
+        const upliftsPromise = context.db.request()
+            .input('liftID', mssql.Int, lift.id)
+            .query(`
+                select UpliftID as id, Season as seasonYear, LocalDateTime as date, waitSeconds 
+                from Uplift
+                where LiftID = @liftID
+                order by ${translatedOrderBy} ${args.order}
+                offset ${args.offset} rows
+                fetch next ${args.limit} rows only
+            `);
+        const upliftCountPromise = context.db.request()
+            .input('liftID', mssql.Int, lift.id)
+            .query(`
+                select cast(count(*) as int) as count
+                from Uplift
+                where LiftID = @liftID
+            `);
+        return Promise.all([upliftsPromise, upliftCountPromise])
+            .then(([uplifts, upliftCount]) => ({
+                count: upliftCount.recordset[0]['count'],
+                uplifts: uplifts.recordset
+            })
+        );
     },
     getUpliftSummaries: (lift, args, context) => context.dataLoaders.upliftSummariesByLiftIDs.load(lift.id),
 };
@@ -174,7 +210,7 @@ export const makeDataLoaders = (db) => ({
     }),
     upliftSummariesByLiftIDs: new DataLoader(async liftIDs => {
         const result = await db.request().query(`
-            select	u.LiftID as liftID, Season as year, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+            select	u.LiftID as liftID, Season as seasonYear, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
             from	Uplift u 
             join    Lift l on u.LiftID = l.LiftID
             where	u.LiftID in (${liftIDs.join()})
