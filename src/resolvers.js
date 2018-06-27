@@ -2,13 +2,16 @@ import { GraphQLScalarType, GraphQLError } from 'graphql';
 import { Kind } from 'graphql/language';
 import slugify from 'slugify';
 import moment from 'moment';
+
 import { Resort, Lift } from './connectors';
+import LiftTypes from './LiftTypes';
 
 const validateDate = value => {
     if (isNaN(Date.parse(value))) {
         throw new GraphQLError('Query error: not a valid date', [value]);
     };
 };
+
 
 const resolvers = {
     Query: {
@@ -17,7 +20,7 @@ const resolvers = {
         resorts: Resort.getAll,
         waitTimeDate: Resort.getWaitTimeDate,
         lift: Lift.getByID,
-        //uplifts: Uplifts.get,
+        liftList: Lift.getList,
     },
     Mutation: {
         createResort: Resort.create,
@@ -26,37 +29,44 @@ const resolvers = {
     Resort: {
         dates: Resort.getWaitTimeDates,
         lastDate: Resort.getLastWaitTimeDate,
-        lifts: Resort.getLifts,
+        lifts: Lift.getAllByResort,
     },
     Lift: {
-        resort: (child, args, context) => Resort.getByID(null, { id: child.resortID }, context),
+        resort: Resort.getByLift,
         upliftSummaries: Lift.getUpliftSummaries,
         upliftList: Lift.getUpliftList,
         upliftGroupings: async (lift, args, context) => {
-            const groupings = await Lift.getUpliftGroupings(lift, args, context);
-            let groupDescription;
-            switch (args.groupBy.toLowerCase()) {
-                case 'season':
-                    groupDescription = key => `${key} - ${key + 1}`;
-                    break;
-                case 'month':
-                    groupDescription = key => moment().month(key - 1).format('MMMM');
-                    break;
-                case 'day':
-                    groupDescription = key => moment().day(key - 1).format('dddd');
-                    break;
-                case 'hour':
-                    groupDescription = key => `${moment().hour(key).format('hA')} - ${moment().hour(key + 1).format('hA')}`;
-                    break;
-                default:
-                    throw new error('Invalid groupBy');
+            const getGroupDescription = groupBy => {
+                if (groupBy === undefined) {
+                    return key => undefined;
+                }
+                switch (groupBy.toLowerCase()) {
+                    case 'season':
+                        return key => `${key} - ${key + 1}`;
+                    case 'month':
+                        return key => moment().month(key - 1).format('MMMM');
+                    case 'day':
+                        return key => moment().day(key - 1).format('dddd');
+                    case 'hour':
+                        return key => `${moment().hour(key).format('hA')} - ${moment().hour(key + 1).format('hA')}`;
+                    default:
+                        throw new error('Invalid groupBy');
+                }
             }
+            const groupDescription = getGroupDescription(args.groupBy);
+            const group2Description = getGroupDescription(args.groupBy2);
+
+            const groupings = await Lift.getUpliftGroupings(lift, args, context);
             return groupings.map(grouping => Object.assign(
                 {},
                 { groupDescription: groupDescription(grouping['groupKey']) },
+                { group2Description: group2Description(grouping['group2Key']) },
                 grouping
             ));
         },
+        type: lift => ({
+            id: lift.typeID,
+        }),
     },
     WaitTimeDate: {
         id: (waitTimeDate) => `${waitTimeDate.resortID.toString()}:${waitTimeDate.date.toISOString()}`,
@@ -76,6 +86,9 @@ const resolvers = {
     },
     Season: {
         description: season => `${season.year} - ${season.year + 1}`,
+    },
+    LiftType: {
+        description: type => LiftTypes.find(t => t.id === type.id).description,
     },
     Date: new GraphQLScalarType({
             name: 'Date',

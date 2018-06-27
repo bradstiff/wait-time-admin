@@ -171,6 +171,7 @@ class LiftUplifts extends Component {
                                         { text: '2016 - 2017', value: 2016 },
                                         { text: '2017 - 2018', value: 2017 },
                                     ]}
+                                    value={seasonYear}
                                     onSelect={this.handleSelectSeason}
                                 />
                                 <SelectMenu
@@ -190,6 +191,7 @@ class LiftUplifts extends Component {
                                         { text: 'November', value: 11 },
                                         { text: 'December', value: 12 },
                                     ]}
+                                    value={month}
                                     onSelect={this.handleSelectMonth}
                                 />
                                 <SelectMenu
@@ -204,6 +206,7 @@ class LiftUplifts extends Component {
                                         { text: 'Friday', value: 6 },
                                         { text: 'Saturday', value: 7 },
                                     ]}
+                                    value={day}
                                     onSelect={this.handleSelectDay}
                                 />
                                 <SelectMenu
@@ -220,6 +223,7 @@ class LiftUplifts extends Component {
                                         { text: '3PM - 4PM', value: 15 },
                                         { text: '4PM - 5PM', value: 16 },
                                     ]}
+                                    value={hour}
                                     onSelect={this.handleSelectHour}
                                 />
                             </div>

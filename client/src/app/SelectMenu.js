@@ -7,7 +7,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 class SelectMenu extends React.Component {
     state = {
-        selected: this.props.options.find(option => option.value === (this.props.initialValue === undefined ? null : this.props.initialValue)),
         anchorEl: null,
     };
 
@@ -21,15 +20,15 @@ class SelectMenu extends React.Component {
 
     handleMenuItemClick = (event, option) => {
         this.setState({
-            selected: option,
             anchorEl: null
         });
         this.props.onSelect(option.value);
     };
 
     render() {
-        const { selected, anchorEl } = this.state;
-        const { id, options } = this.props;
+        const { anchorEl } = this.state;
+        const { id, options, value } = this.props;
+        const selected = options.find(option => option.value === value) || {};
         return (
             <span>
                 <Button
@@ -65,11 +64,11 @@ SelectMenu.propTypes = {
     onSelect: PropTypes.func.isRequired,
     options: PropTypes
         .arrayOf(PropTypes.shape({
-            value: PropTypes.any,//.isRequired, need a way to tell PropTypes that null is a valid value...
+            value: PropTypes.any,
             text: PropTypes.string.isRequired,
         }))
         .isRequired,
-    initialValue: PropTypes.any,
+    value: PropTypes.any,
 };
 
 export default SelectMenu;

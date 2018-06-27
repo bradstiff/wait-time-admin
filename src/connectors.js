@@ -2,8 +2,10 @@ import mssql from 'mssql';
 import DataLoader from 'dataloader';
 import { error } from 'util';
 
+import PredicateBuilder from './PredicateBuilder';
+
 const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude from Resort';
-const liftQuery = 'select LiftID as id, name, resortID from Lift';
+const liftQuery = 'select LiftID as id, name, resortID, typeID, isActive, occupancy from Lift';
 
 const Resort = {
     getBySlug: async(_, { slug }, context) => {
@@ -48,7 +50,7 @@ const Resort = {
             `);
         return result.recordset[0];
     },
-    //getWaitTimePeriods: async (waitTimeDate, args, context) => {
+    //getWaitTimePeriods: async (waitTimeDate, args, context) => {  //recursive CTE too slow (~450ms)
     //    const result = await context.db.request()
     //        .input('resortID', mssql.Int, waitTimeDate.resortID)
     //        .input('date', mssql.Date, waitTimeDate.date)
@@ -79,7 +81,6 @@ const Resort = {
     //    return data;
     //},
     getWaitTimePeriods: async (waitTimeDate, args, context) => {
-        //recursive CTE used in above view too slow (~450ms)
         const result = await context.db.request()
             .input('resortID', mssql.Int, waitTimeDate.resortID)
             .input('date', mssql.Date, waitTimeDate.date)
@@ -116,8 +117,8 @@ const Resort = {
         }
         return waitTimePeriods;
     },
+    getByLift: (lift, args, context) => lift.resortID ? context.dataLoaders.resortsByIDs.load(lift.resortID) : null,
     getWaitTimeDates: (resort, args, context) => context.dataLoaders.waitTimeDatesByResortIDs.load(resort.id),
-    getLifts: (resort, args, context) => context.dataLoaders.liftsByResortIDs.load(resort.id),
     create: async (_, args, context) => {
         const request = context.db.request()
             .input('name', mssql.NVarChar, args.name)
@@ -161,6 +162,36 @@ const Lift = {
             .input('resortID', mssql.Int, lift.resortID)
             .query(`${resortQuery} where ResortID = @resortID`);
         return result.recordset[0];
+    },
+    getAllByResort: (resort, args, context) => context.dataLoaders.liftsByResortIDs.load(resort.id),
+    getList: async (_, args, context) => {
+        const orderBy = args.orderBy.toLowerCase();
+        const predicates = new PredicateBuilder()
+            .append('Name', 'name', mssql.NVarChar, args.name, 'LIKE')
+            .append('TypeID', 'typeID', mssql.Int, args.typeID)
+            .append('ResortID', 'resortID', mssql.Int, args.resortID)
+            .append('IsActive', 'isActive', mssql.Bit, args.isActive);
+        const liftsPromise = predicates
+            .bindParameters(context.db.request())
+            .query(`${liftQuery}
+                ${predicates.whereClause}
+                order by ${orderBy} ${args.order}
+                offset ${args.offset} rows
+                fetch next ${args.limit} rows only
+            `);
+        const liftCountPromise = predicates
+            .bindParameters(context.db.request())
+            .query(`
+                select cast(count(*) as int) count
+                from Lift
+                ${predicates.whereClause}
+            `);
+        return Promise.all([liftsPromise, liftCountPromise])
+            .then(([lifts, liftCount]) => ({
+                count: liftCount.recordset[0]['count'],
+                lifts: lifts.recordset
+            })
+        );
     },
     getUpliftList: async (lift, args, context) => {
         const orderBy = args.orderBy.toLowerCase();
@@ -210,25 +241,32 @@ const Lift = {
     getUpliftGroupings: async (lift, args, context) => {
         let groupBy = args.groupBy.toLowerCase();
         if (groupBy === 'season') {
-            groupBy = 'seasonYear'
-        };
-        const result = await context.db.request()
-            .input('liftID', mssql.Int, lift.id)
-            .input('seasonYear', mssql.Int, args.seasonYear)
-            .input('month', mssql.Int, args.month)
-            .input('day', mssql.Int, args.day)
-            .input('hour', mssql.Int, args.hour)
-            .query(`
+            groupBy = 'seasonYear';
+        }
+        let groupBy2 = args.groupBy2 ? args.groupBy2.toLowerCase() : null;
+        if (groupBy2 === 'season') {
+            groupBy2 = 'seasonYear';
+        }
+        const request = context.db.request().input('liftID', mssql.Int, lift.id);
+        let result = null;
+        //need a query builder
+        if (groupBy2 === null) {
+            result = await request.query(`
                 select	u.LiftID as liftID, ${groupBy} as groupKey, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
                 from Uplift u
                 where LiftID = @liftID
-                and SeasonYear = isnull(@seasonYear, SeasonYear)
-                and Month = isnull(@month, Month)
-                and Day = isnull(@day, Day)
-                and Hour = isnull(@hour, Hour)
                 group by liftID, ${groupBy}
                 order by ${groupBy} asc
             `);
+        } else {
+            result = await request.query(`
+                select	u.LiftID as liftID, ${groupBy} as groupKey, ${groupBy2} as group2Key, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+                from Uplift u
+                where LiftID = @liftID
+                group by liftID, ${groupBy}, ${groupBy2}
+                order by ${groupBy}, ${groupBy2} asc
+            `);
+        }
         return result.recordset;
     },
     getUpliftSummaries: (lift, args, context) => context.dataLoaders.upliftSummariesByLiftIDs.load(lift.id),
@@ -265,5 +303,12 @@ export const makeDataLoaders = (db) => ({
             order by SeasonYear, l.Name
         `);
         return liftIDs.map(liftID => result.recordset.filter(summary => summary.liftID === liftID));
+    }),
+    resortsByIDs: new DataLoader(async ids => {
+        const result = await db.request().query(`
+            ${resortQuery}
+            where ResortID in (${ids.join()})
+        `);
+        return result.recordset;
     }),
 });
