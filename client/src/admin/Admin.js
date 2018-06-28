@@ -45,6 +45,7 @@ class Admin extends Component {
                 <Switch>
                     <Route exact path='/admin/resorts/create' component={AddResort} />
                     <Route exact path='/admin/resorts/:id/lifts' component={ResortLifts} />
+                    <Route exact path='/admin/resorts/:id/edit' component={EditResort} />
                     <Route exact path='/admin/resorts/:id' component={Resort} />
                     <Route exact path='/admin/resorts' component={Resorts} />
                     <Route exact path='/admin/lifts/:id/stats' component={LiftStats} />

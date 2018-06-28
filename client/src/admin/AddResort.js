@@ -7,8 +7,8 @@ import ResortForm from './ResortForm';
 import { resortsQuery } from './Resorts';
 
 const resortMutation = gql`
-    mutation createResort($name: String!, $slug: String!) {
-        createResort(name: $name, slug: $slug) {
+    mutation createResort($name: String!, $slug: String!, $logoFilename: String!, $trailMapFilename: String!, $latitude: Float!, $longitude: Float!, $timezone: String!) {
+        createResort(name: $name, slug: $slug, logoFilename: $logoFilename, trailMapFilename: $trailMapFilename, latitude: $latitude, longitude: $longitude, timezone: $timezone) {
             id,
             name,
             slug,

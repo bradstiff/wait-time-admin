@@ -128,9 +128,11 @@ const Resort = {
             .input('slug', mssql.NVarChar, args.slug)
             .input('logoFilename', mssql.NVarChar, args.slug)
             .input('trailMapFilename', mssql.NVarChar, args.slug)
+            .input('latitude', mssql.Float, args.latitude)
+            .input('longitude', mssql.Float, args.longitude)
         const result = await request.query(`
             insert Resort (Name, Slug, LogoFilename, TrailMapFilename, Latitude, Longitude) 
-                values (@name, @slug, '', '', 0, 0); 
+                values (@name, @slug, @logoFilename, @trailMapFilename, @latitude, @longitude); 
             select scope_identity() as id;
         `);
 
@@ -142,10 +144,18 @@ const Resort = {
             .input('id', mssql.Int, args.id)
             .input('name', mssql.NVarChar, args.name)
             .input('slug', mssql.NVarChar, args.slug)
+            .input('logoFilename', mssql.NVarChar, args.slug)
+            .input('trailMapFilename', mssql.NVarChar, args.slug)
+            .input('latitude', mssql.Float, args.latitude)
+            .input('longitude', mssql.Float, args.longitude)
             .query(`
                 update Resort set 
                     Name = @name, 
-                    Slug = @slug 
+                    Slug = @slug,
+                    LogoFilename = @logoFilename,
+                    TrailMapFilename = @trailMapFilename,
+                    Latitude = @latitude,
+                    Longitude = @longitude
                 where ResortID = @id
             `);
         return Resort.getByID(null, args, context);

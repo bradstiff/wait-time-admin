@@ -21,8 +21,8 @@ const resortQuery = gql`
 `;
 
 const resortMutation = gql`
-    mutation updateResort($id: Int!, $name: String!, $slug: String!) {
-        updateResort(id: $id, name: $name, slug: $slug) {
+    mutation updateResort($id: Int!, $name: String!, $slug: String!, $logoFilename: String!, $trailMapFilename: String!, $latitude: Float!, $longitude: Float!, $timezone: String!) {
+        updateResort(id: $id, name: $name, slug: $slug, logoFilename: $logoFilename, trailMapFilename: $trailMapFilename, latitude: $latitude, longitude: $longitude, timezone: $timezone) {
             id,
             name,
             slug,

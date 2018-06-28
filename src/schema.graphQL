@@ -9,8 +9,8 @@ type Query {
 	uplifts(liftID: Int!, seasonYear: Int, month: Int, day: Int, hour: Int): [Uplift!]
 }
 type Mutation {
-	createResort(name: String!, slug: String!) : Resort
-	updateResort(id: Int!, name: String!, slug: String!) : Resort
+	createResort(name: String!, slug: String!, logoFilename: String!, trailMapFilename: String!, latitude: Float!, longitude: Float!, timezone: String!) : Resort
+	updateResort(id: Int!, name: String!, slug: String!, logoFilename: String!, trailMapFilename: String!, latitude: Float!, longitude: Float!, timezone: String!) : Resort
 	updateResortAssignedLifts(id: Int!, liftIDs: [Int!]) : Resort
 }
 type Resort {

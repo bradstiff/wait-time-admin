@@ -33,6 +33,8 @@ const updateAssignedLiftsMutation = gql`
 `;
 
 class ResortLifts extends React.Component {
+    state = {};
+
     handleAssignLift = id => {
         this.setState({
             assignedLiftIDs: [
@@ -92,13 +94,13 @@ class ResortLifts extends React.Component {
         );
     }
 
-    static getDerivedStateFromProps(nextProps, prevState) {
-        const { assignedLiftIDs } = prevState || {};
-        const { data: { resort } } = nextProps;
-        if (resort && !assignedLiftIDs) {
+    static getDerivedStateFromProps(props, state) {
+        const { assignedLiftIDs } = state || {};
+        const { data: { resort } } = props;
+        if (resort && assignedLiftIDs === undefined) {
             return {
                 assignedLiftIDs: resort.lifts.map(lift => lift.id),
-            };
+            }
         } else {
             return null;
         }

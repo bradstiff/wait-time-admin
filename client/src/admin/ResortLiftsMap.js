@@ -25,9 +25,7 @@ const FullMap = styled(Map) `
 `;
 
 class ResortLiftsMap extends Component {
-    state = {
-
-    };
+    state = {};
 
     assignMapRef = node => {
         this.map = node;
@@ -45,14 +43,15 @@ class ResortLiftsMap extends Component {
 
     render() {
         const { bounds } = this.state;
+        const { assignedLiftIDs, onAssignLift, onUnassignLift, resortLocation } = this.props;
         return (
             <div>
                 <Map
-                    center={this.props.resortLocation}
-                    zoom={10}
+                    center={resortLocation}
+                    zoom={13}
                     ref={this.assignMapRef}
-                    onLoad={() => this.handleMapBoundsChange()}
-                    onViewportChanged={() => this.handleMapBoundsChange()}
+                    onLoad={this.handleMapBoundsChange}
+                    onViewportChanged={this.handleMapBoundsChange}
                 >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     {bounds && <Query
@@ -75,16 +74,10 @@ class ResortLiftsMap extends Component {
                                 id: lift.id,
                                 route: lift.route,
                             }));
-                            const { assignedLiftIDs, onAssignLift, onUnassignLift } = this.props;
-                            const liftPolylines = intersectingLifts.map(lift => {
-                                return assignedLiftIDs.includes(lift.id)
-                                    ? <Polyline positions={lift.route} key={lift.id} onClick={() => onUnassignLift(lift.id)} />
-                                    : <Polyline positions={lift.route} key={lift.id} onClick={() => onAssignLift(lift.id)} color='grey' />;
-                            });
-
-                            return [
-                                ...liftPolylines
-                            ];
+                            return intersectingLifts.map(lift => assignedLiftIDs.includes(lift.id)
+                                ? <Polyline positions={lift.route} key={lift.id} onClick={() => onUnassignLift(lift.id)} color='blue' />
+                                : <Polyline positions={lift.route} key={lift.id} onClick={() => onAssignLift(lift.id)} color='grey' />
+                            );
                         }}
                     </Query>}
                 </Map>

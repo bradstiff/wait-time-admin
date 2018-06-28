@@ -88,10 +88,28 @@ export default ({ resort, submit, close }) => (
                         value={values.timezone}
                         helperText={touched.timezone && errors.timezone}
                     /><br />
-                    <Map zoom={12} center={location}>
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                        <Marker position={location} />
-                    </Map>
+                    <TextField
+                        type="text"
+                        name="latitude"
+                        label="Latitude"
+                        margin='dense'
+                        inputProps={{ size: 100, maxLength: 100 }}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.latitude}
+                        helperText={touched.latitude && errors.latitude}
+                    /><br />
+                    <TextField
+                        type="text"
+                        name="longitude"
+                        label="Longitude"
+                        margin='dense'
+                        inputProps={{ size: 100, maxLength: 100 }}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        value={values.longitude}
+                        helperText={touched.longitude && errors.longitude}
+                    /><br />
                     <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
                     <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>
                 </form>
