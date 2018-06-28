@@ -8,10 +8,13 @@ import LiftTypes from './LiftTypes';
 
 const validateDate = value => {
     if (isNaN(Date.parse(value))) {
-        throw new GraphQLError('Query error: not a valid date', [value]);
+        throw new GraphQLError('Query error: not a valid Date', [value]);
     };
 };
 
+const getLocation = (lat, lng) => lat
+    ? { lat, lng}
+    : null;
 
 const resolvers = {
     Query: {
@@ -21,12 +24,15 @@ const resolvers = {
         waitTimeDate: Resort.getWaitTimeDate,
         lift: Lift.getByID,
         liftList: Lift.getList,
+        intersectingLifts: Lift.getAllIntersecting,
     },
     Mutation: {
         createResort: Resort.create,
         updateResort: Resort.update,
+        updateResortAssignedLifts: Resort.updateAssignedLifts,
     },
     Resort: {
+        location: resort => getLocation(resort.latitude, resort.longitude),
         dates: Resort.getWaitTimeDates,
         lastDate: Resort.getLastWaitTimeDate,
         lifts: Lift.getAllByResort,
@@ -67,6 +73,13 @@ const resolvers = {
         type: lift => ({
             id: lift.typeID,
         }),
+        route: lift => [
+            getLocation(lift.point1Latitude, lift.point1Longitude),
+            getLocation(lift.point2Latitude, lift.point2Longitude),
+            getLocation(lift.point3Latitude, lift.point3Longitude),
+            getLocation(lift.point4Latitude, lift.point4Longitude),
+            getLocation(lift.point5Latitude, lift.point5Longitude),
+        ].filter(location => location !== null),
     },
     WaitTimeDate: {
         id: (waitTimeDate) => `${waitTimeDate.resortID.toString()}:${waitTimeDate.date.toISOString()}`,

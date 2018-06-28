@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import { Link } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
@@ -214,7 +215,7 @@ class Lifts extends Component {
                                             .slice()
                                             .map(lift => (
                                                 <TableRow key={lift.id}>
-                                                    <TableCell component="th" scope="row">{lift.name}</TableCell>
+                                                    <TableCell component="th" scope="row"><Link to={`/admin/lifts/${lift.id}`}>{lift.name}</Link></TableCell>
                                                     <TableCell>{lift.type.description}</TableCell>
                                                     <TableCell>{lift.resort ? lift.resort.name : ''}</TableCell>
                                                     <TableCell>{lift.isActive ? '✓' : ''}</TableCell>

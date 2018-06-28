@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Link } from 'react-router-dom';
+import { Map, TileLayer, Polyline } from 'react-leaflet'
 import ChartistGraph from 'react-chartist';
 import moment from 'moment';
 
@@ -11,11 +12,12 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
 const query = gql`
-    query UpliftStatsByLift($liftID: Int!, $groupBy: String!, $groupBy2: String!) {
+    query LiftAndStatsByHourAndSeason($liftID: Int!) {
         lift(id: $liftID) { 
             id,
             name,
-            upliftGroupings(groupBy: $groupBy, groupBy2: $groupBy2) {
+            route { lat, lon },
+            upliftGroupings(groupBy: "hour", groupBy2: "season") {
                 groupKey,
                 groupDescription,
                 group2Key,
@@ -54,6 +56,7 @@ class Lift extends Component {
                 }
 
                 const { lift, lift: { upliftGroupings } } = data;
+
                 const chartData = dataPoint => ({
                     labels: hours.map(hour => moment().hour(hour).format('hA')),
                     series: seasonYears.map(seasonYear => (
@@ -72,6 +75,13 @@ class Lift extends Component {
                 const someData = chartData('upliftCount');
                 return (
                     <Paper>
+                        <Typography variant="display3" gutterBottom>
+                            {lift.name}
+                        </Typography>
+                        <Map bounds={lift.route}>
+                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                            <Polyline positions={lift.route} />
+                        </Map>
                         {upliftGroupings && (
                             <div>
                                 <ChartistGraph data={chartData('upliftCount')} options={options} type={'Line'} />

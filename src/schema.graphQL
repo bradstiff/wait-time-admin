@@ -4,12 +4,14 @@ type Query {
     resortBySlug(slug: String!): Resort
     waitTimeDate(resortSlug: String!, date: Date!): WaitTimeDate
 	liftList(offset: Int!, limit: Int!, orderBy: String!, order: String!, name: String, typeID: Int, resortID: Int, isActive: Boolean): LiftList!
+	intersectingLifts(topLeft: LocationInput!, bottomRight: LocationInput!): [Lift!]
 	lift(id: Int!): Lift
 	uplifts(liftID: Int!, seasonYear: Int, month: Int, day: Int, hour: Int): [Uplift!]
 }
 type Mutation {
 	createResort(name: String!, slug: String!) : Resort
 	updateResort(id: Int!, name: String!, slug: String!) : Resort
+	updateResortAssignedLifts(id: Int!, liftIDs: [Int!]) : Resort
 }
 type Resort {
     id: Int!
@@ -20,6 +22,7 @@ type Resort {
 	timezone: String!
 	latitude: Float
 	longitude: Float
+	location: Location
     sortOrder: Int!
     dates: [WaitTimeDate!]
 	lastDate: WaitTimeDate
@@ -32,6 +35,7 @@ type Lift {
 	type: LiftType!
 	occupancy: Int
 	isActive: Boolean!
+	route: [Location!]!
 	upliftList(offset: Int!, limit: Int!, orderBy: String!, order: String!, seasonYear: Int, month: Int, day: Int, hour: Int): UpliftList!
 	upliftSummaries: [UpliftSummary!]
 	upliftGroupings(groupBy: String!, groupBy2: String): [UpliftGrouping!]
@@ -71,6 +75,14 @@ type UpliftSummary {
 	season: Season!
     upliftCount: Int!
 	waitTimeAverage: Int!
+}
+type Location {
+	lat: Float!
+	lng: Float!
+}
+input LocationInput {
+	lat: Float!
+	lng: Float!
 }
 type LiftList {
 	count: Int!

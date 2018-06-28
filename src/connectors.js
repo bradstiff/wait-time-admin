@@ -5,7 +5,10 @@ import { error } from 'util';
 import PredicateBuilder from './PredicateBuilder';
 
 const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude from Resort';
-const liftQuery = 'select LiftID as id, name, resortID, typeID, isActive, occupancy from Lift';
+const liftQuery = `
+    select LiftID as id, name, resortID, typeID, isActive, occupancy, point1Latitude, point1Longitude, point2Latitude, point2Longitude, point3Latitude, point3Longitude, point4Latitude, point4Longitude, point5Latitude, point5Longitude 
+    from Lift
+`;
 
 const Resort = {
     getBySlug: async(_, { slug }, context) => {
@@ -146,7 +149,21 @@ const Resort = {
                 where ResortID = @id
             `);
         return Resort.getByID(null, args, context);
-    }
+    },
+    updateAssignedLifts: async (_, { id, liftIDs }, context) => {
+        const result = await context.db.request()
+            .input('id', mssql.Int, id)
+            .query(`
+                update Lift set 
+                    ResortID = @id
+                where LiftID in (${liftIDs.join()});
+                update Lift set
+                    ResortID = null
+                where LiftID not in (${liftIDs.join()})
+                and ResortID = @id;
+            `);
+        return Resort.getByID(null, { id }, context);
+    },
 };
 
 const Lift = {
@@ -164,6 +181,20 @@ const Lift = {
         return result.recordset[0];
     },
     getAllByResort: (resort, args, context) => context.dataLoaders.liftsByResortIDs.load(resort.id),
+    getAllIntersecting: async (_, { topLeft, bottomRight }, context) => {
+        const result = await context.db.request()
+            .query(`
+                ${liftQuery}
+                where GeoRoute.STIntersects(geography::STGeomFromText('POLYGON ((
+                    ${topLeft.lng} ${topLeft.lat}, 
+                    ${topLeft.lng} ${bottomRight.lat}, 
+                    ${bottomRight.lng} ${bottomRight.lat}, 
+                    ${bottomRight.lng} ${topLeft.lat},
+                    ${topLeft.lng} ${topLeft.lat}
+                ))', 4326)) = 1 
+            `);
+        return result.recordset;
+    },
     getList: async (_, args, context) => {
         const orderBy = args.orderBy.toLowerCase();
         const predicates = new PredicateBuilder()

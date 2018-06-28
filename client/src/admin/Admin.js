@@ -12,6 +12,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 import Resorts from './Resorts';
 import Resort from './Resort';
+import ResortLifts from './ResortLifts';
 import EditResort from './EditResort';
 import AddResort from './AddResort';
 import Lifts from './Lifts';
@@ -43,6 +44,7 @@ class Admin extends Component {
                 </AppBar>
                 <Switch>
                     <Route exact path='/admin/resorts/create' component={AddResort} />
+                    <Route exact path='/admin/resorts/:id/lifts' component={ResortLifts} />
                     <Route exact path='/admin/resorts/:id' component={Resort} />
                     <Route exact path='/admin/resorts' component={Resorts} />
                     <Route exact path='/admin/lifts/:id/stats' component={LiftStats} />
