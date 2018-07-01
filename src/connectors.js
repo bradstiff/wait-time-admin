@@ -126,8 +126,8 @@ const Resort = {
         const request = context.db.request()
             .input('name', mssql.NVarChar, args.name)
             .input('slug', mssql.NVarChar, args.slug)
-            .input('logoFilename', mssql.NVarChar, args.slug)
-            .input('trailMapFilename', mssql.NVarChar, args.slug)
+            .input('logoFilename', mssql.VarChar, args.logoFilename)
+            .input('trailMapFilename', mssql.VarChar, args.trailMapFilename)
             .input('latitude', mssql.Float, args.latitude)
             .input('longitude', mssql.Float, args.longitude)
         const result = await request.query(`
@@ -144,8 +144,8 @@ const Resort = {
             .input('id', mssql.Int, args.id)
             .input('name', mssql.NVarChar, args.name)
             .input('slug', mssql.NVarChar, args.slug)
-            .input('logoFilename', mssql.NVarChar, args.slug)
-            .input('trailMapFilename', mssql.NVarChar, args.slug)
+            .input('logoFilename', mssql.VarChar, args.logoFilename)
+            .input('trailMapFilename', mssql.VarChar, args.trailMapFilename)
             .input('latitude', mssql.Float, args.latitude)
             .input('longitude', mssql.Float, args.longitude)
             .query(`

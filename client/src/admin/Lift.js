@@ -10,13 +10,23 @@ import styled from 'styled-components';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import Card from '@material-ui/core/Card';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 
 const query = gql`
     query LiftAndStatsByHourAndSeason($liftID: Int!) {
         lift(id: $liftID) { 
             id,
             name,
-            route { lat, lon },
+            isActive,
+            type { id, description },
+            resort { id, name },
+            occupancy,
+            route { lat, lng },
             upliftGroupings(groupBy: "hour", groupBy2: "season") {
                 groupKey,
                 groupDescription,
@@ -28,6 +38,28 @@ const query = gql`
         }
     }
 `;
+
+const styles = theme => ({
+    lift: {
+        display: 'flex',
+    },
+    liftContent: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    liftHeading: {
+        flex: 'auto',
+    },
+    liftMap: {
+        flex: 'auto',
+        height: 400,
+    },
+    liftActions: {
+        flex: 'none',
+        paddingLeft: theme.spacing.unit,
+        paddingBottom: theme.spacing.unit,
+    },
+});
 
 class Lift extends Component {
     render() {
@@ -74,25 +106,65 @@ class Lift extends Component {
                 };
                 const someData = chartData('upliftCount');
                 return (
-                    <Paper>
-                        <Typography variant="display3" gutterBottom>
-                            {lift.name}
-                        </Typography>
-                        <Map bounds={lift.route}>
-                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                            <Polyline positions={lift.route} />
-                        </Map>
-                        {upliftGroupings && (
-                            <div>
-                                <ChartistGraph data={chartData('upliftCount')} options={options} type={'Line'} />
-                                <ChartistGraph data={chartData('waitTimeAverage')} options={options} type={'Line'} />
-                            </div>
-                        )}
-                    </Paper>
+                    <div>
+                        <Grid container spacing={16}>
+                            <Grid item xs={12}>
+                                <Card className={classes.lift}>
+                                    <div className={classes.liftContent}>
+                                        <CardContent className={classes.liftHeading}>
+                                            <Typography variant="headline">{`${lift.name} ${!lift.isActive ? ' (Inactive)' : ''}`}</Typography>
+                                            <Typography color='textSecondary'>{lift.type.description}</Typography>
+                                            <Typography color='textSecondary'>{lift.occupancy ? lift.occupancy + ' passengers' : null}</Typography>
+                                            <Typography color='textSecondary'>{lift.resort ? lift.resort.name : 'No resort assigned'}</Typography>
+                                        </CardContent>
+                                        <div className={classes.liftActions}>
+                                            <Button component={Link} to={`/admin/lifts/${lift.id}/edit`}>Edit</Button>
+                                        </div>
+                                    </div>
+                                    <CardMedia className={classes.liftMap}>
+                                        <Map bounds={lift.route} style={{ width: '100%', height: '100%' }}>
+                                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                            <Polyline positions={lift.route} />
+                                        </Map>
+                                    </CardMedia>
+                                </Card>
+                            </Grid>
+                            {upliftGroupings.length && [
+                                <Grid item xs={6}>
+                                    <Card>
+                                        <CardContent>
+                                            <Typography variant='headline'>Uplifts</Typography>
+                                            <Typography color='textSecondary'>Current season versus previous</Typography>
+                                        </CardContent>
+                                        <CardMedia>
+                                            <ChartistGraph data={chartData('upliftCount')} options={options} type={'Line'} />
+                                        </CardMedia>
+                                        <CardActions>
+                                            <Button component={Link} to={`/admin/lifts/${lift.id}/uplifts`}>Uplifts</Button>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>,
+                                <Grid item xs={6}>
+                                    <Card>
+                                        <CardContent>
+                                            <Typography variant='headline'>Average Wait Time (seconds)</Typography>
+                                            <Typography color='textSecondary'>Current season versus previous</Typography>
+                                        </CardContent>
+                                        <CardMedia>
+                                            <ChartistGraph data={chartData('waitTimeAverage')} options={options} type={'Line'} />
+                                        </CardMedia>
+                                        <CardActions>
+                                            <Button component={Link} to={`/admin/lifts/${lift.id}/stats`}>Stats</Button>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            ]}
+                        </Grid>
+                    </div>
                 );
             }}
         </Query>;
     }
 }
 
-export default Lift;
+export default withStyles(styles)(Lift);

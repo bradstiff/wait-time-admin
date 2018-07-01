@@ -31,20 +31,10 @@ const upliftsQuery = gql`
     }
 `;
 
-const toolbarStyles = theme => ({
-    root: {
-        paddingRight: theme.spacing.unit,
+const styles = theme => ({
+    toolbar: {
+//        paddingRight: theme.spacing.unit,
     },
-    highlight:
-        theme.palette.type === 'light'
-            ? {
-                color: theme.palette.secondary.main,
-                backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-            }
-            : {
-                color: theme.palette.text.primary,
-                backgroundColor: theme.palette.secondary.dark,
-            },
     spacer: {
         flex: 'auto',
     },
@@ -98,9 +88,9 @@ class LiftStats extends Component {
                 const { lift, lift: { upliftGroupings } } = data;
                 return (
                     <Paper>
-                        <Toolbar>
+                        <Toolbar className={classes.toolbar}>
                             <div className={classes.title}>
-                                <Typography variant="subheading" gutterBottom>
+                                <Typography variant="headline" gutterBottom>
                                     {lift.name} Stats
                                 </Typography>
                             </div>
@@ -115,7 +105,7 @@ class LiftStats extends Component {
                                         { text: 'By hour', value: 'Hour' },
                                     ]}
                                     onSelect={this.handleSelectGroupBy}
-                                    initialValue={groupBy}
+                                    value={groupBy}
                                 />
                             </div>
                         </Toolbar>
@@ -148,4 +138,4 @@ class LiftStats extends Component {
     };
 }
 
-export default withStyles(toolbarStyles)(LiftStats);
+export default withStyles(styles)(LiftStats);

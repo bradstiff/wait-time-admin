@@ -1,7 +1,3 @@
-body {
-  font-family: sans-serif;
-}
-
 html, body {
     height: 100%;
 }
@@ -9,8 +5,23 @@ html, body {
 .rc-slider-mark-text-active {
     color: #D44126 !important;
 }
-
+/*
 .leaflet-container {
     height: 1000px;
     width: 1500px;
+}*/
+.ct-label {
+    color: #888;
+}
+.ct-grid {
+    stroke: #666;
+}
+.ct-series-a .ct-line {
+    stroke: #999;
+}
+.ct-series-a .ct-point {
+    stroke: #999;
+}
+.ct-series-a .ct-area {
+    fill: #999;
 }

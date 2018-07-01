@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -19,6 +20,7 @@ import Search from '@material-ui/icons/Search';
 import { DebounceInput } from 'react-debounce-input';
 
 import SortEnabledTableHead, { makeCompareFn } from '../app/SortEnabledTableHead';
+import LinkButton from '../app/LinkButton';
 import SelectMenu from '../app/SelectMenu';
 import LiftTypes from '../app/LiftTypes';
 
@@ -44,26 +46,19 @@ const query = gql`
 `;
 
 const columnData = [
-    { field: 'name', numeric: false, disablePadding: true, label: 'Name' },
+    { field: 'name', numeric: false, disablePadding: false, label: 'Name' },
     { field: 'typeID', numeric: false, disablePadding: false, label: 'Type' },
     { field: 'resortID', numeric: false, disablePadding: false, label: 'Resort' },
     { field: 'isActive', numeric: false, disablePadding: false, label: 'Active' },
 ];
 
-const toolbarStyles = theme => ({
-    root: {
-        paddingRight: theme.spacing.unit,
+const styles = theme => ({
+    paper: {
+        //backgroundColor: '#2F2F2F',
     },
-    highlight:
-        theme.palette.type === 'light'
-            ? {
-                color: theme.palette.secondary.main,
-                backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-            }
-            : {
-                color: theme.palette.text.primary,
-                backgroundColor: theme.palette.secondary.dark,
-            },
+    toolbar: {
+        //paddingRight: theme.spacing.unit,
+    },
     spacer: {
         flex: 'auto',
     },
@@ -74,14 +69,17 @@ const toolbarStyles = theme => ({
     title: {
         flex: 'none',
     },
+    table: {
+    },
+    row: {
+    },
 });
 
-class Lifts extends Component {
-    rowsPerPage = 100;
 
+class Lifts extends Component {
     state = {
         page: 0,
-        rowsPerPage: 50,
+        rowsPerPage: 25,
         order: 'asc',
         orderByCol: columnData[0],
         isActive: true,
@@ -153,10 +151,10 @@ class Lifts extends Component {
 
                 const { liftList } = data;
                 return (
-                    <Paper>
-                        <Toolbar>
+                    <Paper className={classes.paper}>
+                        <Toolbar className={classes.toolbar}>
                             <div className={classes.title}>
-                                <Typography variant="subheading" gutterBottom>
+                                <Typography variant="headline">
                                     Lifts
                                 </Typography>
                             </div>
@@ -203,7 +201,7 @@ class Lifts extends Component {
                         </Toolbar>
                         {liftList.count && (
                             <div>
-                                <Table>
+                                <Table className={classes.table}>
                                     <SortEnabledTableHead
                                         order={order}
                                         orderByCol={orderByCol}
@@ -214,8 +212,8 @@ class Lifts extends Component {
                                         {liftList.lifts
                                             .slice()
                                             .map(lift => (
-                                                <TableRow key={lift.id}>
-                                                    <TableCell component="th" scope="row"><Link to={`/admin/lifts/${lift.id}`}>{lift.name}</Link></TableCell>
+                                                <TableRow key={lift.id} className={classes.row}>
+                                                    <TableCell component="th" scope="row"><LinkButton to={`/admin/lifts/${lift.id}`}>{lift.name}</LinkButton></TableCell>
                                                     <TableCell>{lift.type.description}</TableCell>
                                                     <TableCell>{lift.resort ? lift.resort.name : ''}</TableCell>
                                                     <TableCell>{lift.isActive ? '✓' : ''}</TableCell>
@@ -248,4 +246,4 @@ class Lifts extends Component {
     };
 }
 
-export default withStyles(toolbarStyles)(Lifts);
+export default withStyles(styles)(Lifts);

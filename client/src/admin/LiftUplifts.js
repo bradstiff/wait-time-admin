@@ -35,13 +35,13 @@ const upliftsQuery = gql`
 `;
 
 const columnData = [
-    { field: 'date', numeric: false, disablePadding: true, label: 'Date' },
+    { field: 'date', numeric: false, disablePadding: false, label: 'Date' },
     { field: 'waitSeconds', numeric: true, disablePadding: false, label: 'Wait Time (s)' },
 ];
 
-const toolbarStyles = theme => ({
-    root: {
-        paddingRight: theme.spacing.unit,
+const styles = theme => ({
+    toolbar: {
+//        paddingRight: theme.spacing.unit,
     },
     highlight:
         theme.palette.type === 'light'
@@ -66,11 +66,9 @@ const toolbarStyles = theme => ({
 });
 
 class LiftUplifts extends Component {
-    rowsPerPage = 100;
-
     state = {
         page: 0,
-        rowsPerPage: 50,
+        rowsPerPage: 25,
         order: 'asc',
         orderByCol: columnData[0],
         seasonYear: null,
@@ -154,9 +152,9 @@ class LiftUplifts extends Component {
                 const { lift, lift: { upliftList } } = data;
                 return (
                     <Paper>
-                        <Toolbar>
+                        <Toolbar className={classes.toolbar}>
                             <div className={classes.title}>
-                                <Typography variant="subheading" gutterBottom>
+                                <Typography variant="headline" gutterBottom>
                                     {lift.name} Uplifts
                                 </Typography>
                             </div>
@@ -273,4 +271,4 @@ class LiftUplifts extends Component {
     };
 }
 
-export default withStyles(toolbarStyles)(LiftUplifts);
+export default withStyles(styles)(LiftUplifts);
