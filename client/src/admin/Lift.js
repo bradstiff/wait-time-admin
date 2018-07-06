@@ -26,7 +26,7 @@ const query = gql`
             type { id, description },
             resort { id, name },
             occupancy,
-            route { lat, lng },
+            stations {number, name, location { lat, lng} },
             upliftGroupings(groupBy: "hour", groupBy2: "season") {
                 groupKey,
                 groupDescription,
@@ -75,20 +75,20 @@ class Lift extends Component {
                 groupBy2: 'season',
             }}
         >
-            {({ loading, error, data }) => {
+            {({ error, data: { lift } }) => {
                 if (error) {
                     console.log(error);
                     return null;
                 }
-                if (data.lift === undefined) {
+                if (lift === undefined) {
                     return null;
                 }
-                if (data.lift === null) {
+                if (lift === null) {
                     return <p>Lift not found</p>;
                 }
 
-                const { lift, lift: { upliftGroupings } } = data;
-
+                const { upliftGroupings } = lift;
+                const route = lift.stations.map(station => station.location);
                 const chartData = dataPoint => ({
                     labels: hours.map(hour => moment().hour(hour).format('hA')),
                     series: seasonYears.map(seasonYear => (
@@ -122,16 +122,16 @@ class Lift extends Component {
                                         </div>
                                     </div>
                                     <CardMedia className={classes.liftMap}>
-                                        <Map bounds={lift.route} style={{ width: '100%', height: '100%' }}>
+                                        <Map bounds={route} style={{ width: '100%', height: '100%' }}>
                                             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                                            <Polyline positions={lift.route} />
+                                            <Polyline positions={route} />
                                         </Map>
                                     </CardMedia>
                                 </Card>
                             </Grid>
                             {upliftGroupings.length && [
                                 <Grid item xs={6}>
-                                    <Card>
+                                    <Card key='uplifts'>
                                         <CardContent>
                                             <Typography variant='headline'>Uplifts</Typography>
                                             <Typography color='textSecondary'>Current season versus previous</Typography>
@@ -145,7 +145,7 @@ class Lift extends Component {
                                     </Card>
                                 </Grid>,
                                 <Grid item xs={6}>
-                                    <Card>
+                                    <Card key='stats'>
                                         <CardContent>
                                             <Typography variant='headline'>Average Wait Time (seconds)</Typography>
                                             <Typography color='textSecondary'>Current season versus previous</Typography>

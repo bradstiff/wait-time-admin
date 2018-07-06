@@ -16,7 +16,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 
-import SortEnabledTableHead, { makeCompareFn } from '../app/SortEnabledTableHead';
+import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableHead';
 
 const resortQuery = gql`
     query Resort($id: Int!) {

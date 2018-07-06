@@ -78,7 +78,7 @@ class ResortLifts extends React.Component {
 
         const { assignedLiftIDs } = this.state;
         return (
-            <Paper>
+            <Paper style={{ width: '100%', height: '800px' }}>
                 <Typography variant="display3" gutterBottom>
                     {resort.name}
                 </Typography>

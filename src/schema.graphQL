@@ -12,6 +12,7 @@ type Mutation {
 	createResort(name: String!, slug: String!, logoFilename: String!, trailMapFilename: String!, latitude: Float!, longitude: Float!, timezone: String!) : Resort
 	updateResort(id: Int!, name: String!, slug: String!, logoFilename: String!, trailMapFilename: String!, latitude: Float!, longitude: Float!, timezone: String!) : Resort
 	updateResortAssignedLifts(id: Int!, liftIDs: [Int!]) : Resort
+	updateLift(id: Int!, name: String!, typeID: Int!, resortID: Int, occupancy: Int, isActive: Boolean!, station1Lat: Float!, station1Lng: Float!, station2Lat: Float!, station2Lng: Float!, station3Lat: Float, station3Lng: Float, station4Lat: Float, station4Lng: Float, station5Lat: Float, station5Lng: Float): Lift
 }
 type Resort {
     id: Int!
@@ -35,7 +36,7 @@ type Lift {
 	type: LiftType!
 	occupancy: Int
 	isActive: Boolean!
-	route: [Location!]!
+	stations: [LiftStation!]!
 	upliftList(offset: Int!, limit: Int!, orderBy: String!, order: String!, seasonYear: Int, month: Int, day: Int, hour: Int): UpliftList!
 	upliftSummaries: [UpliftSummary!]
 	upliftGroupings(groupBy: String!, groupBy2: String): [UpliftGrouping!]
@@ -75,6 +76,11 @@ type UpliftSummary {
 	season: Season!
     upliftCount: Int!
 	waitTimeAverage: Int!
+}
+type LiftStation {
+	number: Int!
+	name: String!
+	location: Location!
 }
 type Location {
 	lat: Float!

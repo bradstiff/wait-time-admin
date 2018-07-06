@@ -15,12 +15,14 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Resorts from './Resorts';
 import Resort from './Resort';
 import ResortLifts from './ResortLifts';
-import EditResort from './EditResort';
-import AddResort from './AddResort';
+import ResortEdit from './ResortEdit';
+import ResortCreate from './ResortCreate';
 import Lifts from './Lifts';
 import Lift from './Lift';
+import LiftEdit from './LiftEdit';
 import LiftUplifts from './LiftUplifts';
 import LiftStats from './LiftStats';
+
 import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
 const Background = styled.div`
@@ -38,7 +40,7 @@ const styles = theme => ({
         margin: 'auto',
     },
     content: {
-        marginTop: theme.spacing.unit,
+        marginTop: theme.spacing.unit * 2,
     }
 });
 
@@ -68,13 +70,14 @@ class Admin extends Component {
                     </AppBar>
                     <div className={classes.content}>
                         <Switch>
-                            <Route exact path='/admin/resorts/create' component={AddResort} />
+                            <Route exact path='/admin/resorts/create' component={ResortCreate} />
                             <Route exact path='/admin/resorts/:id/lifts' component={ResortLifts} />
-                            <Route exact path='/admin/resorts/:id/edit' component={EditResort} />
+                            <Route exact path='/admin/resorts/:id/edit' component={ResortEdit} />
                             <Route exact path='/admin/resorts/:id' component={Resort} />
                             <Route exact path='/admin/resorts' component={Resorts} />
                             <Route exact path='/admin/lifts/:id/stats' component={LiftStats} />
                             <Route exact path='/admin/lifts/:id/uplifts' component={LiftUplifts} />
+                            <Route exact path='/admin/lifts/:id/edit' component={LiftEdit} />
                             <Route exact path='/admin/lifts/:id' component={Lift} />
                             <Route exact path='/admin/lifts' component={Lifts} />
                         </Switch>

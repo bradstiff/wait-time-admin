@@ -14,8 +14,8 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
 
-import SortEnabledTableHead, { makeCompareFn } from '../app/SortEnabledTableHead';
-import SelectMenu from '../app/SelectMenu';
+import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableHead';
+import SelectMenu from '../common/SelectMenu';
 
 const upliftsQuery = gql`
     query UpliftsByLift($liftID: Int!, $offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
@@ -137,19 +137,19 @@ class LiftUplifts extends Component {
                 hour,
             }}
         >
-            {({ loading, error, data }) => {
+            {({ error, data: { lift } }) => {
                 if (error) {
                     console.log(error);
                     return null;
                 }
-                if (data.lift === undefined) {
+                if (lift === undefined) {
                     return null;
                 }
-                if (data.lift === null) {
+                if (lift === null) {
                     return <p>Lift not found</p>;
                 }
 
-                const { lift, lift: { upliftList } } = data;
+                const { upliftList } = lift;
                 return (
                     <Paper>
                         <Toolbar className={classes.toolbar}>

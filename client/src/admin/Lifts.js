@@ -19,10 +19,11 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Search from '@material-ui/icons/Search';
 import { DebounceInput } from 'react-debounce-input';
 
-import SortEnabledTableHead, { makeCompareFn } from '../app/SortEnabledTableHead';
-import LinkButton from '../app/LinkButton';
-import SelectMenu from '../app/SelectMenu';
-import LiftTypes from '../app/LiftTypes';
+import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableHead';
+import LinkButton from '../common/LinkButton';
+import SelectMenu from '../common/SelectMenu';
+import LiftTypeData from '../common/LiftTypeData';
+import ResortData from '../common/ResortData';
 
 const query = gql`
     query LiftList($offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $name: String, $typeID: Int, $resortID: Int, $isActive: Boolean) {
@@ -171,22 +172,25 @@ class Lifts extends Component {
                                     id='type'
                                     options={[
                                         { text: 'All types' },
-                                        ...LiftTypes.map(type => ({ text: type.description, value: type.id, }))
+                                        ...LiftTypeData.map(type => ({ text: type.description, value: type.id, }))
                                     ]}
                                     value={typeID}
                                     onSelect={this.handleSelectType}
                                 />
-                                <SelectMenu
-                                    id='resort'
-                                    options={[
-                                        { text: 'All resorts' },
-                                        { text: 'No resort assigned', value: null },
-                                        { text: 'Steamboat', value: 1 },
-                                        { text: 'Winter Park', value: 2 },
-                                    ]}
-                                    value={resortID}
-                                    onSelect={this.handleSelectResort}
-                                />
+                                <ResortData>
+                                    {({ options }) => {
+                                        return options && <SelectMenu
+                                            id='resort'
+                                            options={[
+                                                { text: 'All resorts' },
+                                                { text: 'No resort assigned', value: null },
+                                                ...options,
+                                            ]}
+                                            value={resortID}
+                                            onSelect={this.handleSelectResort}
+                                        />
+                                    }}
+                                </ResortData>
                                 <SelectMenu
                                     id='status'
                                     options={[

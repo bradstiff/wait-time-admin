@@ -12,10 +12,6 @@ const validateDate = value => {
     };
 };
 
-const getLocation = (lat, lng) => lat
-    ? { lat, lng}
-    : null;
-
 const resolvers = {
     Query: {
         resort: Resort.getByID,
@@ -30,9 +26,10 @@ const resolvers = {
         createResort: Resort.create,
         updateResort: Resort.update,
         updateResortAssignedLifts: Resort.updateAssignedLifts,
+        updateLift: Lift.update,
     },
     Resort: {
-        location: resort => getLocation(resort.latitude, resort.longitude),
+        location: resort => ({ lat: resort.latitude, lng: resort.longitude }),
         dates: Resort.getWaitTimeDates,
         lastDate: Resort.getLastWaitTimeDate,
         lifts: Lift.getAllByResort,
@@ -73,13 +70,28 @@ const resolvers = {
         type: lift => ({
             id: lift.typeID,
         }),
-        route: lift => [
-            getLocation(lift.point1Latitude, lift.point1Longitude),
-            getLocation(lift.point2Latitude, lift.point2Longitude),
-            getLocation(lift.point3Latitude, lift.point3Longitude),
-            getLocation(lift.point4Latitude, lift.point4Longitude),
-            getLocation(lift.point5Latitude, lift.point5Longitude),
-        ].filter(location => location !== null),
+        stations: lift => {
+            const makeStation = (number, lat, lng) => lat
+                ? {
+                    number,
+                    location: { lat, lng },
+                }
+                : null;
+
+            const stations = [
+                makeStation(1, lift.station1Lat, lift.station1Lng),
+                makeStation(2, lift.station2Lat, lift.station2Lng),
+                makeStation(3, lift.station3Lat, lift.station3Lng),
+                makeStation(4, lift.station4Lat, lift.station4Lng),
+                makeStation(5, lift.station5Lat, lift.station5Lng),
+            ].filter(station => station !== null);
+            stations[0].name = 'Load station';
+            stations[stations.length - 1].name = 'Unload station';
+            stations
+                .filter(station => station.name === undefined)
+                .forEach(station => station.name = 'Mid station');
+            return stations;
+        }
     },
     WaitTimeDate: {
         id: (waitTimeDate) => `${waitTimeDate.resortID.toString()}:${waitTimeDate.date.toISOString()}`,

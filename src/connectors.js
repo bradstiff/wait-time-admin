@@ -6,7 +6,7 @@ import PredicateBuilder from './PredicateBuilder';
 
 const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude from Resort';
 const liftQuery = `
-    select LiftID as id, name, resortID, typeID, isActive, occupancy, point1Latitude, point1Longitude, point2Latitude, point2Longitude, point3Latitude, point3Longitude, point4Latitude, point4Longitude, point5Latitude, point5Longitude 
+    select LiftID as id, name, resortID, typeID, isActive, occupancy, Point1Latitude as station1Lat, Point1Longitude as station1Lng, Point2Latitude as station2Lat, Point2Longitude as station2Lng, Point3Latitude as station3Lat, Point3Longitude as station3Lng, Point4Latitude as station4Lat, Point4Longitude as station4Lng, Point5Latitude as station5Lat, Point5Longitude as station5Lng
     from Lift
 `;
 
@@ -311,6 +311,45 @@ const Lift = {
         return result.recordset;
     },
     getUpliftSummaries: (lift, args, context) => context.dataLoaders.upliftSummariesByLiftIDs.load(lift.id),
+    update: async (_, args, context) => {
+        const result = await context.db.request()
+            .input('id', mssql.Int, args.id)
+            .input('name', mssql.NVarChar, args.name)
+            .input('typeID', mssql.Int, args.typeID)
+            .input('occupancy', mssql.Int, args.occupancy)
+            .input('resortID', mssql.Int, args.resortID)
+            .input('isActive', mssql.Bit, args.isActive)
+            .input('station1Lat', mssql.Float, args.station1Lat)
+            .input('station1Lng', mssql.Float, args.station1Lng)
+            .input('station2Lat', mssql.Float, args.station2Lat)
+            .input('station2Lng', mssql.Float, args.station2Lng)
+            .input('station3Lat', mssql.Float, args.station3Lat)
+            .input('station3Lng', mssql.Float, args.station3Lng)
+            .input('station4Lat', mssql.Float, args.station4Lat)
+            .input('station4Lng', mssql.Float, args.station4Lng)
+            .input('station5Lat', mssql.Float, args.station5Lat)
+            .input('station5Lng', mssql.Float, args.station5Lng)
+            .query(`
+                update Lift set 
+                    Name = @name, 
+                    TypeID = @typeID,
+                    Occupancy = @occupancy,
+                    ResortID = @resortID,
+                    IsActive = @isActive,
+                    Point1Latitude = @station1Lat,
+                    Point1Longitude = @station1Lng,
+                    Point2Latitude = @station2Lat,
+                    Point2Longitude = @station2Lng,
+                    Point3Latitude = @station3Lat,
+                    Point3Longitude = @station3Lng,
+                    Point4Latitude = @station4Lat,
+                    Point4Longitude = @station4Lng,
+                    Point5Latitude = @station5Lat,
+                    Point5Longitude = @station5Lng
+                where LiftID = @id
+            `);
+        return Resort.getByID(null, args, context);
+    },
 };
 
 export { Resort, Lift };

@@ -14,7 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
 import TableHead from '@material-ui/core/TableHead';
 
-import SelectMenu from '../app/SelectMenu';
+import SelectMenu from '../common/SelectMenu';
 
 const upliftsQuery = gql`
     query UpliftStatsByLift($liftID: Int!, $groupBy: String!) {
@@ -73,19 +73,19 @@ class LiftStats extends Component {
                 hour,
             }}
         >
-            {({ loading, error, data }) => {
+            {({ error, data: { lift } }) => {
                 if (error) {
                     console.log(error);
                     return null;
                 }
-                if (data.lift === undefined) {
+                if (lift === undefined) {
                     return null;
                 }
-                if (data.lift === null) {
+                if (lift === null) {
                     return <p>Lift not found</p>;
                 }
 
-                const { lift, lift: { upliftGroupings } } = data;
+                const { upliftGroupings } = lift;
                 return (
                     <Paper>
                         <Toolbar className={classes.toolbar}>

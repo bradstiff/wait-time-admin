@@ -14,7 +14,7 @@ const liftsQuery = gql`
             id,
             name,
             resort { id },
-            route { lat, lng },
+            stations { location { lat, lng } },
         }
     }
 `;
@@ -45,13 +45,13 @@ class ResortLiftsMap extends Component {
         const { bounds } = this.state;
         const { assignedLiftIDs, onAssignLift, onUnassignLift, resortLocation } = this.props;
         return (
-            <div>
                 <Map
                     center={resortLocation}
                     zoom={13}
                     ref={this.assignMapRef}
                     onLoad={this.handleMapBoundsChange}
                     onViewportChanged={this.handleMapBoundsChange}
+                    style={{ width: '100%', height: '100%' }}
                 >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     {bounds && <Query
@@ -72,7 +72,7 @@ class ResortLiftsMap extends Component {
 
                             const intersectingLifts = data.intersectingLifts.map(lift => ({
                                 id: lift.id,
-                                route: lift.route,
+                                route: lift.stations.map(station => station.location),
                             }));
                             return intersectingLifts.map(lift => assignedLiftIDs.includes(lift.id)
                                 ? <Polyline positions={lift.route} key={lift.id} onClick={() => onUnassignLift(lift.id)} color='blue' />
@@ -81,7 +81,6 @@ class ResortLiftsMap extends Component {
                         }}
                     </Query>}
                 </Map>
-            </div>
         );
     }
 }
