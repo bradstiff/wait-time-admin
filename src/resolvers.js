@@ -12,6 +12,24 @@ const validateDate = value => {
     };
 };
 
+const getGroupDescription = (groupBy, key) => {
+    if (groupBy === undefined) {
+        return undefined;
+    }
+    switch (groupBy.toLowerCase()) {
+        case 'season':
+            return `${key} - ${key + 1}`;
+        case 'month':
+            return moment().month(key - 1).format('MMMM');
+        case 'day':
+            return moment().day(key - 1).format('dddd');
+        case 'hour':
+            return `${moment().hour(key).format('hA')} - ${moment().hour(key + 1).format('hA')}`;
+        default:
+            throw new Error(`groupBy '${groupBy}' is not supported.`);
+    }
+}
+
 const resolvers = {
     Query: {
         resort: Resort.getByID,
@@ -33,40 +51,27 @@ const resolvers = {
         dates: Resort.getWaitTimeDates,
         lastDate: Resort.getLastWaitTimeDate,
         lifts: Lift.getAllByResort,
+        upliftGroupings: Resort.getUpliftGroupings,
+        liftEnvelope: resort => {
+            const start = resort.liftEnvelopeText.indexOf('STRING (') + 'STRING ('.length;
+            const length = resort.liftEnvelopeText.length - start - '))'.length;
+            const pointPairs = resort.liftEnvelopeText.substr(start, length);
+            return pointPairs
+                .split(', ')
+                .map(pointPair => {
+                    const points = pointPair.split(' ');
+                    return {
+                        lng: parseFloat(points[0]),
+                        lat: parseFloat(points[1]),
+                    };
+                }
+            );
+        },
     },
     Lift: {
         resort: Resort.getByLift,
-        upliftSummaries: Lift.getUpliftSummaries,
         upliftList: Lift.getUpliftList,
-        upliftGroupings: async (lift, args, context) => {
-            const getGroupDescription = groupBy => {
-                if (groupBy === undefined) {
-                    return key => undefined;
-                }
-                switch (groupBy.toLowerCase()) {
-                    case 'season':
-                        return key => `${key} - ${key + 1}`;
-                    case 'month':
-                        return key => moment().month(key - 1).format('MMMM');
-                    case 'day':
-                        return key => moment().day(key - 1).format('dddd');
-                    case 'hour':
-                        return key => `${moment().hour(key).format('hA')} - ${moment().hour(key + 1).format('hA')}`;
-                    default:
-                        throw new error('Invalid groupBy');
-                }
-            }
-            const groupDescription = getGroupDescription(args.groupBy);
-            const group2Description = getGroupDescription(args.groupBy2);
-
-            const groupings = await Lift.getUpliftGroupings(lift, args, context);
-            return groupings.map(grouping => Object.assign(
-                {},
-                { groupDescription: groupDescription(grouping['groupKey']) },
-                { group2Description: group2Description(grouping['group2Key']) },
-                grouping
-            ));
-        },
+        upliftGroupings: Lift.getUpliftGroupings,
         type: lift => ({
             id: lift.typeID,
         }),
@@ -91,7 +96,7 @@ const resolvers = {
                 .filter(station => station.name === undefined)
                 .forEach(station => station.name = 'Mid station');
             return stations;
-        }
+        },
     },
     WaitTimeDate: {
         id: (waitTimeDate) => `${waitTimeDate.resortID.toString()}:${waitTimeDate.date.toISOString()}`,
@@ -104,10 +109,9 @@ const resolvers = {
             year: uplift.seasonYear
         }),
     },
-    UpliftSummary: {
-        season: upliftSummary => ({
-            year: upliftSummary.seasonYear
-        })
+    UpliftGrouping: {
+        groupDescription: grouping => getGroupDescription(grouping.groupBy, grouping['groupKey']),
+        group2Description: grouping => getGroupDescription(grouping.groupBy2, grouping['group2Key']),
     },
     Season: {
         description: season => `${season.year} - ${season.year + 1}`,

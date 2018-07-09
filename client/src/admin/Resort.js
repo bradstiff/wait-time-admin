@@ -1,213 +1,161 @@
 import React, { Component } from 'react';
-import { graphql, compose } from 'react-apollo';
+import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Link } from 'react-router-dom';
+import { Map, TileLayer, Polyline } from 'react-leaflet'
 
 import styled from 'styled-components';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+import Card from '@material-ui/core/Card';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 
-import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableHead';
+import ResortLiftsMap from './ResortLiftsMap';
+import UpliftStatChart from './UpliftStatChart';
 
-const resortQuery = gql`
-    query Resort($id: Int!) {
-        resort(id: $id) { 
+const query = gql`
+    query ResortAndStatsByHourAndSeason($resortID: Int!) {
+        resort(id: $resortID) { 
             id,
             name,
             logoFilename,
-            lifts {
-                id,
-                name,
-                upliftSummaries {
-                    upliftCount,
-                    waitTimeAverage,
-                    season {
-                        year,
-                        description
-                    }
-                }
+            location { lat, lng },
+            liftEnvelope { lat, lng },
+            lifts { id },
+            upliftGroupings(groupBy: "hour", groupBy2: "season") {
+                groupKey,
+                groupDescription,
+                group2Key,
+                group2Description,
+                upliftCount,
+                waitTimeAverage
             }
         }
     }
 `;
 
-const ResortLogo = styled.img`
-    height: 60px;
-    width: auto;
-    max-width: 140px;
-    padding: 10px;
-    opacity: 0.75;
-`;
-
 const styles = theme => ({
-    rowHeading: {
-        fontSize: theme.typography.pxToRem(15),
+    resort: {
+        display: 'flex',
     },
-    value: {
-        fontSize: theme.typography.pxToRem(15),
-        color: theme.palette.text.secondary,
+    resortContent: {
+        display: 'flex',
+        flexDirection: 'column',
     },
-    rowHeadingColumn: {
-        flexBasis: '50%'
+    resortHeading: {
+        flex: 'auto',
     },
-    valueColumn: {
-        flexBasis: '25%',
+    resortLogo: {
+        height: '60px',
+        width: 'auto',
+        maxWidth: '140px',
+        padding: '10px',
+        opacity: '1',
+    },
+    resortMap: {
+        flex: 'auto',
+        height: 400,
+    },
+    resortActions: {
+        flex: 'none',
+        paddingLeft: theme.spacing.unit,
+        paddingBottom: theme.spacing.unit,
     },
 });
 
-const columnData = [
-    { field: 'lift', numeric: false, disablePadding: true, label: 'Lift' },
-    { field: 'upliftCount', numeric: true, disablePadding: false, label: 'Uplifts' },
-    { field: 'waitTimeAverage', numeric: true, disablePadding: false, label: 'Avg Wait (s)' },
-];
-
 class Resort extends Component {
-    state = {
-        selectedYear: null,
-        order: 'asc',
-        orderByCol: columnData[0],
-    };
-
-    handleSelectSeason = selectedYear => (event, expanded) => {
-        if (expanded) {
-            //select the uplift summaries for the selected season
-            const upliftSummaries = this.props.data.resort.lifts
-                .map(lift => {
-                    const upliftSummary = lift.upliftSummaries.find(summary => summary.season.year === selectedYear) || {};
-                    return {
-                        liftID: lift.id,
-                        lift: lift.name,
-                        upliftCount: upliftSummary.upliftCount,
-                        waitTimeAverage: upliftSummary.waitTimeAverage,
-                    };
-                });
-            this.setState({
-                selectedYear,
-                upliftSummaries,
-            });
-        } else {
-            this.setState({
-                selectedYear: null,
-                upliftSummaries: null,
-            });
-        }
-    };
-
-    handleRequestSort = (event, column) => {
-        let order = 'desc';
-
-        if (this.state.orderByCol === column && this.state.order === 'desc') {
-            order = 'asc';
-        }
-
-        this.setState({ order, orderByCol: column});
-    };
-
     render() {
-        const { classes, data: { loading, error, resort } } = this.props;
-        if (error) {
-            console.log(error);
-            return null;
-        }
-        if (loading) {
-            return null;
-        }
+        const { classes, match } = this.props;
+        const id = parseInt(match.params.id);
+        return <Query
+            query={query}
+            variables={{
+                resortID: id,
+                groupBy: 'hour',
+                groupBy2: 'season',
+            }}
+        >
+            {({ error, data: { resort } }) => {
+                if (error) {
+                    console.log(error);
+                    return null;
+                }
+                if (resort === undefined) {
+                    return null;
+                }
+                if (resort === null) {
+                    return <p>Resort not found</p>; //todo
+                }
 
-        const { selectedYear, upliftSummaries, order, orderByCol } = this.state;
+                const { upliftGroupings } = resort;
+                const assignedLiftIDs = resort.lifts.map(lift => lift.id);
 
-        //flatten summaries
-        const allUpliftSummaries = resort.lifts.reduce((acc, lift) => acc.concat(lift.upliftSummaries), []);
-        //extract seasons, e.g., ['2014-2015', '2015-2016']
-        const seasons = allUpliftSummaries.reduce((acc, summary) => {
-            if (!acc.some(season => season.year === summary.season.year)) {
-                acc.push({
-                    year: summary.season.year,
-                    description: summary.season.description
-                });
-            }
-            return acc;
-        }, []);
-        //calculate stats by season
-        seasons.forEach(season => {
-            const seasonUpliftSummaries = allUpliftSummaries.filter(summary => summary.season.year === season.year);
-            season.upliftCount = seasonUpliftSummaries.reduce((acc, summary) => acc + summary.upliftCount, 0);
-            season.waitTimeAverage = Math.round(seasonUpliftSummaries.reduce((acc, summary) => acc + summary.waitTimeAverage * summary.upliftCount, 0) / season.upliftCount);
-        });
-
-        return (
-            <Paper>
-                <ResortLogo alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} />
-                <Typography variant="display3" gutterBottom>
-                    {resort.name}
-                </Typography>
-                <div style={{ display: 'flex' }}>
-                    <div className={classes.rowHeadingColumn}>
-                        <Typography className={classes.rowHeading}>Season</Typography>
+                return (
+                    <div>
+                        <Grid container spacing={16}>
+                            <Grid item xs={12}>
+                                <Card className={classes.resort}>
+                                    <div className={classes.resortContent}>
+                                        <CardContent className={classes.resortHeading}>
+                                            <img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.resortLogo} />
+                                            <Typography color='textSecondary'>{resort.name}</Typography>
+                                            <Typography color='textSecondary'>{`${resort.lifts.length} lifts`}</Typography>
+                                        </CardContent>
+                                        <div className={classes.resortActions}>
+                                            <Button component={Link} to={`/admin/resorts/${resort.id}/edit`}>Edit</Button>
+                                            <Button component={Link} to={`/admin/resorts/${resort.id}/lifts`}>Assign Lifts</Button>
+                                        </div>
+                                    </div>
+                                    <CardMedia className={classes.resortMap}>
+                                        <ResortLiftsMap
+                                            resortLocation={resort.location}
+                                            initialBounds={resort.liftEnvelope}
+                                            assignedLiftIDs={assignedLiftIDs}
+                                        />
+                                    </CardMedia>
+                                </Card>
+                            </Grid>
+                            {upliftGroupings.length && [
+                                <Grid item xs={6}>
+                                    <Card key='uplifts'>
+                                        <CardContent>
+                                            <Typography variant='headline'>Uplifts</Typography>
+                                            <Typography color='textSecondary'>Current season versus previous</Typography>
+                                        </CardContent>
+                                        <CardMedia>
+                                            <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='upliftCount' />
+                                        </CardMedia>
+                                        <CardActions>
+                                            <Button component={Link} to={`/admin/resort/${resort.id}/stats`}>More</Button>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>,
+                                <Grid item xs={6}>
+                                    <Card key='stats'>
+                                        <CardContent>
+                                            <Typography variant='headline'>Average Wait Time (seconds)</Typography>
+                                            <Typography color='textSecondary'>Current season versus previous</Typography>
+                                        </CardContent>
+                                        <CardMedia>
+                                            <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='waitTimeAverage' />
+                                        </CardMedia>
+                                        <CardActions>
+                                            <Button component={Link} to={`/admin/lifts/${resort.id}/stats`}>More</Button>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            ]}
+                        </Grid>
                     </div>
-                    <div className={classes.valueColumn}>
-                        <Typography className={classes.value}>Uplifts</Typography>
-                    </div>
-                    <div className={classes.valueColumn}>
-                        <Typography className={classes.value}>Avg Wait (s)</Typography>
-                    </div>
-                </div>
-                {seasons.map(season => (
-                    <ExpansionPanel key={season.year} expanded={selectedYear === season.year} onChange={this.handleSelectSeason(season.year)}>
-                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                            <div className={classes.rowHeadingColumn}>
-                                <Typography className={classes.rowHeading}>{season.description}</Typography>
-                            </div>
-                            <div className={classes.valueColumn}>
-                                <Typography className={classes.value}>{season.upliftCount}</Typography>
-                            </div>
-                            <div className={classes.valueColumn}>
-                                <Typography className={classes.value}>{season.waitTimeAverage}</Typography>
-                            </div>
-                        </ExpansionPanelSummary>
-                        {selectedYear === season.year && (
-                            <ExpansionPanelDetails>
-                                <Table>
-                                    <SortEnabledTableHead
-                                        order={order}
-                                        orderByCol={orderByCol}
-                                        onRequestSort={this.handleRequestSort}
-                                        columns={columnData}
-                                    />
-                                    <TableBody>
-                                        {upliftSummaries
-                                            .sort(makeCompareFn(order, orderByCol, 'liftID'))
-                                            .map(summary => (
-                                                <TableRow key={summary.liftID}>
-                                                    <TableCell component="th" scope="row">
-                                                        <Link to={`/admin/lifts/${summary.liftID}/uplifts`}>{summary.lift}</Link>
-                                                    </TableCell>
-                                                    <TableCell numeric>{summary.upliftCount}</TableCell>
-                                                    <TableCell numeric>{summary.waitTimeAverage}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table>
-                            </ExpansionPanelDetails>
-                        )}
-                    </ExpansionPanel>
-                ))}
-            </Paper>
-        );
-    };
+                );
+            }}
+        </Query>;
+    }
 }
 
-export default compose(
-    withStyles(styles),
-    graphql(resortQuery, {
-        options: ({ match }) => ({ variables: { id: parseInt(match.params.id) } })
-    })
-)(Resort);
+export default withStyles(styles)(Resort);

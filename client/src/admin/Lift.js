@@ -17,6 +17,8 @@ import CardActions from '@material-ui/core/CardActions';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
+import UpliftStatChart from './UpliftStatChart';
+
 const query = gql`
     query LiftAndStatsByHourAndSeason($liftID: Int!) {
         lift(id: $liftID) { 
@@ -65,8 +67,6 @@ class Lift extends Component {
     render() {
         const { classes, match } = this.props;
         const id = parseInt(match.params.id);
-        const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16];
-        const seasonYears = [2016, 2017];
         return <Query
             query={query}
             variables={{
@@ -84,27 +84,11 @@ class Lift extends Component {
                     return null;
                 }
                 if (lift === null) {
-                    return <p>Lift not found</p>;
+                    return <p>Lift not found</p>;//todo
                 }
 
                 const { upliftGroupings } = lift;
                 const route = lift.stations.map(station => station.location);
-                const chartData = dataPoint => ({
-                    labels: hours.map(hour => moment().hour(hour).format('hA')),
-                    series: seasonYears.map(seasonYear => (
-                        hours.map(hour => {
-                            const grouping = upliftGroupings.find(g => g.groupKey === hour && g.group2Key === seasonYear);
-                            return grouping
-                                ? grouping[dataPoint]
-                                : null;
-                        })
-                    )),
-                });
-                var options = {
-                    low: 0,
-                    showArea: true
-                };
-                const someData = chartData('upliftCount');
                 return (
                     <div>
                         <Grid container spacing={16}>
@@ -137,7 +121,7 @@ class Lift extends Component {
                                             <Typography color='textSecondary'>Current season versus previous</Typography>
                                         </CardContent>
                                         <CardMedia>
-                                            <ChartistGraph data={chartData('upliftCount')} options={options} type={'Line'} />
+                                            <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='upliftCount' />
                                         </CardMedia>
                                         <CardActions>
                                             <Button component={Link} to={`/admin/lifts/${lift.id}/uplifts`}>Uplifts</Button>
@@ -151,7 +135,7 @@ class Lift extends Component {
                                             <Typography color='textSecondary'>Current season versus previous</Typography>
                                         </CardContent>
                                         <CardMedia>
-                                            <ChartistGraph data={chartData('waitTimeAverage')} options={options} type={'Line'} />
+                                            <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='waitTimeAverage' />
                                         </CardMedia>
                                         <CardActions>
                                             <Button component={Link} to={`/admin/lifts/${lift.id}/stats`}>Stats</Button>

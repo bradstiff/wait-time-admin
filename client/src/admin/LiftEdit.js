@@ -33,8 +33,7 @@ const mutation = gql`
     }
 `;
 
-const LiftEdit = ({ match, submit, close }) => {
-    const id = parseInt(match.params.id);
+const LiftEdit = ({ id, submit, close }) => {
     return <Query query={query} variables={{ id }}>
         {({ error, data: { lift } }) => {
             if (error) {
@@ -72,6 +71,7 @@ export default compose(
             const id = parseInt(match.params.id);
             const nextLocation = `/admin/lifts/${id}`;
             return {
+                id,
                 submit: (values, actions) => {
                     updateLift({ variables: values })
                         .then(() => history.push(nextLocation));

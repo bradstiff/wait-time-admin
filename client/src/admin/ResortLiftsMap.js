@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Map, TileLayer, Polyline } from 'react-leaflet'
@@ -24,65 +25,100 @@ const FullMap = styled(Map) `
     width: 1500px;
 `;
 
-class ResortLiftsMap extends Component {
+class ResortLiftsMap extends React.Component {
     state = {};
 
     assignMapRef = node => {
         this.map = node;
     };
 
-    handleMapBoundsChange = () => {
-        const bounds = this.map.leafletElement.getBounds();
+    handleMapBoundsChange = leaflet => {
+        const boundingBox = leaflet.getBounds();
         this.setState({
-            bounds: [
-                bounds.getNorthWest(),
-                bounds.getSouthEast(),
-            ],
+            topLeft: boundingBox.getNorthWest(),
+            bottomRight: boundingBox.getSouthEast(),
         });
     };
 
     render() {
-        const { bounds } = this.state;
-        const { assignedLiftIDs, onAssignLift, onUnassignLift, resortLocation } = this.props;
+        const { topLeft, bottomRight } = this.state;
+        const { assignedLiftIDs, onAssignLift, onUnassignLift, resortLocation, initialBounds } = this.props;
+        const mapProps = initialBounds
+            ? { bounds: initialBounds }
+            : {
+                center: resortLocation,
+                zoom: 13,
+            };
         return (
-                <Map
-                    center={resortLocation}
-                    zoom={13}
-                    ref={this.assignMapRef}
-                    onLoad={this.handleMapBoundsChange}
-                    onViewportChanged={this.handleMapBoundsChange}
-                    style={{ width: '100%', height: '100%' }}
+            <Map
+                {...mapProps}
+                ref={this.assignMapRef}
+                whenReady={event => this.handleMapBoundsChange(event.target)}
+                //onViewportChanged={() => this.handleMapBoundsChange(this.map.leafletElement)}
+                style={{ width: '100%', height: '100%' }}
+            >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                {topLeft && <Query
+                    query={liftsQuery}
+                    variables={{ topLeft, bottomRight }}
                 >
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    {bounds && <Query
-                        query={liftsQuery}
-                        variables={{
-                            topLeft: bounds[0],
-                            bottomRight: bounds[1]
-                        }}
-                    >
-                        {({ loading, error, data }) => {
-                            if (error) {
-                                console.log(error);
-                                return null;
-                            }
-                            if (data.intersectingLifts === undefined) {
-                                return null;
-                            }
+                    {({ loading, error, data }) => {
+                        if (error) {
+                            console.log(error);
+                            return null;
+                        }
+                        if (data.intersectingLifts === undefined) {
+                            return null;
+                        }
 
-                            const intersectingLifts = data.intersectingLifts.map(lift => ({
+                        const enableEdit = onUnassignLift && onAssignLift;
+                        const intersectingLifts = data.intersectingLifts.map(lift => {
+                            const assigned = assignedLiftIDs.includes(lift.id);
+                            return {
                                 id: lift.id,
                                 route: lift.stations.map(station => station.location),
-                            }));
-                            return intersectingLifts.map(lift => assignedLiftIDs.includes(lift.id)
-                                ? <Polyline positions={lift.route} key={lift.id} onClick={() => onUnassignLift(lift.id)} color='blue' />
-                                : <Polyline positions={lift.route} key={lift.id} onClick={() => onAssignLift(lift.id)} color='grey' />
-                            );
-                        }}
-                    </Query>}
-                </Map>
+                                clickHandler: enableEdit
+                                    ? assigned
+                                        ? onUnassignLift
+                                        : onAssignLift
+                                    : undefined,
+                                color: assigned
+                                    ? 'blue'
+                                    : enableEdit
+                                        ? 'grey'
+                                        : undefined,
+                            };
+                        });
+                        return intersectingLifts.map(lift => <Polyline
+                            positions={lift.route}
+                            key={lift.id}
+                            onClick={lift.clickHandler ? () => lift.clickHandler(lift.id) : undefined}
+                            color={lift.color}
+                        />);
+                    }}
+                </Query>}
+            </Map>
         );
     }
+}
+
+ResortLiftsMap.propTypes = {
+    assignedLiftIDs: PropTypes
+        .arrayOf(PropTypes.number)
+        .isRequired,
+    resortLocation: PropTypes
+        .shape({
+            lat: PropTypes.number.isRequired,
+            lng: PropTypes.number.isRequired,
+        })
+        .isRequired,
+    initialBounds: PropTypes
+        .arrayOf(PropTypes.shape({
+            lat: PropTypes.number.isRequired,
+            lng: PropTypes.number.isRequired,
+        })),
+    onAssignLift: PropTypes.func,
+    onUnassignLift: PropTypes.func,
 }
 
 export default ResortLiftsMap;

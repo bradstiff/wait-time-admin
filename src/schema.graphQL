@@ -21,13 +21,13 @@ type Resort {
     logoFilename: String!
     trailMapFilename: String!
 	timezone: String!
-	latitude: Float
-	longitude: Float
 	location: Location
+	liftEnvelope: [Location!]
     sortOrder: Int!
     dates: [WaitTimeDate!]
 	lastDate: WaitTimeDate
     lifts: [Lift!]
+	upliftGroupings(groupBy: String!, groupBy2: String): [UpliftGrouping!]
 }
 type Lift {
     id: Int!
@@ -38,7 +38,6 @@ type Lift {
 	isActive: Boolean!
 	stations: [LiftStation!]!
 	upliftList(offset: Int!, limit: Int!, orderBy: String!, order: String!, seasonYear: Int, month: Int, day: Int, hour: Int): UpliftList!
-	upliftSummaries: [UpliftSummary!]
 	upliftGroupings(groupBy: String!, groupBy2: String): [UpliftGrouping!]
 }
 type WaitTimeDate {
@@ -70,12 +69,6 @@ type Uplift {
 	season: Season!
 	date: Date!
 	waitSeconds: Int!
-}
-type UpliftSummary {
-	lift: Lift!
-	season: Season!
-    upliftCount: Int!
-	waitTimeAverage: Int!
 }
 type LiftStation {
 	number: Int!

@@ -4,7 +4,7 @@ import { error } from 'util';
 
 import PredicateBuilder from './PredicateBuilder';
 
-const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude from Resort';
+const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude, LiftEnvelope.ToString() as liftEnvelopeText from Resort';
 const liftQuery = `
     select LiftID as id, name, resortID, typeID, isActive, occupancy, Point1Latitude as station1Lat, Point1Longitude as station1Lng, Point2Latitude as station2Lat, Point2Longitude as station2Lng, Point3Latitude as station3Lat, Point3Longitude as station3Lng, Point4Latitude as station4Lat, Point4Longitude as station4Lng, Point5Latitude as station5Lat, Point5Longitude as station5Lng
     from Lift
@@ -122,6 +122,44 @@ const Resort = {
     },
     getByLift: (lift, args, context) => lift.resortID ? context.dataLoaders.resortsByIDs.load(lift.resortID) : null,
     getWaitTimeDates: (resort, args, context) => context.dataLoaders.waitTimeDatesByResortIDs.load(resort.id),
+    getUpliftGroupings: async (resort, args, context) => {
+        let groupBy = args.groupBy.toLowerCase();
+        if (groupBy === 'season') {
+            groupBy = 'seasonYear';
+        }
+        let groupBy2 = args.groupBy2 ? args.groupBy2.toLowerCase() : null;
+        if (groupBy2 === 'season') {
+            groupBy2 = 'seasonYear';
+        }
+        const request = context.db.request().input('resortID', mssql.Int, resort.id);
+        let result = null;
+        //need a query builder
+        if (groupBy2 === null) {
+            result = await request.query(`
+                select	l.ResortID as resortID, '${groupBy}' as groupBy, ${groupBy} as groupKey, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+                from Uplift u
+                join Lift l on l.LiftID = u.LiftID
+                where ResortID = @resortID
+                group by resortID, ${groupBy}
+                order by ${groupBy} asc
+            `);
+        } else {
+            result = await request.query(`
+                select	l.ResortID as resortID, '${groupBy}' as groupBy, '${groupBy2}' as groupBy2, ${groupBy} as groupKey, ${groupBy2} as group2Key, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+                from Uplift u
+                join Lift l on l.LiftID = u.LiftID
+                where ResortID = @resortID
+                group by resortID, ${groupBy}, ${groupBy2}
+                order by ${groupBy}, ${groupBy2} asc
+            `);
+        }
+        return result.recordset.map(record => Object.assign(
+            record, {
+                groupBy: args.groupBy,
+                groupBy2: args.groupBy2,
+            }
+        ));
+    },
     create: async (_, args, context) => {
         const request = context.db.request()
             .input('name', mssql.NVarChar, args.name)
@@ -308,7 +346,12 @@ const Lift = {
                 order by ${groupBy}, ${groupBy2} asc
             `);
         }
-        return result.recordset;
+        return result.recordset.map(record => Object.assign(
+            record, {
+                groupBy: args.groupBy,
+                groupBy2: args.groupBy2,
+            }
+        ));
     },
     getUpliftSummaries: (lift, args, context) => context.dataLoaders.upliftSummariesByLiftIDs.load(lift.id),
     update: async (_, args, context) => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
 import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -55,13 +56,17 @@ class ResortLifts extends React.Component {
         }
     }
 
+    navigateBack = () => {
+        const nextLocation = `/admin/resorts/${this.props.data.resort.id}`;
+        this.props.history.push(nextLocation);
+    }
+
     handleSave = () => {
         this.props.saveAssignedLifts(this.props.data.resort.id, this.state.assignedLiftIDs);
+        this.navigateBack();
     }
 
-    handleCancel = () => {
-
-    }
+    handleCancel = this.navigateBack;
 
     render() {
         const { data: { resort, error } } = this.props;
@@ -96,7 +101,7 @@ class ResortLifts extends React.Component {
 
     static getDerivedStateFromProps(props, state) {
         const { assignedLiftIDs } = state || {};
-        const { data: { resort } } = props;
+        const { resort } = props.data || {};
         if (resort && assignedLiftIDs === undefined) {
             return {
                 assignedLiftIDs: resort.lifts.map(lift => lift.id),
@@ -108,8 +113,9 @@ class ResortLifts extends React.Component {
 }
 
 export default compose(
+    withRouter,
     graphql(resortQuery, {
-        options: ({ match }) => ({ variables: { resortID: parseInt(match.params.id) } })
+        options: ({ match }) => ({ variables: { resortID: parseInt(match.params.id) } }),
     }),
     graphql(updateAssignedLiftsMutation, {
         name: 'updateAssignedLifts',
@@ -120,7 +126,7 @@ export default compose(
                         id,
                         liftIDs,
                     }
-                })
+                }),
         })
-    })
+    }),
 )(ResortLifts);
