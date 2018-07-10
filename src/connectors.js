@@ -134,9 +134,18 @@ const Resort = {
         const request = context.db.request().input('resortID', mssql.Int, resort.id);
         let result = null;
         //need a query builder
-        if (groupBy2 === null) {
+        if (groupBy === 'lift') { 
             result = await request.query(`
-                select	l.ResortID as resortID, '${groupBy}' as groupBy, ${groupBy} as groupKey, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+                select	l.ResortID as resortID, l.LiftID as groupKey, l.Name as groupDescription, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+                from Uplift u
+                join Lift l on l.LiftID = u.LiftID
+                where ResortID = @resortID
+                group by resortID, l.LiftID, l.Name
+                order by l.Name asc
+            `);
+        } else if (groupBy2 === null) {
+            result = await request.query(`
+                select	l.ResortID as resortID, ${groupBy} as groupKey, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
                 from Uplift u
                 join Lift l on l.LiftID = u.LiftID
                 where ResortID = @resortID
@@ -145,7 +154,7 @@ const Resort = {
             `);
         } else {
             result = await request.query(`
-                select	l.ResortID as resortID, '${groupBy}' as groupBy, '${groupBy2}' as groupBy2, ${groupBy} as groupKey, ${groupBy2} as group2Key, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
+                select	l.ResortID as resortID, ${groupBy} as groupKey, ${groupBy2} as group2Key, count(*) as upliftCount, avg(waitSeconds) as waitTimeAverage
                 from Uplift u
                 join Lift l on l.LiftID = u.LiftID
                 where ResortID = @resortID
@@ -164,13 +173,14 @@ const Resort = {
         const request = context.db.request()
             .input('name', mssql.NVarChar, args.name)
             .input('slug', mssql.NVarChar, args.slug)
+            .input('timezone', mssql.VarChar, args.timezone)
             .input('logoFilename', mssql.VarChar, args.logoFilename)
             .input('trailMapFilename', mssql.VarChar, args.trailMapFilename)
             .input('latitude', mssql.Float, args.latitude)
             .input('longitude', mssql.Float, args.longitude)
         const result = await request.query(`
-            insert Resort (Name, Slug, LogoFilename, TrailMapFilename, Latitude, Longitude) 
-                values (@name, @slug, @logoFilename, @trailMapFilename, @latitude, @longitude); 
+            insert Resort (Name, Slug, Timezone, LogoFilename, TrailMapFilename, Latitude, Longitude) 
+                values (@name, @slug, @timezone, @logoFilename, @trailMapFilename, @latitude, @longitude); 
             select scope_identity() as id;
         `);
 
@@ -182,6 +192,7 @@ const Resort = {
             .input('id', mssql.Int, args.id)
             .input('name', mssql.NVarChar, args.name)
             .input('slug', mssql.NVarChar, args.slug)
+            .input('timezone', mssql.VarChar, args.timezone)
             .input('logoFilename', mssql.VarChar, args.logoFilename)
             .input('trailMapFilename', mssql.VarChar, args.trailMapFilename)
             .input('latitude', mssql.Float, args.latitude)
@@ -192,6 +203,7 @@ const Resort = {
                     Slug = @slug,
                     LogoFilename = @logoFilename,
                     TrailMapFilename = @trailMapFilename,
+                    Timezone = @timezone,
                     Latitude = @latitude,
                     Longitude = @longitude
                 where ResortID = @id

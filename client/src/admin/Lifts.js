@@ -47,10 +47,10 @@ const query = gql`
 `;
 
 const columnData = [
-    { field: 'name', numeric: false, disablePadding: false, label: 'Name' },
-    { field: 'typeID', numeric: false, disablePadding: false, label: 'Type' },
-    { field: 'resortID', numeric: false, disablePadding: false, label: 'Resort' },
-    { field: 'isActive', numeric: false, disablePadding: false, label: 'Active' },
+    { field: 'name', label: 'Name' },
+    { field: 'typeID', label: 'Type' },
+    { field: 'resortID', label: 'Resort' },
+    { field: 'isActive', label: 'Active' },
 ];
 
 const styles = theme => ({
@@ -82,7 +82,7 @@ class Lifts extends Component {
         page: 0,
         rowsPerPage: 25,
         order: 'asc',
-        orderByCol: columnData[0],
+        orderBy: 'name',
         isActive: true,
     };
 
@@ -115,25 +115,25 @@ class Lifts extends Component {
     handleChangeRowsPerPage = event => 
         this.setState({ rowsPerPage: event.target.value });
 
-    handleRequestSort = (event, column) => {
-        let order = 'desc';
-
-        if (this.state.orderByCol === column && this.state.order === 'desc') {
-            order = 'asc';
-        }
-
-        this.setState({ order, orderByCol: column });
+    handleRequestSort = (event, fieldName) => {
+        const order = this.state.orderBy === fieldName && this.state.order === 'asc'
+            ? 'desc'
+            : 'asc';
+        this.setState({
+            order,
+            orderBy: fieldName
+        });
     };
 
     render() {
         const { classes, match } = this.props;
-        const { page, rowsPerPage, order, orderByCol, name, typeID, resortID, isActive } = this.state;
+        const { page, rowsPerPage, order, orderBy, name, typeID, resortID, isActive } = this.state;
         return <Query
             query={query}
             variables={{
                 offset: page * rowsPerPage,
                 limit: rowsPerPage,
-                orderBy: orderByCol.field,
+                orderBy,
                 order,
                 name,
                 typeID,
@@ -208,7 +208,7 @@ class Lifts extends Component {
                                 <Table className={classes.table}>
                                     <SortEnabledTableHead
                                         order={order}
-                                        orderByCol={orderByCol}
+                                        orderBy={orderBy}
                                         onRequestSort={this.handleRequestSort}
                                         columns={columnData}
                                     />

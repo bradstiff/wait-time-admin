@@ -4,18 +4,25 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import fieldProps from '../common/FormHelper';
 
+import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import MenuItem from '@material-ui/core/MenuItem';
+import { withStyles } from '@material-ui/core/styles';
 
 import LiftTypeData from '../common/LiftTypeData';
 import ResortData from '../common/ResortData';
 
-export default ({ lift, submit, close }) => {
+const styles = theme => ({
+    root: {
+        padding: theme.spacing.unit,
+    }
+})
+
+const LiftForm = ({ lift, submit, close, classes }) => {
     const model = {
         name: Yup.string().min(2).max(100).required().label('Name'),
         typeID: Yup.number().integer().required().label('Type'),
@@ -36,49 +43,53 @@ export default ({ lift, submit, close }) => {
         model[station.lngField] = Yup.number().min(-180).max(180).required().label(station.lngLabel);
     });
 
-    return <Formik
-        initialValues={lift}
-        validationSchema={Yup.object().shape(model)}
-        onSubmit={submit}
-        render={props => {
-            const { values, handleSubmit, isSubmitting, } = props;
-            return (
-                <form onSubmit={handleSubmit}>
-                    <div><TextField {...fieldProps('name', props) } label='Name' required width={100} maxLength={100} /></div>
-                    <div>
-                        <TextField {...fieldProps('typeID', props) } label='Type' select required > 
-                            {LiftTypeData.map(type => (
-                                <MenuItem key={type.id} value={type.id}>
-                                    {type.description}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </div>
-                    <div><TextField {...fieldProps('occupancy', props) } label='Occupancy' /></div>
-                    <div>
-                        <ResortData>
-                            {({ options }) => (
-                                <TextField {...fieldProps('resortID', props) } label='Resort' select required >
-                                    {options && options.map(option => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                            {option.text}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            )}
-                        </ResortData>
-                    </div>
-                    {stationMeta.map(station => (
+    return <Paper className={classes.root}>
+        <Formik
+            initialValues={lift}
+            validationSchema={Yup.object().shape(model)}
+            onSubmit={submit}
+            render={props => {
+                const { values, handleSubmit, isSubmitting, } = props;
+                return (
+                    <form onSubmit={handleSubmit}>
+                        <div><TextField {...fieldProps('name', props) } label='Name' required width={100} maxLength={100} /></div>
                         <div>
-                            <TextField {...fieldProps(station.latField, props) } label={station.latLabel} required />
-                            <TextField {...fieldProps(station.lngField, props) } label={station.lngLabel} required />
+                            <TextField {...fieldProps('typeID', props) } label='Type' select required > 
+                                {LiftTypeData.map(type => (
+                                    <MenuItem key={type.id} value={type.id}>
+                                        {type.description}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
                         </div>
-                    ))}
-                    <div><FormControlLabel control={<Checkbox {...fieldProps('isActive', props) } checked={values.isActive} />} label='Active' /></div>
-                    <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
-                    <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>
-                </form>
-            );
-        }}
-    />
+                        <div><TextField {...fieldProps('occupancy', props) } label='Occupancy' /></div>
+                        <div>
+                            <ResortData>
+                                {({ options }) => (
+                                    <TextField {...fieldProps('resortID', props) } label='Resort' select required >
+                                        {options && options.map(option => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.text}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                )}
+                            </ResortData>
+                        </div>
+                        {stationMeta.map(station => (
+                            <div>
+                                <TextField {...fieldProps(station.latField, props) } label={station.latLabel} required />
+                                <TextField {...fieldProps(station.lngField, props) } label={station.lngLabel} required />
+                            </div>
+                        ))}
+                        <div><FormControlLabel control={<Checkbox {...fieldProps('isActive', props) } checked={values.isActive} />} label='Active' /></div>
+                        <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
+                        <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>
+                    </form>
+                );
+            }}
+        />
+    </Paper>
 };
+
+export default withStyles(styles)(LiftForm);

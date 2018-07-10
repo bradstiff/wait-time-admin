@@ -12,7 +12,7 @@ const validateDate = value => {
     };
 };
 
-const getGroupDescription = (groupBy, key) => {
+const getGroupDescription = (groupBy, key, grouping) => {
     if (groupBy === undefined) {
         return undefined;
     }
@@ -25,6 +25,8 @@ const getGroupDescription = (groupBy, key) => {
             return moment().day(key - 1).format('dddd');
         case 'hour':
             return `${moment().hour(key).format('hA')} - ${moment().hour(key + 1).format('hA')}`;
+        case 'lift': 
+            return grouping.groupDescription; //groupBy2 = lift is not supported
         default:
             throw new Error(`groupBy '${groupBy}' is not supported.`);
     }
@@ -113,8 +115,8 @@ const resolvers = {
         }),
     },
     UpliftGrouping: {
-        groupDescription: grouping => getGroupDescription(grouping.groupBy, grouping['groupKey']),
-        group2Description: grouping => getGroupDescription(grouping.groupBy2, grouping['group2Key']),
+        groupDescription: grouping => getGroupDescription(grouping.groupBy, grouping['groupKey'], grouping),
+        group2Description: grouping => getGroupDescription(grouping.groupBy2, grouping['group2Key'], grouping),
     },
     Season: {
         description: season => `${season.year} - ${season.year + 1}`,

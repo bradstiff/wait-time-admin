@@ -15,6 +15,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import TableHead from '@material-ui/core/TableHead';
 
 import SelectMenu from '../common/SelectMenu';
+import LinkButton from '../common/LinkButton';
+import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableHead';
 
 const upliftsQuery = gql`
     query UpliftStatsByResort($resortID: Int!, $groupBy: String!) {
@@ -50,6 +52,8 @@ const styles = theme => ({
 class ResortStats extends Component {
     state = {
         groupBy: 'Season',
+        order: 'asc',
+        orderBy: 'groupDescription',
     };
 
     handleSelectGroupBy = groupBy => {
@@ -58,19 +62,25 @@ class ResortStats extends Component {
         });
     }
 
+    handleRequestSort = (event, fieldName) => {
+        const order = this.state.orderBy === fieldName && this.state.order === 'asc'
+            ? 'desc'
+            : 'asc';
+        this.setState({
+            order,
+            orderBy: fieldName
+        });
+    };
+
     render() {
         const { classes, match } = this.props;
-        const { groupBy, seasonYear, month, day, hour } = this.state;
+        const { groupBy, seasonYear, month, day, hour, order, orderBy } = this.state;
         const id = parseInt(match.params.id);
         return <Query
             query={upliftsQuery}
             variables={{
                 resortID: id,
                 groupBy,
-                seasonYear,
-                month,
-                day,
-                hour,
             }}
         >
             {({ error, data }) => {
@@ -87,6 +97,11 @@ class ResortStats extends Component {
                 }
 
                 const { upliftGroupings } = resort;
+                const columnData = [
+                    { field: 'groupDescription', label: groupBy, keyField: 'groupKey', compareField: groupBy === 'Lift' ? 'groupDescription' : 'groupKey' },
+                    { field: 'upliftCount', label: 'Uplifts', keyField: 'groupKey' },
+                    { field: 'waitTimeAverage', label: 'Avg Wait (s)', keyField: 'groupKey' },
+                ];
                 return (
                     <Paper>
                         <Toolbar className={classes.toolbar}>
@@ -104,6 +119,7 @@ class ResortStats extends Component {
                                         { text: 'By month', value: 'Month' },
                                         { text: 'By day', value: 'Day' },
                                         { text: 'By hour', value: 'Hour' },
+                                        { text: 'By lift', value: 'Lift' },
                                     ]}
                                     onSelect={this.handleSelectGroupBy}
                                     value={groupBy}
@@ -113,20 +129,27 @@ class ResortStats extends Component {
                         {upliftGroupings && (
                             <div>
                                 <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>{groupBy}</TableCell>
-                                            <TableCell>Uplifts</TableCell>
-                                            <TableCell>Avg Wait (s)</TableCell>
-                                        </TableRow>
-                                    </TableHead>
+                                    <SortEnabledTableHead
+                                        order={order}
+                                        orderBy={orderBy}
+                                        onRequestSort={this.handleRequestSort}
+                                        columns={columnData}
+                                    />
                                     <TableBody>
-                                        {upliftGroupings.map(grouping => (
-                                            <TableRow key={grouping.groupKey}>
-                                                <TableCell component="th" scope="row">{grouping.groupDescription}</TableCell>
-                                                <TableCell>{grouping.upliftCount}</TableCell>
-                                                <TableCell>{grouping.waitTimeAverage}</TableCell>
-                                            </TableRow>
+                                        {upliftGroupings
+                                            .slice()
+                                            .sort(makeCompareFn(order, orderBy, columnData, 'groupKey'))
+                                            .map(grouping => (
+                                                <TableRow key={grouping.groupKey}>
+                                                    <TableCell component="th" scope="row">
+                                                        {groupBy === 'Lift'
+                                                            ? <LinkButton to={`/admin/lifts/${grouping.groupKey}`}>{grouping.groupDescription}</LinkButton>
+                                                            : grouping.groupDescription
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell>{grouping.upliftCount}</TableCell>
+                                                    <TableCell>{grouping.waitTimeAverage}</TableCell>
+                                                </TableRow>
                                         ))}
                                     </TableBody>
                                 </Table>

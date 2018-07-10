@@ -35,8 +35,8 @@ const upliftsQuery = gql`
 `;
 
 const columnData = [
-    { field: 'date', numeric: false, disablePadding: false, label: 'Date' },
-    { field: 'waitSeconds', numeric: true, disablePadding: false, label: 'Wait Time (seconds)' },
+    { field: 'date', label: 'Date' },
+    { field: 'waitSeconds', label: 'Wait Time (seconds)', numeric: true },
 ];
 
 const styles = theme => ({
@@ -70,7 +70,7 @@ class LiftUplifts extends Component {
         page: 0,
         rowsPerPage: 25,
         order: 'asc',
-        orderByCol: columnData[0],
+        orderBy: 'date',
         seasonYear: null,
         month: null,
         day: null,
@@ -109,19 +109,19 @@ class LiftUplifts extends Component {
         this.setState({ rowsPerPage: event.target.value });
     };
 
-    handleRequestSort = (event, column) => {
-        let order = 'desc';
-
-        if (this.state.orderByCol === column && this.state.order === 'desc') {
-            order = 'asc';
-        }
-
-        this.setState({ order, orderByCol: column });
+    handleRequestSort = (event, fieldName) => {
+        const order = this.state.orderBy === fieldName && this.state.order === 'asc'
+            ? 'desc'
+            : 'asc';
+        this.setState({
+            order,
+            orderBy: fieldName
+        });
     };
 
     render() {
         const { classes, match } = this.props;
-        const { page, rowsPerPage, order, orderByCol, seasonYear, month, day, hour } = this.state;
+        const { page, rowsPerPage, order, orderBy, seasonYear, month, day, hour } = this.state;
         const id = parseInt(match.params.id);
         return <Query
             query={upliftsQuery}
@@ -129,7 +129,7 @@ class LiftUplifts extends Component {
                 liftID: id,
                 offset: page * rowsPerPage,
                 limit: rowsPerPage,
-                orderBy: orderByCol.field,
+                orderBy,
                 order,
                 seasonYear,
                 month,
@@ -232,7 +232,7 @@ class LiftUplifts extends Component {
                                 <Table>
                                     <SortEnabledTableHead
                                         order={order}
-                                        orderByCol={orderByCol}
+                                        orderBy={orderBy}
                                         onRequestSort={this.handleRequestSort}
                                         columns={columnData}
                                     />
