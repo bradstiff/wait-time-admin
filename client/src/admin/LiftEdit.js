@@ -35,11 +35,12 @@ const mutation = gql`
 
 const LiftEdit = ({ id, submit, close }) => {
     return <Query query={query} variables={{ id }}>
-        {({ error, data: { lift } }) => {
+        {({ error, data }) => {
             if (error) {
                 console.log(error);
                 return null;
             }
+            const { lift } = data;
             if (lift === undefined) {
                 return null;
             }

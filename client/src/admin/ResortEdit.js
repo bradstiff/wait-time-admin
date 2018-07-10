@@ -14,8 +14,7 @@ const resortQuery = gql`
             logoFilename,
             trailMapFilename,
             timezone,
-            latitude,
-            longitude
+            location { lat, lng} ,
         }
     }
 `;
@@ -29,8 +28,7 @@ const resortMutation = gql`
             logoFilename,
             trailMapFilename,
             timezone,
-            latitude,
-            longitude
+            location { lat, lng} ,
         }
     }
 `;
@@ -38,15 +36,24 @@ const resortMutation = gql`
 const EditResort = ({ match, submit, close }) => {
     const id = parseInt(match.params.id);
     return <Query query={resortQuery} variables={{ id }}>
-        {({ loading, error, data }) => {
+        {({ error, data }) => {
             if (error) {
                 console.log(error);
                 return null;
             }
-            if (loading) {
+            const { resort } = data;
+            if (resort === undefined) {
                 return null;
             }
-            return <ResortForm resort={data.resort} submit={submit} close={close} />
+            if (resort === null) {
+                return <p>Resort not found</p>;
+            }
+            const resortValues = {
+                latitude: resort.location.lat,
+                longitude: resort.location.lng,
+                ...resort,
+            };
+            return <ResortForm resort={resortValues} submit={submit} close={close} />
         }}
     </Query>
 };

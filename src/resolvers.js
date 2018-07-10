@@ -53,6 +53,9 @@ const resolvers = {
         lifts: Lift.getAllByResort,
         upliftGroupings: Resort.getUpliftGroupings,
         liftEnvelope: resort => {
+            if (!resort.liftEnvelopeText) {
+                return null;
+            }
             const start = resort.liftEnvelopeText.indexOf('STRING (') + 'STRING ('.length;
             const length = resort.liftEnvelopeText.length - start - '))'.length;
             const pointPairs = resort.liftEnvelopeText.substr(start, length);

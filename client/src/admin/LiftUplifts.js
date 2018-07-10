@@ -137,11 +137,12 @@ class LiftUplifts extends Component {
                 hour,
             }}
         >
-            {({ error, data: { lift } }) => {
+            {({ error, data }) => {
                 if (error) {
                     console.log(error);
                     return null;
                 }
+                const { lift } = data;
                 if (lift === undefined) {
                     return null;
                 }

@@ -205,10 +205,16 @@ const Resort = {
                 update Lift set 
                     ResortID = @id
                 where LiftID in (${liftIDs.join()});
+
                 update Lift set
                     ResortID = null
                 where LiftID not in (${liftIDs.join()})
                 and ResortID = @id;
+
+                update r set		
+                    LiftEnvelope = (select geography::EnvelopeAggregate(GeoRoute) from Lift where ResortID = r.ResortID)
+                from Resort r
+                where r.ResortID = @id;
             `);
         return Resort.getByID(null, { id }, context);
     },

@@ -9,17 +9,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-const liftsQuery = gql`
-    query IntersectingLifts($topLeft: LocationInput!, $bottomRight: LocationInput!) {
-        intersectingLifts(topLeft: $topLeft, bottomRight: $bottomRight) { 
-            id,
-            name,
-            resort { id },
-            stations { location { lat, lng } },
-        }
-    }
-`;
-
 const FullMap = styled(Map) `
     height: 1000px;
     width: 1500px;
@@ -32,19 +21,19 @@ class ResortLiftsMap extends React.Component {
         this.map = node;
     };
 
-    handleMapBoundsChange = leaflet => {
-        const boundingBox = leaflet.getBounds();
-        this.setState({
-            topLeft: boundingBox.getNorthWest(),
-            bottomRight: boundingBox.getSouthEast(),
-        });
+    handleMapBoundsChange = event => {
+        const leaflet = event.target || (this.map && this.map.leafletElement);
+        const { onBoundsChange } = this.props;
+        if (!leaflet || !onBoundsChange) {
+            return;
+        }
+        onBoundsChange(leaflet.getBounds());
     };
 
     render() {
-        const { topLeft, bottomRight } = this.state;
-        const { assignedLiftIDs, onAssignLift, onUnassignLift, resortLocation, initialBounds } = this.props;
-        const mapProps = initialBounds
-            ? { bounds: initialBounds }
+        const { resortLocation, bounds, children, onBoundsChange } = this.props;
+        const mapProps = bounds
+            ? { bounds }
             : {
                 center: resortLocation,
                 zoom: 13,
@@ -53,72 +42,31 @@ class ResortLiftsMap extends React.Component {
             <Map
                 {...mapProps}
                 ref={this.assignMapRef}
-                whenReady={event => this.handleMapBoundsChange(event.target)}
-                //onViewportChanged={() => this.handleMapBoundsChange(this.map.leafletElement)}
+                whenReady={event => this.handleMapBoundsChange(event)}
+                onViewportChanged={event => this.handleMapBoundsChange(event)}
                 style={{ width: '100%', height: '100%' }}
             >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {topLeft && <Query
-                    query={liftsQuery}
-                    variables={{ topLeft, bottomRight }}
-                >
-                    {({ loading, error, data }) => {
-                        if (error) {
-                            console.log(error);
-                            return null;
-                        }
-                        if (data.intersectingLifts === undefined) {
-                            return null;
-                        }
-
-                        const enableEdit = onUnassignLift && onAssignLift;
-                        const intersectingLifts = data.intersectingLifts.map(lift => {
-                            const assigned = assignedLiftIDs.includes(lift.id);
-                            return {
-                                id: lift.id,
-                                route: lift.stations.map(station => station.location),
-                                clickHandler: enableEdit
-                                    ? assigned
-                                        ? onUnassignLift
-                                        : onAssignLift
-                                    : undefined,
-                                color: assigned
-                                    ? 'blue'
-                                    : enableEdit
-                                        ? 'grey'
-                                        : undefined,
-                            };
-                        });
-                        return intersectingLifts.map(lift => <Polyline
-                            positions={lift.route}
-                            key={lift.id}
-                            onClick={lift.clickHandler ? () => lift.clickHandler(lift.id) : undefined}
-                            color={lift.color}
-                        />);
-                    }}
-                </Query>}
+                {children}
             </Map>
         );
     }
 }
 
 ResortLiftsMap.propTypes = {
-    assignedLiftIDs: PropTypes
-        .arrayOf(PropTypes.number)
-        .isRequired,
     resortLocation: PropTypes
         .shape({
             lat: PropTypes.number.isRequired,
             lng: PropTypes.number.isRequired,
         })
         .isRequired,
-    initialBounds: PropTypes
+    bounds: PropTypes
         .arrayOf(PropTypes.shape({
             lat: PropTypes.number.isRequired,
             lng: PropTypes.number.isRequired,
         })),
-    onAssignLift: PropTypes.func,
-    onUnassignLift: PropTypes.func,
+    onBoundsChange: PropTypes.func,
+    children: PropTypes.arrayOf(PropTypes.node),
 }
 
 export default ResortLiftsMap;

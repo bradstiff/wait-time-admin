@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Link } from 'react-router-dom';
-import { Map, TileLayer, Polyline } from 'react-leaflet'
+import { Polyline } from 'react-leaflet'
 
 import styled from 'styled-components';
 import { withStyles } from '@material-ui/core/styles';
@@ -26,7 +26,10 @@ const query = gql`
             logoFilename,
             location { lat, lng },
             liftEnvelope { lat, lng },
-            lifts { id },
+            lifts { 
+                id, 
+                stations { location { lat, lng } },
+            },
             upliftGroupings(groupBy: "hour", groupBy2: "season") {
                 groupKey,
                 groupDescription,
@@ -80,11 +83,12 @@ class Resort extends Component {
                 groupBy2: 'season',
             }}
         >
-            {({ error, data: { resort } }) => {
+            {({ error, data }) => {
                 if (error) {
                     console.log(error);
                     return null;
                 }
+                const { resort } = data;
                 if (resort === undefined) {
                     return null;
                 }
@@ -93,7 +97,6 @@ class Resort extends Component {
                 }
 
                 const { upliftGroupings } = resort;
-                const assignedLiftIDs = resort.lifts.map(lift => lift.id);
 
                 return (
                     <div>
@@ -114,9 +117,13 @@ class Resort extends Component {
                                     <CardMedia className={classes.resortMap}>
                                         <ResortLiftsMap
                                             resortLocation={resort.location}
-                                            initialBounds={resort.liftEnvelope}
-                                            assignedLiftIDs={assignedLiftIDs}
-                                        />
+                                            bounds={resort.liftEnvelope}
+                                        >
+                                            {resort.lifts.map(lift => <Polyline
+                                                key={lift.id}
+                                                positions={lift.stations.map(station => station.location)}
+                                            />)}
+                                        </ResortLiftsMap>
                                     </CardMedia>
                                 </Card>
                             </Grid>

@@ -1,118 +1,54 @@
 import React from 'react';
-import { Formik, Field, Form } from 'formik';
-import { Map, TileLayer, Marker } from 'react-leaflet'
+
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import fieldProps from '../common/FormHelper';
+
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
-const location = [46, -90];
-export default ({ resort, submit, close }) => (
-    <Formik
+export default ({ resort, submit, close }) => {
+    const model = {
+        name: Yup.string().max(100).required().label('Name'),
+        slug: Yup.string().max(100).required().label('Slug'),
+        logoFilename: Yup.string().max(50).label('Logo filename'),
+        trailMapFilename: Yup.string().max(50).label('Trail map filename'),
+        latitude: Yup.number().min(-90).max(90).required().label('Latitude'),
+        longitude: Yup.number().min(-180).max(180).required().label('Longitude'),
+    };
+    return <Formik
         initialValues={resort}
-        validate={values => {
-            let errors = {};
-            if (!values.name) {
-                errors.name = 'Required';
-            }
-            if (!values.slug) {
-                errors.slug = 'Required';
-            }
-            return errors;
-        }}
+        validationSchema={Yup.object().shape(model)}
         onSubmit={submit}
-        render={({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            isSubmitting,
-        }) => (
+        render={props => {
+            const { values, handleSubmit, isSubmitting, } = props;
+            return (
                 <form onSubmit={handleSubmit}>
-                    <TextField
-                        type="text"
-                        name="name"
-                        label="Name"
-                        margin='dense'
-                        required
-                        inputProps={{ size: 100, maxLength: 100}}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.name}
-                        error={touched.name && errors.name}
-                        helperText={touched.name && errors.name}
-                    /><br />
-                    <TextField
-                        type="text"
-                        name="slug"
-                        label="Slug"
-                        margin='dense'
-                        required
-                        inputProps={{ size: 100, maxLength: 100 }}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.slug}
-                        error={touched.slug && errors.slug}
-                        helperText={touched.slug && errors.slug}
-                    /><br />
-                    <TextField
-                        type="text"
-                        name="logoFilename"
-                        label="Logo Filename"
-                        margin='dense'
-                        inputProps={{size:50, maxLength:50}}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.logoFilename}
-                        helperText={touched.logoFilename && errors.logoFilename}
-                    /><br />
-                    <TextField
-                        type="text"
-                        name="trailMapFilename"
-                        label="Trail Map Filename"
-                        margin='dense'
-                        inputProps={{ size: 50, maxLength: 50 }}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.trailMapFilename}
-                        helperText={touched.trailMapFilename && errors.trailMapFilename}
-                    /><br />
-                    <TextField
-                        type="text"
-                        name="timezone"
-                        label="Timezone"
-                        margin='dense'
-                        inputProps={{ size: 100, maxLength: 100 }}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.timezone}
-                        helperText={touched.timezone && errors.timezone}
-                    /><br />
-                    <TextField
-                        type="text"
-                        name="latitude"
-                        label="Latitude"
-                        margin='dense'
-                        inputProps={{ size: 100, maxLength: 100 }}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.latitude}
-                        helperText={touched.latitude && errors.latitude}
-                    /><br />
-                    <TextField
-                        type="text"
-                        name="longitude"
-                        label="Longitude"
-                        margin='dense'
-                        inputProps={{ size: 100, maxLength: 100 }}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.longitude}
-                        helperText={touched.longitude && errors.longitude}
-                    /><br />
+                    <div>
+                        <TextField {...fieldProps('name', props) } label="Name" required inputProps={{ size: 100, maxLength: 100 }} />
+                    </div>
+                    <div>
+                        <TextField {...fieldProps('slug', props) } label='Slug' required inputProps={{ size: 100, maxLength: 100 }} />
+                    </div>
+                    <div>
+                        <TextField {...fieldProps('logoFilename', props) } label="Logo filename" inputProps={{ size: 50, maxLength: 50 }} />
+                    </div>
+                    <div>
+                        <TextField {...fieldProps('trailMapFilename', props) } label="Trail map filename" inputProps={{ size: 50, maxLength: 50 }} />
+                    </div>
+                    <div>
+                        <TextField {...fieldProps('timezone', props) } label="Timezone" inputProps={{ size: 100, maxLength: 100 }} />
+                    </div>
+                    <div>
+                        <TextField {...fieldProps('latitude', props) } label="Latitude" inputProps={{ size: 100, maxLength: 100 }} />
+                    </div>
+                    <div>
+                        <TextField {...fieldProps('longitude', props) } label="Longitude" inputProps={{ size: 100, maxLength: 100 }} />
+                    </div>
                     <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
                     <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>
                 </form>
-            )}
+            )
+        }}
     />
-);
+};

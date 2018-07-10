@@ -1,7 +1,8 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { graphql, compose } from 'react-apollo';
+import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
+import { Polyline } from 'react-leaflet'
 
 import styled from 'styled-components';
 import { withStyles } from '@material-ui/core/styles';
@@ -17,7 +18,19 @@ const resortQuery = gql`
             id,
             name,
             location { lat, lng },
+            liftEnvelope { lat, lng},
             lifts { id },
+        }
+    }
+`;
+
+const intersectingLiftsQuery = gql`
+    query IntersectingLifts($topLeft: LocationInput!, $bottomRight: LocationInput!) {
+        intersectingLifts(topLeft: $topLeft, bottomRight: $bottomRight) { 
+            id,
+            name,
+            resort { id },
+            stations { location { lat, lng } },
         }
     }
 `;
@@ -28,6 +41,7 @@ const updateAssignedLiftsMutation = gql`
             id,
             name,
             location { lat, lng },
+            liftEnvelope { lat, lng},
             lifts { id },
         }
     }
@@ -56,6 +70,13 @@ class ResortLifts extends React.Component {
         }
     }
 
+    handleMapBoundsChange = boundingBox => {
+        this.setState({
+            topLeft: boundingBox.getNorthWest(),
+            bottomRight: boundingBox.getSouthEast(),
+        });
+    };
+
     navigateBack = () => {
         const nextLocation = `/admin/resorts/${this.props.data.resort.id}`;
         this.props.history.push(nextLocation);
@@ -81,7 +102,7 @@ class ResortLifts extends React.Component {
             return <p>Resort not found</p>;
         }
 
-        const { assignedLiftIDs } = this.state;
+        const { assignedLiftIDs, topLeft, bottomRight } = this.state;
         return (
             <Paper style={{ width: '100%', height: '800px' }}>
                 <Typography variant="display3" gutterBottom>
@@ -91,10 +112,35 @@ class ResortLifts extends React.Component {
                 <Button variant='contained' color='primary' onClick={() => this.handleSave()}>Save</Button>
                 <ResortLiftsMap
                     resortLocation={resort.location}
-                    assignedLiftIDs={assignedLiftIDs}
-                    onAssignLift={this.handleAssignLift}
-                    onUnassignLift={this.handleUnassignLift}
-                />
+                    bounds={resort.liftEnvelope}
+                    onBoundsChange={this.handleMapBoundsChange}
+                >
+                    {topLeft && <Query
+                        query={intersectingLiftsQuery}
+                        variables={{ topLeft, bottomRight }}
+                    >
+                        {({ loading, error, data }) => {
+                            if (error) {
+                                console.log(error);
+                                return null;
+                            }
+                            if (data.intersectingLifts === undefined) {
+                                return null;
+                            }
+
+                            return data.intersectingLifts.map(lift => {
+                                const assigned = assignedLiftIDs.includes(lift.id);
+                                return <Polyline
+                                    positions={lift.stations.map(station => station.location)}
+                                    key={lift.id}
+                                    id={lift.id}
+                                    onClick={() => assigned ? this.handleUnassignLift(lift.id) : this.handleAssignLift(lift.id)}
+                                    color={assigned ? 'blue' : 'grey'}
+                                />;
+                            });
+                        }}
+                    </Query>}
+                </ResortLiftsMap>
             </Paper>
         );
     }

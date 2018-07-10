@@ -1,26 +1,21 @@
 import React from 'react';
-import { Formik, Field, Form } from 'formik';
-import * as Yup from 'yup';
 
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import fieldProps from '../common/FormHelper';
+
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 
 import LiftTypeData from '../common/LiftTypeData';
 import ResortData from '../common/ResortData';
 
 export default ({ lift, submit, close }) => {
-    const fields = {
-        name: { name: 'name', label: 'Name', required: true, width: 100, maxLength: 100 },
-        typeID: { name: 'typeID', label: 'Type', type: 'select', required: true, width: 100, options: LiftTypeData.map(type => ({ value: type.id, text: type.description })) },
-        occupancy: { name: 'occupancy', label: 'Occupancy', type: 'number', width: 45 },
-        resortID: { name: 'resortID', label: 'Resort', type: 'select', width: 100, optionsComponent: ResortData },
-        isActive: { name: 'isActive', label: 'Active', type: 'checkbox' },
-    };
     const model = {
         name: Yup.string().required().label('Name'),
         typeID: Yup.number().integer().required().label('Type'),
@@ -35,11 +30,9 @@ export default ({ lift, submit, close }) => {
             lngLabel: station.name + ' longitude',
         }));
     stationMeta.forEach(station => {
-        //add lat and lng fields for each station
-        fields[station.latField] = { name: station.latField, label: station.latLabel, required: true, size: 45, type: 'number' };
+        //a lift has between two and five stations, each with lat and lng
+        //flatten them into individual field names
         model[station.latField] = Yup.number().min(-90).max(90).required().label(station.latLabel);
-
-        fields[station.lngField] = { name: station.lngField, label: station.lngLabel, required: true, size: 45, type: 'number' };
         model[station.lngField] = Yup.number().min(-180).max(180).required().label(station.lngLabel);
     });
 
@@ -47,105 +40,41 @@ export default ({ lift, submit, close }) => {
         initialValues={lift}
         validationSchema={Yup.object().shape(model)}
         onSubmit={submit}
-        render={({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            setFieldTouched,
-            handleSubmit,
-            isSubmitting,
-        }) => {
-            const makeFormField = field => {
-                let fieldProps = {
-                    key: field.name,
-                    name: field.name,
-                    margin: 'normal',
-                    onChange: handleChange,
-                    onBlur: () => setFieldTouched(field.name), //the event target for a mui Select is the Menu, not the Input to which the name prop is assigned
-                };
-
-                if (field.type === 'checkbox') {
-                    return <FormControlLabel
-                        control={
-                            <Checkbox {...fieldProps} checked={values[field.name]} />
-                        }
-                        label={field.label}
-                    />
-                } 
-
-                fieldProps = {
-                    label: field.label,
-                    value: values[field.name],
-                    required: field.required,
-                    onBlur: () => setFieldTouched(field.name), //the event target for a mui Select is the Menu, not the Input to which the name prop is assigned
-                    ...fieldProps,
-                };
-
-                if (field.type === 'select') {
-                    let elementProps = {};
-                    if (field.width) {
-                        elementProps.width = field.width + 'px';
-                    }
-                    if (field.options) {
-                        return <TextField
-                            select
-                            SelectProps={{ SelectDisplayProps: elementProps }}
-                            {...fieldProps}
-                        >
-                            {field.options.map(option => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.text}
-                                </MenuItem>))
-                            }
+        render={props => {
+            const { values, handleSubmit, isSubmitting, } = props;
+            return (
+                <form onSubmit={handleSubmit}>
+                    <div><TextField {...fieldProps('name', props) } label='Name' required width={100} maxLength={100} /></div>
+                    <div>
+                        <TextField {...fieldProps('typeID', props) } label='Type' select required > 
+                            {LiftTypeData.map(type => (
+                                <MenuItem key={type.id} value={type.id}>
+                                    {type.description}
+                                </MenuItem>
+                            ))}
                         </TextField>
-                    } else if (field.optionsComponent) {
-                        const Options = field.optionsComponent;
-                        return <Options>
+                    </div>
+                    <div><TextField {...fieldProps('occupancy', props) } label='Occupancy' /></div>
+                    <div>
+                        <ResortData>
                             {({ options }) => (
-                                options && <TextField
-                                    select
-                                    SelectProps={{ SelectDisplayProps: elementProps }}
-                                    {...fieldProps}
-                                >
-                                    {options.map(option => (
+                                <TextField {...fieldProps('resortID', props) } label='Resort' select required >
+                                    {options && options.map(option => (
                                         <MenuItem key={option.value} value={option.value}>
                                             {option.text}
                                         </MenuItem>
                                     ))}
                                 </TextField>
                             )}
-                        </Options>
-                    } else {
-                        //error
-                    }
-                } else {
-                    let elementProps = {};
-                    if (field.width) {
-                        elementProps.size = field.width;
-                    }
-                    if (field.maxLength) {
-                        elementProps.maxLength = field.maxLength;
-                    }
-                    return (
-                        <TextField
-                            inputProps={elementProps}
-                            {...fieldProps}
-                        />
-                    );
-                }
-            };
-            return (
-                <form onSubmit={handleSubmit}>
-                    <div>{makeFormField(fields.name)}</div>
-                    <div>{makeFormField(fields.typeID)}</div>
-                    <div>{makeFormField(fields.occupancy)}</div>
-                    <div>{makeFormField(fields.resortID)}</div>
+                        </ResortData>
+                    </div>
                     {stationMeta.map(station => (
-                        <div>{makeFormField(fields[station.latField])} {makeFormField(fields[station.lngField])}</div>
+                        <div>
+                            <TextField {...fieldProps(station.latField, props) } label={station.latLabel} required />
+                            <TextField {...fieldProps(station.lngField, props) } label={station.lngLabel} required />
+                        </div>
                     ))}
-                    <div>{makeFormField(fields.isActive)}</div>
+                    <div><FormControlLabel control={<Checkbox {...fieldProps('isActive', props) } checked={values.isActive} />} label='Active' /></div>
                     <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
                     <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>
                 </form>
