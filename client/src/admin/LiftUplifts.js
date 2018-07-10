@@ -36,7 +36,7 @@ const upliftsQuery = gql`
 
 const columnData = [
     { field: 'date', numeric: false, disablePadding: false, label: 'Date' },
-    { field: 'waitSeconds', numeric: true, disablePadding: false, label: 'Wait Time (s)' },
+    { field: 'waitSeconds', numeric: true, disablePadding: false, label: 'Wait Time (seconds)' },
 ];
 
 const styles = theme => ({

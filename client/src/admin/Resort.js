@@ -138,7 +138,7 @@ class Resort extends Component {
                                             <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='upliftCount' />
                                         </CardMedia>
                                         <CardActions>
-                                            <Button component={Link} to={`/admin/resort/${resort.id}/stats`}>More</Button>
+                                            <Button component={Link} to={`/admin/resorts/${resort.id}/stats`}>More</Button>
                                         </CardActions>
                                     </Card>
                                 </Grid>,
@@ -152,7 +152,7 @@ class Resort extends Component {
                                             <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='waitTimeAverage' />
                                         </CardMedia>
                                         <CardActions>
-                                            <Button component={Link} to={`/admin/lifts/${resort.id}/stats`}>More</Button>
+                                            <Button component={Link} to={`/admin/resorts/${resort.id}/stats`}>More</Button>
                                         </CardActions>
                                     </Card>
                                 </Grid>

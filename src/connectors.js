@@ -225,7 +225,7 @@ const Lift = {
         const id = args.id || args.liftID;
         const result = await context.db.request()
             .input('id', mssql.Int, id)
-            .query(`${liftQuery} where LiftID = @id`);
+            .query(`${liftQuery} where IsHidden = 0 and LiftID = @id`);
         return result.recordset[0];
     },
     getResort: async(lift, args, context) => {
@@ -239,7 +239,7 @@ const Lift = {
         const result = await context.db.request()
             .query(`
                 ${liftQuery}
-                where GeoRoute.STIntersects(geography::STGeomFromText('POLYGON ((
+                where IsHidden = 0 and GeoRoute.STIntersects(geography::STGeomFromText('POLYGON ((
                     ${topLeft.lng} ${topLeft.lat}, 
                     ${topLeft.lng} ${bottomRight.lat}, 
                     ${bottomRight.lng} ${bottomRight.lat}, 
@@ -252,6 +252,7 @@ const Lift = {
     getList: async (_, args, context) => {
         const orderBy = args.orderBy.toLowerCase();
         const predicates = new PredicateBuilder()
+            .append('IsHidden', 'isHidden', mssql.Bit, 0)
             .append('Name', 'name', mssql.NVarChar, args.name, 'LIKE')
             .append('TypeID', 'typeID', mssql.Int, args.typeID)
             .append('ResortID', 'resortID', mssql.Int, args.resortID)

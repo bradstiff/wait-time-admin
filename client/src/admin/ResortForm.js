@@ -9,10 +9,10 @@ import Button from '@material-ui/core/Button';
 
 export default ({ resort, submit, close }) => {
     const model = {
-        name: Yup.string().max(100).required().label('Name'),
-        slug: Yup.string().max(100).required().label('Slug'),
-        logoFilename: Yup.string().max(50).label('Logo filename'),
-        trailMapFilename: Yup.string().max(50).label('Trail map filename'),
+        name: Yup.string().min(2).max(100).required().label('Name'),
+        slug: Yup.string().min(2).max(100).required().label('Slug'),
+        logoFilename: Yup.string().min(2).max(50).label('Logo filename'),
+        trailMapFilename: Yup.string().min(2).max(50).label('Trail map filename'),
         latitude: Yup.number().min(-90).max(90).required().label('Latitude'),
         longitude: Yup.number().min(-180).max(180).required().label('Longitude'),
     };

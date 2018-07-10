@@ -62,11 +62,15 @@ export default compose(
     withRouter,
     graphql(resortMutation, {
         name: 'updateResort',
-        props: ({ updateResort, ownProps: { history }} ) => ({
-            submit: (values, actions) =>
-                updateResort({ variables: values })
-                    .then(() => history.push('/admin/resorts')),
-            close: () => history.push('/admin/resorts')
-        })
+        props: ({ updateResort, ownProps: { history, match } }) => {
+            const id = parseInt(match.params.id);
+            const nextLocation = `/admin/resorts/${id}`;
+            return {
+                submit: (values, actions) =>
+                    updateResort({ variables: values })
+                        .then(() => history.push(nextLocation)),
+                close: () => history.push(nextLocation)
+            };
+        }
     })
 )(EditResort);

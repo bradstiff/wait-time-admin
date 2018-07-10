@@ -17,7 +17,7 @@ import ResortData from '../common/ResortData';
 
 export default ({ lift, submit, close }) => {
     const model = {
-        name: Yup.string().required().label('Name'),
+        name: Yup.string().min(2).max(100).required().label('Name'),
         typeID: Yup.number().integer().required().label('Type'),
         occupancy: Yup.number().integer().positive().label('Occupancy'),
         resortID: Yup.number().integer().label('Resort'),

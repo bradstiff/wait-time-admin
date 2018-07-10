@@ -17,6 +17,7 @@ import Resort from './Resort';
 import ResortLifts from './ResortLifts';
 import ResortEdit from './ResortEdit';
 import ResortCreate from './ResortCreate';
+import ResortStats from './ResortStats';
 import Lifts from './Lifts';
 import Lift from './Lift';
 import LiftEdit from './LiftEdit';
@@ -71,6 +72,7 @@ class Admin extends Component {
                     <div className={classes.content}>
                         <Switch>
                             <Route exact path='/admin/resorts/create' component={ResortCreate} />
+                            <Route exact path='/admin/resorts/:id/stats' component={ResortStats} />
                             <Route exact path='/admin/resorts/:id/lifts' component={ResortLifts} />
                             <Route exact path='/admin/resorts/:id/edit' component={ResortEdit} />
                             <Route exact path='/admin/resorts/:id' component={Resort} />
