@@ -73,9 +73,8 @@ class ResortStats extends Component {
     };
 
     render() {
-        const { classes, match } = this.props;
+        const { classes, id } = this.props;
         const { groupBy, seasonYear, month, day, hour, order, orderBy } = this.state;
-        const id = parseInt(match.params.id);
         return <Query
             query={upliftsQuery}
             variables={{

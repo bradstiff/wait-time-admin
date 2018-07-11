@@ -33,8 +33,7 @@ const resortMutation = gql`
     }
 `;
 
-const EditResort = ({ match, submit, close }) => {
-    const id = parseInt(match.params.id);
+const EditResort = ({ id, submit, close }) => {
     return <Query query={resortQuery} variables={{ id }}>
         {({ error, data }) => {
             if (error) {
@@ -62,8 +61,7 @@ export default compose(
     withRouter,
     graphql(resortMutation, {
         name: 'updateResort',
-        props: ({ updateResort, ownProps: { history, match } }) => {
-            const id = parseInt(match.params.id);
+        props: ({ updateResort, ownProps: { history, id } }) => {
             const nextLocation = `/admin/resorts/${id}`;
             return {
                 submit: (values, actions) =>

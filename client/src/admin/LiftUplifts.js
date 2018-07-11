@@ -120,9 +120,8 @@ class LiftUplifts extends Component {
     };
 
     render() {
-        const { classes, match } = this.props;
+        const { classes, id } = this.props;
         const { page, rowsPerPage, order, orderBy, seasonYear, month, day, hour } = this.state;
-        const id = parseInt(match.params.id);
         return <Query
             query={upliftsQuery}
             variables={{

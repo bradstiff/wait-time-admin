@@ -72,15 +72,31 @@ class Admin extends Component {
                     <div className={classes.content}>
                         <Switch>
                             <Route exact path='/admin/resorts/create' component={ResortCreate} />
-                            <Route exact path='/admin/resorts/:id/stats' component={ResortStats} />
-                            <Route exact path='/admin/resorts/:id/lifts' component={ResortLifts} />
-                            <Route exact path='/admin/resorts/:id/edit' component={ResortEdit} />
-                            <Route exact path='/admin/resorts/:id' component={Resort} />
+                            <Route path='/admin/resorts/:id' children={({ match }) => {
+                                const id = parseInt(match.params.id);
+                                if (isNaN(id)) {
+                                    //todo
+                                }
+                                return <Switch>
+                                    <Route exact path='/admin/resorts/:id/stats' component={() => <ResortStats id={id} />} />
+                                    <Route exact path='/admin/resorts/:id/lifts' component={() => <ResortLifts id={id} />} />
+                                    <Route exact path='/admin/resorts/:id/edit' component={() => <ResortEdit id={id} />} />
+                                    <Route exact path='/admin/resorts/:id' component={() => <Resort id={id} />} />
+                                </Switch>
+                            }} />
                             <Route exact path='/admin/resorts' component={Resorts} />
-                            <Route exact path='/admin/lifts/:id/stats' component={LiftStats} />
-                            <Route exact path='/admin/lifts/:id/uplifts' component={LiftUplifts} />
-                            <Route exact path='/admin/lifts/:id/edit' component={LiftEdit} />
-                            <Route exact path='/admin/lifts/:id' component={Lift} />
+                            <Route path='/admin/lifts/:id' children={({ match }) => {
+                                const id = parseInt(match.params.id);
+                                if (isNaN(id)) {
+                                    //todo
+                                }
+                                return <Switch>
+                                    <Route exact path='/admin/lifts/:id/stats' component={() => <LiftStats id={id} />} />
+                                    <Route exact path='/admin/lifts/:id/uplifts' component={() => <LiftUplifts id={id} />} />
+                                    <Route exact path='/admin/lifts/:id/edit' component={() => <LiftEdit id={id} />} />
+                                    <Route exact path='/admin/lifts/:id' component={() => <Lift id={id} />} />
+                                </Switch>
+                            }} />
                             <Route exact path='/admin/lifts' component={Lifts} />
                         </Switch>
                     </div>

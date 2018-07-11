@@ -65,8 +65,7 @@ const styles = theme => ({
 
 class Lift extends Component {
     render() {
-        const { classes, match } = this.props;
-        const id = parseInt(match.params.id);
+        const { classes, id } = this.props;
         return <Query
             query={query}
             variables={{

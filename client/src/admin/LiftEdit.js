@@ -68,8 +68,7 @@ export default compose(
     withRouter,
     graphql(mutation, {
         name: 'updateLift',
-        props: ({ updateLift, ownProps: { history, match } }) => {
-            const id = parseInt(match.params.id);
+        props: ({ updateLift, ownProps: { history, id } }) => {
             const nextLocation = `/admin/lifts/${id}`;
             return {
                 id,

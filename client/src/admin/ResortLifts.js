@@ -161,7 +161,7 @@ class ResortLifts extends React.Component {
 export default compose(
     withRouter,
     graphql(resortQuery, {
-        options: ({ match }) => ({ variables: { resortID: parseInt(match.params.id) } }),
+        options: ({ id }) => ({ variables: { resortID: id } }),
     }),
     graphql(updateAssignedLiftsMutation, {
         name: 'updateAssignedLifts',
