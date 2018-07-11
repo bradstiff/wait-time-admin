@@ -31,6 +31,7 @@ const LiftForm = ({ lift, submit, close, classes }) => {
     };
     const stationMeta = lift.stations
         .map(station => ({
+            name: station.name,
             latField: `station${station.number}Lat`,
             latLabel: station.name + ' latitude',
             lngField: `station${station.number}Lng`,
@@ -77,7 +78,7 @@ const LiftForm = ({ lift, submit, close, classes }) => {
                             </ResortData>
                         </div>
                         {stationMeta.map(station => (
-                            <div>
+                            <div key={station.name}>
                                 <TextField {...textFieldProps(station.latField, props) } label={station.latLabel} required />
                                 <TextField {...textFieldProps(station.lngField, props) } label={station.lngLabel} required />
                             </div>

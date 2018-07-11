@@ -125,8 +125,8 @@ class Resort extends Component {
                                 </Card>
                             </Grid>
                             {upliftGroupings.length && [
-                                <Grid item xs={6}>
-                                    <Card key='uplifts'>
+                                <Grid item xs={6} key='uplifts'>
+                                    <Card>
                                         <CardContent>
                                             <Typography variant='headline'>Uplifts</Typography>
                                             <Typography color='textSecondary'>Current season versus previous</Typography>
@@ -139,8 +139,8 @@ class Resort extends Component {
                                         </CardActions>
                                     </Card>
                                 </Grid>,
-                                <Grid item xs={6}>
-                                    <Card key='stats'>
+                                <Grid item xs={6} key='stats'>
+                                    <Card>
                                         <CardContent>
                                             <Typography variant='headline'>Average Wait Time (seconds)</Typography>
                                             <Typography color='textSecondary'>Current season versus previous</Typography>
