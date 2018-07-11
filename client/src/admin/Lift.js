@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import { Query, graphql, compose } from 'react-apollo';
+import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Link } from 'react-router-dom';
 import { Map, TileLayer, Polyline } from 'react-leaflet'
-import ChartistGraph from 'react-chartist';
-import moment from 'moment';
 
-import styled from 'styled-components';
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';

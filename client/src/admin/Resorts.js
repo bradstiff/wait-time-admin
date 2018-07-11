@@ -5,17 +5,9 @@ import gql from 'graphql-tag';
 
 import styled from 'styled-components';
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
 import { withStyles } from '@material-ui/core/styles';
 
 export const resortsQuery = gql`
@@ -71,25 +63,6 @@ export default () => {
                     ))}
                 </List>
             );
-                <Paper>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Slug</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {resorts.map(resort => (
-                                <TableRow key={resort.id}>
-                                    <TableCell><Link to={`/admin/resorts/${resort.id}`}>{resort.name}</Link></TableCell>
-                                    <TableCell>{resort.slug}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    <Button variant='contained' color='primary' component={Link} to='/admin/resorts/create'>Add resort</Button>
-                </Paper>
         }}
     </Query>
 };

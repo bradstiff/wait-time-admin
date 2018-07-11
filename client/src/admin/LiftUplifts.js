@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Query, graphql, compose } from 'react-apollo';
+import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import moment from 'moment';
 
@@ -14,7 +14,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
 
-import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableHead';
+import SortEnabledTableHead from '../common/SortEnabledTableHead';
 import SelectMenu from '../common/SelectMenu';
 
 const upliftsQuery = gql`

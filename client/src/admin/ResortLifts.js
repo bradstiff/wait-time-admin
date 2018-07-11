@@ -4,7 +4,6 @@ import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Polyline } from 'react-leaflet'
 
-import styled from 'styled-components';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -119,7 +118,7 @@ class ResortLifts extends React.Component {
                         query={intersectingLiftsQuery}
                         variables={{ topLeft, bottomRight }}
                     >
-                        {({ loading, error, data }) => {
+                        {({ error, data }) => {
                             if (error) {
                                 console.log(error);
                                 return null;

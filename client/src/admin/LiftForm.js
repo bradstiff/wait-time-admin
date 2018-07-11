@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import fieldProps from '../common/FormHelper';
+import { textFieldProps, checkboxProps } from '../common/FormHelper';
 
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
@@ -52,9 +52,9 @@ const LiftForm = ({ lift, submit, close, classes }) => {
                 const { values, handleSubmit, isSubmitting, } = props;
                 return (
                     <form onSubmit={handleSubmit}>
-                        <div><TextField {...fieldProps('name', props) } label='Name' required width={100} maxLength={100} /></div>
+                        <div><TextField {...textFieldProps('name', props) } label='Name' required width={100} maxLength={100} /></div>
                         <div>
-                            <TextField {...fieldProps('typeID', props) } label='Type' select required > 
+                            <TextField {...textFieldProps('typeID', props) } label='Type' select required > 
                                 {LiftTypeData.map(type => (
                                     <MenuItem key={type.id} value={type.id}>
                                         {type.description}
@@ -62,11 +62,11 @@ const LiftForm = ({ lift, submit, close, classes }) => {
                                 ))}
                             </TextField>
                         </div>
-                        <div><TextField {...fieldProps('occupancy', props) } label='Occupancy' /></div>
+                        <div><TextField {...textFieldProps('occupancy', props) } label='Occupancy' /></div>
                         <div>
                             <ResortData>
                                 {({ options }) => (
-                                    <TextField {...fieldProps('resortID', props) } label='Resort' select required >
+                                    <TextField {...textFieldProps('resortID', props) } label='Resort' select required >
                                         {options && options.map(option => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.text}
@@ -78,11 +78,11 @@ const LiftForm = ({ lift, submit, close, classes }) => {
                         </div>
                         {stationMeta.map(station => (
                             <div>
-                                <TextField {...fieldProps(station.latField, props) } label={station.latLabel} required />
-                                <TextField {...fieldProps(station.lngField, props) } label={station.lngLabel} required />
+                                <TextField {...textFieldProps(station.latField, props) } label={station.latLabel} required />
+                                <TextField {...textFieldProps(station.lngField, props) } label={station.lngLabel} required />
                             </div>
                         ))}
-                        <div><FormControlLabel control={<Checkbox {...fieldProps('isActive', props) } checked={values.isActive} />} label='Active' /></div>
+                        <div><FormControlLabel control={<Checkbox {...checkboxProps('isActive', props) } checked={values.isActive} />} label='Active' /></div>
                         <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
                         <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>
                     </form>

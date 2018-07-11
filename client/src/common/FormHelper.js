@@ -1,5 +1,5 @@
 //generates the name-driven and generic props for a Formik field
-export default (name, formProps) => ({
+const textFieldProps = (name, formProps) => ({
     name,
     value: formProps.values[name],
     error: formProps.touched[name] && formProps.errors[name],
@@ -8,3 +8,12 @@ export default (name, formProps) => ({
     onBlur: () => formProps.setFieldTouched(name),
     margin: 'normal',
 });
+
+const checkboxProps = (name, formProps) => ({
+    name,
+    onChange: formProps.handleChange,
+    onBlur: () => formProps.setFieldTouched(name),
+    margin: 'normal',
+});
+
+export { textFieldProps, checkboxProps };

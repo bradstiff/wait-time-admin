@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import fieldProps from '../common/FormHelper';
+import { textFieldProps } from '../common/FormHelper';
 
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -33,23 +33,23 @@ const ResortForm = ({ resort, submit, close, classes }) => {
             validationSchema={Yup.object().shape(model)}
             onSubmit={submit}
             render={props => {
-                const { values, handleSubmit, isSubmitting, } = props;
+                const { handleSubmit, isSubmitting, } = props;
                 return (
                     <form onSubmit={handleSubmit}>
                         <div>
-                            <TextField {...fieldProps('name', props) } label="Name" required inputProps={{ size: 100, maxLength: 100 }} />
+                            <TextField {...textFieldProps('name', props) } label="Name" required inputProps={{ size: 100, maxLength: 100 }} />
                         </div>
                         <div>
-                            <TextField {...fieldProps('slug', props) } label='Slug' required inputProps={{ size: 100, maxLength: 100 }} />
+                            <TextField {...textFieldProps('slug', props) } label='Slug' required inputProps={{ size: 100, maxLength: 100 }} />
                         </div>
                         <div>
-                            <TextField {...fieldProps('logoFilename', props) } label="Logo filename" inputProps={{ size: 50, maxLength: 50 }} />
+                            <TextField {...textFieldProps('logoFilename', props) } label="Logo filename" inputProps={{ size: 50, maxLength: 50 }} />
                         </div>
                         <div>
-                            <TextField {...fieldProps('trailMapFilename', props) } label="Trail map filename" inputProps={{ size: 50, maxLength: 50 }} />
+                            <TextField {...textFieldProps('trailMapFilename', props) } label="Trail map filename" inputProps={{ size: 50, maxLength: 50 }} />
                         </div>
                         <div>
-                            <TextField {...fieldProps('timezone', props) } label="Time zone" select>
+                            <TextField {...textFieldProps('timezone', props) } label="Time zone" select>
                                 {TimezoneData.map(timezone => (
                                     <MenuItem key={timezone.id} value={timezone.id}>
                                         {timezone.description}
@@ -58,10 +58,10 @@ const ResortForm = ({ resort, submit, close, classes }) => {
                             </TextField>
                         </div>
                         <div>
-                            <TextField {...fieldProps('latitude', props) } label="Latitude" inputProps={{ size: 100, maxLength: 100 }} />
+                            <TextField {...textFieldProps('latitude', props) } label="Latitude" inputProps={{ size: 100, maxLength: 100 }} />
                         </div>
                         <div>
-                            <TextField {...fieldProps('longitude', props) } label="Longitude" inputProps={{ size: 100, maxLength: 100 }} />
+                            <TextField {...textFieldProps('longitude', props) } label="Longitude" inputProps={{ size: 100, maxLength: 100 }} />
                         </div>
                         <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
                         <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>

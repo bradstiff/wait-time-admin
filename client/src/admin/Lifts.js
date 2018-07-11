@@ -1,12 +1,9 @@
 ﻿import React, { Component } from 'react';
-import { Query, graphql, compose } from 'react-apollo';
+import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Link } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
-import { lighten } from '@material-ui/core/styles/colorManipulator';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -14,12 +11,10 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import Search from '@material-ui/icons/Search';
 import { DebounceInput } from 'react-debounce-input';
 
-import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableHead';
+import SortEnabledTableHead from '../common/SortEnabledTableHead';
 import LinkButton from '../common/LinkButton';
 import SelectMenu from '../common/SelectMenu';
 import LiftTypeData from '../common/LiftTypeData';
@@ -126,7 +121,7 @@ class Lifts extends Component {
     };
 
     render() {
-        const { classes, match } = this.props;
+        const { classes } = this.props;
         const { page, rowsPerPage, order, orderBy, name, typeID, resortID, isActive } = this.state;
         return <Query
             query={query}

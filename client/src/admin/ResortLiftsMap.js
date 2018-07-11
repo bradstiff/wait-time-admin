@@ -1,13 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Query, graphql, compose } from 'react-apollo';
-import gql from 'graphql-tag';
-import { Map, TileLayer, Polyline } from 'react-leaflet'
+import { Map, TileLayer } from 'react-leaflet'
 
 import styled from 'styled-components';
-import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 
 const FullMap = styled(Map) `
     height: 1000px;
@@ -31,7 +26,7 @@ class ResortLiftsMap extends React.Component {
     };
 
     render() {
-        const { resortLocation, bounds, children, onBoundsChange } = this.props;
+        const { resortLocation, bounds, children } = this.props;
         const mapProps = bounds
             ? { bounds }
             : {
