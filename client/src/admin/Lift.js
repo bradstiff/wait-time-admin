@@ -38,8 +38,14 @@ const query = gql`
 `;
 
 const styles = theme => ({
-    lift: {
+    liftCard: {
         display: 'flex',
+        [theme.breakpoints.down('sm')]: {
+            flexDirection: 'column',
+        },
+        [theme.breakpoints.up('md')]: {
+            flexDirection: 'row-reverse',
+        },
     },
     liftContent: {
         display: 'flex',
@@ -48,14 +54,12 @@ const styles = theme => ({
     liftHeading: {
         flex: 'auto',
     },
-    liftMap: {
-        flex: 'auto',
-        height: 400,
-    },
     liftActions: {
         flex: 'none',
-        paddingLeft: theme.spacing.unit,
-        paddingBottom: theme.spacing.unit,
+    },
+    liftMap: {
+        flex: 'auto',
+        height: '50vh',
     },
 });
 
@@ -89,7 +93,13 @@ class Lift extends Component {
                     <div>
                         <Grid container spacing={16}>
                             <Grid item xs={12}>
-                                <Card className={classes.lift}>
+                                <Card className={classes.liftCard}>
+                                    <CardMedia className={classes.liftMap}>
+                                        <Map bounds={route} style={{ width: '100%', height: '100%' }}>
+                                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                            <Polyline positions={route} />
+                                        </Map>
+                                    </CardMedia>
                                     <div className={classes.liftContent}>
                                         <CardContent className={classes.liftHeading}>
                                             <Typography variant="headline">{`${lift.name} ${!lift.isActive ? ' (Inactive)' : ''}`}</Typography>
@@ -97,20 +107,14 @@ class Lift extends Component {
                                             <Typography color='textSecondary'>{lift.occupancy ? lift.occupancy + ' passengers' : null}</Typography>
                                             <Typography color='textSecondary'>{lift.resort ? lift.resort.name : 'No resort assigned'}</Typography>
                                         </CardContent>
-                                        <div className={classes.liftActions}>
+                                        <CardActions className={classes.liftActions}>
                                             <Button component={Link} to={`/admin/lifts/${lift.id}/edit`}>Edit</Button>
-                                        </div>
+                                        </CardActions>
                                     </div>
-                                    <CardMedia className={classes.liftMap}>
-                                        <Map bounds={route} style={{ width: '100%', height: '100%' }}>
-                                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                                            <Polyline positions={route} />
-                                        </Map>
-                                    </CardMedia>
                                 </Card>
                             </Grid>
                             {upliftGroupings.length && [
-                                <Grid item xs={6} key='uplifts'>
+                                <Grid item xs={12} md={6} key='uplifts'>
                                     <Card>
                                         <CardContent>
                                             <Typography variant='headline'>Uplifts</Typography>
@@ -124,7 +128,7 @@ class Lift extends Component {
                                         </CardActions>
                                     </Card>
                                 </Grid>,
-                                <Grid item xs={6} key='stats'>
+                                <Grid item xs={12} md={6} key='stats'>
                                     <Card>
                                         <CardContent>
                                             <Typography variant='headline'>Average Wait Time (seconds)</Typography>

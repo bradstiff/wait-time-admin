@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Query } from 'react-apollo';
+import { Query, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Link } from 'react-router-dom';
 import { Polyline } from 'react-leaflet'
 
+import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
@@ -47,50 +48,45 @@ const styles = theme => ({
             flexDirection: 'column',
         },
         [theme.breakpoints.up('md')]: {
-            flexDirection: 'row',
+            flexDirection: 'row-reverse',
         },
     },
     resortContent: {
         display: 'flex',
+        flexDirection: 'column',
+    },
+    resortHeading: {
+        flex: 'auto',
+        display: 'flex',
         [theme.breakpoints.down('sm')]: {
-            flexDirection: 'row',
-            alignItems: 'flex-end',
+            flexDirection: 'row-reverse',
         },
         [theme.breakpoints.up('md')]: {
             flexDirection: 'column',
-            alignItems: 'flex-start',
         },
-        paddingTop: theme.spacing.unit * 2,
-        paddingRight: theme.spacing.unit * 3,
-        paddingBottom: theme.spacing.unit,
-        paddingLeft: theme.spacing.unit * 3,
+    },
+    resortTitle: {
+        flex: 'auto',
     },
     resortLogo: {
-        flex: 'none',
-    },
-    resortLogoImage: {
+        //flex: 'none',
+        opacity: 1,
         [theme.breakpoints.down('sm')]: {
-            maxHeight: 40,
+            maxHeight: 30,
             width: 'auto',
         },
         [theme.breakpoints.up('md')]: {
+            maxWidth: 150,
             height: 'auto',
-            maxWidth: 175,
+            paddingBottom: 5,
         },
-        opacity: 1,
-    },
-    resortInfo: {
-        flex: 'auto',
-        [theme.breakpoints.down('sm')]: {
-            paddingLeft: theme.spacing.unit * 3,
-        },
-    },
-    resortMap: {
-        flex: 'auto',
-        height: 400,
     },
     resortActions: {
         flex: 'none',
+    },
+    resortMap: {
+        flex: 'auto',
+        height: '50vh',
     },
 });
 
@@ -119,25 +115,18 @@ class Resort extends Component {
                 }
 
                 const { upliftGroupings } = resort;
+                const resortNameProps = isWidthUp('md', this.props.width)
+                    ? {
+                        color: 'textSecondary',
+                    } : {
+                        variant: 'headline',
+                    };
 
                 return (
                     <div>
                         <Grid container spacing={16}>
                             <Grid item xs={12}>
                                 <Card className={classes.resortCard}>
-                                    <div className={classes.resortContent}>
-                                        <div className={classes.resortLogo}>
-                                            <img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.resortLogoImage} />
-                                        </div>
-                                        <div className={classes.resortInfo}>
-                                            <Typography color='textSecondary'>{resort.name}</Typography>
-                                            <Typography color='textSecondary'>{`${resort.lifts.length} lifts`}</Typography>
-                                        </div>
-                                        <div className={classes.resortActions}>
-                                            <Button component={Link} to={`/admin/resorts/${resort.id}/edit`}>Edit</Button>
-                                            <Button component={Link} to={`/admin/resorts/${resort.id}/lifts`}>Assign Lifts</Button>
-                                        </div>
-                                    </div>
                                     <CardMedia className={classes.resortMap}>
                                         <ResortLiftsMap
                                             resortLocation={resort.location}
@@ -149,6 +138,19 @@ class Resort extends Component {
                                             />)}
                                         </ResortLiftsMap>
                                     </CardMedia>
+                                    <div className={classes.resortContent}>
+                                        <CardContent className={classes.resortHeading}>
+                                            <div><img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.resortLogo} /></div>
+                                            <div className={classes.resortTitle}>
+                                                <Typography {...resortNameProps}>{resort.name}</Typography>
+                                                <Typography color='textSecondary'>{`${resort.lifts.length} lifts`}</Typography>
+                                            </div>
+                                        </CardContent>
+                                        <CardActions className={classes.resortActions}>
+                                            <Button component={Link} to={`/admin/resorts/${resort.id}/edit`}>Edit</Button>
+                                            <Button component={Link} to={`/admin/resorts/${resort.id}/lifts`}>Assign Lifts</Button>
+                                        </CardActions>
+                                    </div>
                                 </Card>
                             </Grid>
                             {upliftGroupings.length && [
@@ -189,4 +191,7 @@ class Resort extends Component {
     }
 }
 
-export default withStyles(styles)(Resort);
+export default compose(
+    withStyles(styles),
+    withWidth(),
+)(Resort);
