@@ -34,7 +34,7 @@ const Background = styled.div`
 
 const styles = theme => ({
     container: {
-        maxWidth: '1200px',
+        maxWidth: '1250px',
         margin: 'auto',
     },
     content: {

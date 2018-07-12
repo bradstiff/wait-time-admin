@@ -52,7 +52,7 @@ const EditResort = ({ id, submit, close }) => {
                 longitude: resort.location.lng,
                 ...resort,
             };
-            return <ResortForm resort={resortValues} submit={submit} close={close} />
+            return <ResortForm resort={resortValues} title='Edit resort' submit={submit} close={close} />
         }}
     </Query>
 };

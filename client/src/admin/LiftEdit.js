@@ -59,7 +59,7 @@ const LiftEdit = ({ id, submit, close }) => {
                 ...stationCoordinates,
                 ...lift,
             };
-            return <LiftForm lift={liftValues} submit={submit} close={close} />
+            return <LiftForm lift={liftValues} title='Edit lift' submit={submit} close={close} />
         }}
     </Query>
 };

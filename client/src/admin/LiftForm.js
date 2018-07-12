@@ -19,15 +19,15 @@ import ResortData from '../common/ResortData';
 const styles = theme => ({
     root: {
         padding: theme.spacing.unit,
-    }
+    },
 })
 
-const LiftForm = ({ lift, submit, close, classes }) => {
+const LiftForm = ({ lift, submit, close, title, classes }) => {
     const model = {
         name: Yup.string().min(2).max(100).required().label('Name'),
         typeID: Yup.number().integer().required().label('Type'),
-        occupancy: Yup.number().integer().positive().label('Occupancy'),
-        resortID: Yup.number().integer().label('Resort'),
+        occupancy: Yup.number().integer().positive().nullable().label('Occupancy'),
+        resortID: Yup.number().integer().nullable().label('Resort'),
     };
     const stationMeta = lift.stations
         .map(station => ({
@@ -45,6 +45,7 @@ const LiftForm = ({ lift, submit, close, classes }) => {
     });
 
     return <Paper className={classes.root}>
+        <Typography variant='headline'>{title}</Typography>
         <Formik
             initialValues={lift}
             validationSchema={Yup.object().shape(model)}
@@ -53,9 +54,9 @@ const LiftForm = ({ lift, submit, close, classes }) => {
                 const { values, handleSubmit, isSubmitting, } = props;
                 return (
                     <form onSubmit={handleSubmit}>
-                        <div><TextField {...textFieldProps('name', props) } label='Name' required width={100} maxLength={100} /></div>
+                        <div><TextField {...textFieldProps('name', props, 100) } label='Name' required style={{ width: 400 }} /></div>
                         <div>
-                            <TextField {...textFieldProps('typeID', props) } label='Type' select required > 
+                            <TextField {...textFieldProps('typeID', props) } label='Type' select required style={{ width: 200 }} > 
                                 {LiftTypeData.map(type => (
                                     <MenuItem key={type.id} value={type.id}>
                                         {type.description}
@@ -63,11 +64,11 @@ const LiftForm = ({ lift, submit, close, classes }) => {
                                 ))}
                             </TextField>
                         </div>
-                        <div><TextField {...textFieldProps('occupancy', props) } label='Occupancy' /></div>
+                        <div><TextField {...textFieldProps('occupancy', props) } label='Occupancy' style={{ width: 200 }} /></div>
                         <div>
                             <ResortData>
                                 {({ options }) => (
-                                    <TextField {...textFieldProps('resortID', props) } label='Resort' select required >
+                                    <TextField {...textFieldProps('resortID', props) } label='Resort' select style={{ width: 400 }} >
                                         {options && options.map(option => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.text}
@@ -79,8 +80,8 @@ const LiftForm = ({ lift, submit, close, classes }) => {
                         </div>
                         {stationMeta.map(station => (
                             <div key={station.name}>
-                                <TextField {...textFieldProps(station.latField, props) } label={station.latLabel} required />
-                                <TextField {...textFieldProps(station.lngField, props) } label={station.lngLabel} required />
+                                <TextField {...textFieldProps(station.latField, props) } label={station.latLabel} required style={{ width: 195 }} />
+                                <TextField {...textFieldProps(station.lngField, props) } label={station.lngLabel} required style={{ width: 195, marginLeft: 10 }} />
                             </div>
                         ))}
                         <div><FormControlLabel control={<Checkbox {...checkboxProps('isActive', props) } checked={values.isActive} />} label='Active' /></div>

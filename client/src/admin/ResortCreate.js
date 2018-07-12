@@ -22,7 +22,7 @@ const resortMutation = gql`
 `;
 
 const AddResort = ({ submit, close }) => (
-    <ResortForm submit={submit} close={close} />
+    <ResortForm title='Create resort' submit={submit} close={close} />
 );
 
 export default compose(

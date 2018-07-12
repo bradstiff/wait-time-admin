@@ -19,16 +19,14 @@ const ResortData = ({ children }) => (
     <Query query={resortsQuery}>
         {({ data, error }) => {
             //todo: error handling
-            if (data.resorts === undefined) {
-                return null;
-            }
             //transform resorts into value/text pairs as an alternate form
-            const options = data.resorts.map(resort => ({
+            const resorts = data.resorts || [];
+            const options = resorts.map(resort => ({
                 value: resort.id,
                 text: resort.name,
             }));
             return children({
-                resorts: data.resorts,
+                resorts: resorts,
                 options,
             });
         }}

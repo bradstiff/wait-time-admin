@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { textFieldProps } from '../common/FormHelper';
 
+import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -18,7 +19,7 @@ const styles = theme => ({
     }
 })
 
-const ResortForm = ({ resort, submit, close, classes }) => {
+const ResortForm = ({ resort, submit, close, title, classes }) => {
     const model = {
         name: Yup.string().min(2).max(100).required().label('Name'),
         slug: Yup.string().min(2).max(100).required().label('Slug'),
@@ -28,6 +29,7 @@ const ResortForm = ({ resort, submit, close, classes }) => {
         longitude: Yup.number().min(-180).max(180).required().label('Longitude'),
     };
     return <Paper className={classes.root}>
+        <Typography variant='headline'>{title}</Typography>
         <Formik
             initialValues={resort}
             validationSchema={Yup.object().shape(model)}
@@ -37,19 +39,19 @@ const ResortForm = ({ resort, submit, close, classes }) => {
                 return (
                     <form onSubmit={handleSubmit}>
                         <div>
-                            <TextField {...textFieldProps('name', props) } label="Name" required inputProps={{ size: 100, maxLength: 100 }} />
+                            <TextField {...textFieldProps('name', props, 100) } label="Name" required style={{ width: 400 }} />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('slug', props) } label='Slug' required inputProps={{ size: 100, maxLength: 100 }} />
+                            <TextField {...textFieldProps('slug', props, 100) } label='Slug' required style={{ width: 400 }} />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('logoFilename', props) } label="Logo filename" inputProps={{ size: 50, maxLength: 50 }} />
+                            <TextField {...textFieldProps('logoFilename', props, 50) } label="Logo filename" style={{ width: 200 }} />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('trailMapFilename', props) } label="Trail map filename" inputProps={{ size: 50, maxLength: 50 }} />
+                            <TextField {...textFieldProps('trailMapFilename', props, 50) } label="Trail map filename" style={{ width: 200 }} />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('timezone', props) } label="Time zone" select>
+                            <TextField {...textFieldProps('timezone', props) } label="Time zone" select style={{ width: 400 }}>
                                 {TimezoneData.map(timezone => (
                                     <MenuItem key={timezone.id} value={timezone.id}>
                                         {timezone.description}
@@ -58,10 +60,10 @@ const ResortForm = ({ resort, submit, close, classes }) => {
                             </TextField>
                         </div>
                         <div>
-                            <TextField {...textFieldProps('latitude', props) } label="Latitude" inputProps={{ size: 100, maxLength: 100 }} />
+                            <TextField {...textFieldProps('latitude', props) } label="Latitude" style={{ width: 200 }} />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('longitude', props) } label="Longitude" inputProps={{ size: 100, maxLength: 100 }} />
+                            <TextField {...textFieldProps('longitude', props) } label="Longitude" style={{ width: 200 }} />
                         </div>
                         <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
                         <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>

@@ -41,22 +41,49 @@ const query = gql`
 `;
 
 const styles = theme => ({
-    resort: {
+    resortCard: {
         display: 'flex',
+        [theme.breakpoints.down('sm')]: {
+            flexDirection: 'column',
+        },
+        [theme.breakpoints.up('md')]: {
+            flexDirection: 'row',
+        },
     },
     resortContent: {
         display: 'flex',
-        flexDirection: 'column',
-    },
-    resortHeading: {
-        flex: 'auto',
+        [theme.breakpoints.down('sm')]: {
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+        },
+        [theme.breakpoints.up('md')]: {
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+        },
+        paddingTop: theme.spacing.unit * 2,
+        paddingRight: theme.spacing.unit * 3,
+        paddingBottom: theme.spacing.unit,
+        paddingLeft: theme.spacing.unit * 3,
     },
     resortLogo: {
-        height: '60px',
-        width: 'auto',
-        maxWidth: '140px',
-        padding: '10px',
-        opacity: '1',
+        flex: 'none',
+    },
+    resortLogoImage: {
+        [theme.breakpoints.down('sm')]: {
+            maxHeight: 40,
+            width: 'auto',
+        },
+        [theme.breakpoints.up('md')]: {
+            height: 'auto',
+            maxWidth: 175,
+        },
+        opacity: 1,
+    },
+    resortInfo: {
+        flex: 'auto',
+        [theme.breakpoints.down('sm')]: {
+            paddingLeft: theme.spacing.unit * 3,
+        },
     },
     resortMap: {
         flex: 'auto',
@@ -64,8 +91,6 @@ const styles = theme => ({
     },
     resortActions: {
         flex: 'none',
-        paddingLeft: theme.spacing.unit,
-        paddingBottom: theme.spacing.unit,
     },
 });
 
@@ -99,13 +124,15 @@ class Resort extends Component {
                     <div>
                         <Grid container spacing={16}>
                             <Grid item xs={12}>
-                                <Card className={classes.resort}>
+                                <Card className={classes.resortCard}>
                                     <div className={classes.resortContent}>
-                                        <CardContent className={classes.resortHeading}>
-                                            <img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.resortLogo} />
+                                        <div className={classes.resortLogo}>
+                                            <img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.resortLogoImage} />
+                                        </div>
+                                        <div className={classes.resortInfo}>
                                             <Typography color='textSecondary'>{resort.name}</Typography>
                                             <Typography color='textSecondary'>{`${resort.lifts.length} lifts`}</Typography>
-                                        </CardContent>
+                                        </div>
                                         <div className={classes.resortActions}>
                                             <Button component={Link} to={`/admin/resorts/${resort.id}/edit`}>Edit</Button>
                                             <Button component={Link} to={`/admin/resorts/${resort.id}/lifts`}>Assign Lifts</Button>
@@ -125,7 +152,7 @@ class Resort extends Component {
                                 </Card>
                             </Grid>
                             {upliftGroupings.length && [
-                                <Grid item xs={6} key='uplifts'>
+                                <Grid item xs={12} md={6} key='uplifts'>
                                     <Card>
                                         <CardContent>
                                             <Typography variant='headline'>Uplifts</Typography>
@@ -139,7 +166,7 @@ class Resort extends Component {
                                         </CardActions>
                                     </Card>
                                 </Grid>,
-                                <Grid item xs={6} key='stats'>
+                                <Grid item xs={12} md={6} key='stats'>
                                     <Card>
                                         <CardContent>
                                             <Typography variant='headline'>Average Wait Time (seconds)</Typography>
