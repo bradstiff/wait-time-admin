@@ -23,6 +23,7 @@ type Resort {
 	timezone: String!
 	location: Location
 	liftEnvelope: [Location!]
+	hasWaitTimes: Boolean!
     sortOrder: Int!
     dates: [WaitTimeDate!]
 	lastDate: WaitTimeDate

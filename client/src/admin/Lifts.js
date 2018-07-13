@@ -11,9 +11,12 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
-import Search from '@material-ui/icons/Search';
-import { DebounceInput } from 'react-debounce-input';
+import Collapse from '@material-ui/core/Collapse';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import Hidden from '@material-ui/core/Hidden';
 
+import Search from '../common/Search';
+import ToggleIconButton from '../common/ToggleIconButton';
 import SortEnabledTableHead from '../common/SortEnabledTableHead';
 import LinkButton from '../common/LinkButton';
 import SelectMenu from '../common/SelectMenu';
@@ -78,6 +81,7 @@ class Lifts extends Component {
         rowsPerPage: 25,
         order: 'asc',
         orderBy: 'name',
+        showFilter: false,
         isActive: true,
     };
 
@@ -120,9 +124,15 @@ class Lifts extends Component {
         });
     };
 
+    handleToggleFilter = () => {
+        this.setState({
+            showFilter: !this.state.showFilter,
+        });
+    }
+
     render() {
         const { classes } = this.props;
-        const { page, rowsPerPage, order, orderBy, name, typeID, resortID, isActive } = this.state;
+        const { page, rowsPerPage, order, orderBy, showFilter, name, typeID, resortID, isActive } = this.state;
         return <Query
             query={query}
             variables={{
@@ -145,6 +155,45 @@ class Lifts extends Component {
                     return null;
                 }
 
+                //filter controls are persistently displayed for smUp, and toggled down for xs
+                const filterControls = [
+                    <SelectMenu
+                        id='type'
+                        key='type'
+                        options={[
+                            { text: 'All types' },
+                            ...LiftTypeData.map(type => ({ text: type.description, value: type.id, }))
+                        ]}
+                        value={typeID}
+                        onSelect={this.handleSelectType}
+                    />,
+                    <ResortData key='resort'>
+                        {({ options }) => {
+                            return options && <SelectMenu
+                                id='resort'
+                                options={[
+                                    { text: 'All resorts' },
+                                    { text: 'No resort assigned', value: null },
+                                    ...options,
+                                ]}
+                                value={resortID}
+                                onSelect={this.handleSelectResort}
+                            />
+                        }}
+                    </ResortData>,
+                    <SelectMenu
+                        id='status'
+                        key='status'
+                        options={[
+                            { text: 'All statuses' },
+                            { text: 'Active', value: true },
+                            { text: 'Inactive', value: false },
+                        ]}
+                        value={isActive}
+                        onSelect={this.handleSelectStatus}
+                    />,
+                ];
+
                 const { liftList } = data;
                 return (
                     <Paper className={classes.paper}>
@@ -156,48 +205,26 @@ class Lifts extends Component {
                             </div>
                             <div className={classes.spacer} />
                             <div className={classes.actions}>
-                                <DebounceInput
-                                    debounceTimeout={750}
+                                <Search
                                     value={name}
                                     onChange={this.handleSearchName}
-                                    type='search'
                                     placeholder='Name'
                                 />
-                                <SelectMenu
-                                    id='type'
-                                    options={[
-                                        { text: 'All types' },
-                                        ...LiftTypeData.map(type => ({ text: type.description, value: type.id, }))
-                                    ]}
-                                    value={typeID}
-                                    onSelect={this.handleSelectType}
-                                />
-                                <ResortData>
-                                    {({ options }) => {
-                                        return options && <SelectMenu
-                                            id='resort'
-                                            options={[
-                                                { text: 'All resorts' },
-                                                { text: 'No resort assigned', value: null },
-                                                ...options,
-                                            ]}
-                                            value={resortID}
-                                            onSelect={this.handleSelectResort}
-                                        />
-                                    }}
-                                </ResortData>
-                                <SelectMenu
-                                    id='status'
-                                    options={[
-                                        { text: 'All statuses' },
-                                        { text: 'Active', value: true },
-                                        { text: 'Inactive', value: false },
-                                    ]}
-                                    value={isActive}
-                                    onSelect={this.handleSelectStatus}
-                                />
+                                <Hidden xsDown>
+                                    {filterControls}
+                                </Hidden>
+                                <Hidden smUp>
+                                    <ToggleIconButton isOn={showFilter} onTip='Show filters' offTip='Hide filters' onToggle={this.handleToggleFilter}>
+                                        <FilterListIcon />
+                                    </ToggleIconButton>
+                                </Hidden>
                             </div>
                         </Toolbar>
+                        <Hidden smUp>
+                            <Collapse in={showFilter}>
+                                {filterControls}
+                            </Collapse>
+                        </Hidden>
                         {liftList.count && (
                             <div>
                                 <Table className={classes.table}>

@@ -24,6 +24,7 @@ const query = gql`
             name,
             logoFilename,
             location { lat, lng },
+            hasWaitTimes,
             liftEnvelope { lat, lng },
             lifts { 
                 id, 
@@ -144,6 +145,7 @@ class Resort extends Component {
                                             <div className={classes.resortTitle}>
                                                 <Typography {...resortNameProps}>{resort.name}</Typography>
                                                 <Typography color='textSecondary'>{`${resort.lifts.length} lifts`}</Typography>
+                                                <Typography color='textSecondary'>{!resort.hasWaitTimes && 'No wait time data available'}</Typography>
                                             </div>
                                         </CardContent>
                                         <CardActions className={classes.resortActions}>
@@ -153,7 +155,7 @@ class Resort extends Component {
                                     </div>
                                 </Card>
                             </Grid>
-                            {upliftGroupings.length && [
+                            {resort.hasWaitTimes && [
                                 <Grid item xs={12} md={6} key='uplifts'>
                                     <Card>
                                         <CardContent>

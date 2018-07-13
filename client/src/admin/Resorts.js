@@ -1,13 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Query } from 'react-apollo';
+import { Query, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { withStyles } from '@material-ui/core/styles';
+import Hidden from '@material-ui/core/Hidden';
 
 export const resortsQuery = gql`
     query Resorts {
@@ -16,6 +19,7 @@ export const resortsQuery = gql`
             name,
             slug,
             logoFilename,
+            hasWaitTimes,
             lifts { id },
         }
     }
@@ -23,18 +27,22 @@ export const resortsQuery = gql`
 
 const styles = theme => ({
     container: {
-        width: 400,
+        maxWidth: 700,
         backgroundColor: theme.palette.background.default,
     },
+    grow: {
+        flexGrow: 2,
+    },
     avatar: {
-        width: 140,
         textAlign: 'center',
+        width: 180,
     },
     logo: {
         height: 60,
         width: 'auto',
-        maxWidth: 140,
-        padding: 10,
+        maxWidth: 200,
+        padding: 5,
+        paddingRight: 20,
         opacity: 0.75,
         cursor: 'pointer',
         ['&:hover']: {
@@ -57,14 +65,23 @@ const Resorts = ({ classes }) => {
             return (
                 <div className={classes.container}>
                     <List>
-                        {resorts.map(resort => (
-                            <ListItem key={resort.id} dense button component={Link} to={`/admin/resorts/${resort.id}`}>
-                                <div className={classes.avatar}>
-                                    <img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.logo} />
-                                </div>
-                                <ListItemText primary={resort.name} secondary={`${resort.lifts.length} lifts`} />
-                            </ListItem>
-                        ))}
+                        {resorts.map(resort => {
+                            let secondaryText = `${resort.lifts.length} lifts`;
+                            if (resort.hasWaitTimes) {
+                                secondaryText += ', Wait time data';
+                            }
+                            return (
+                                <ListItem key={resort.id} dense button component={Link} to={`/admin/resorts/${resort.id}`}>
+                                    <div className={classes.avatar}>
+                                        <img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.logo} />
+                                    </div>
+                                    <ListItemText primary={resort.name} secondary={secondaryText} />
+                                    <ListItemIcon>
+                                        <ChevronRightIcon />
+                                    </ListItemIcon>
+                                </ListItem>
+                            );
+                        })}
                     </List>
                 </div>
             );

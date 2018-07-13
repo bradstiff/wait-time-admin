@@ -4,7 +4,7 @@ import { error } from 'util';
 
 import PredicateBuilder from './PredicateBuilder';
 
-const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude, LiftEnvelope.ToString() as liftEnvelopeText from Resort';
+const resortQuery = 'select ResortID as id, name, slug, logoFilename, trailMapFilename, timezone, latitude, longitude, hasWaitTimes, LiftEnvelope.ToString() as liftEnvelopeText from Resort';
 const liftQuery = `
     select LiftID as id, name, resortID, typeID, isActive, occupancy, Point1Latitude as station1Lat, Point1Longitude as station1Lng, Point2Latitude as station2Lat, Point2Longitude as station2Lng, Point3Latitude as station3Lat, Point3Longitude as station3Lng, Point4Latitude as station4Lat, Point4Longitude as station4Lng, Point5Latitude as station5Lat, Point5Longitude as station5Lng
     from Lift
