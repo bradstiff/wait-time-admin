@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import styled from 'styled-components';
-
+import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -16,31 +15,35 @@ export const resortsQuery = gql`
             id,
             name,
             slug,
-            logoFilename
+            logoFilename,
+            lifts { id },
         }
     }
 `;
 
-const ResortAvatar = styled.div`
-    background-color: #000;
-    width: 140px;
-    text-align: center;
+const styles = theme => ({
+    container: {
+        width: 400,
+        backgroundColor: theme.palette.background.default,
+    },
+    avatar: {
+        width: 140,
+        textAlign: 'center',
+    },
+    logo: {
+        height: 60,
+        width: 'auto',
+        maxWidth: 140,
+        padding: 10,
+        opacity: 0.75,
+        cursor: 'pointer',
+        ['&:hover']: {
+            opacity: 1
+        },
+    },
+});
 
-    &:hover img {
-        opacity: 1;
-    }    
-`;
-
-const ResortLogo = styled.img`
-    height: 60px;
-    width: auto;
-    max-width: 140px;
-    padding: 10px;
-    opacity: 0.5;
-    cursor: pointer;
-`;
-
-export default () => {
+const Resorts = ({ classes }) => {
     return <Query query={resortsQuery}>
         {({ loading, error, data }) => {
             if (error) {
@@ -52,17 +55,21 @@ export default () => {
             }
             const { resorts } = data;
             return (
-                <List>
-                    {resorts.map(resort => (
-                        <ListItem key={resort.id} dense button component={Link} to={`/admin/resorts/${resort.id}`}>
-                            <ResortAvatar>
-                                <ResortLogo alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} />
-                            </ResortAvatar>
-                            <ListItemText primary='0 lifts' />
-                        </ListItem>
-                    ))}
-                </List>
+                <div className={classes.container}>
+                    <List>
+                        {resorts.map(resort => (
+                            <ListItem key={resort.id} dense button component={Link} to={`/admin/resorts/${resort.id}`}>
+                                <div className={classes.avatar}>
+                                    <img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.logo} />
+                                </div>
+                                <ListItemText primary={resort.name} secondary={`${resort.lifts.length} lifts`} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </div>
             );
         }}
     </Query>
 };
+
+export default withStyles(styles)(Resorts);

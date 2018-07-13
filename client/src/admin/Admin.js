@@ -58,7 +58,7 @@ class Admin extends Component {
                     <AppBar position="static" color='default'>
                         <Toolbar>
                             <Typography variant="title">
-                                Wait Times Admin
+                                Wait Time Admin
                             </Typography>
                             <Tabs value={activeTab}>
                                 <Tab label="Resorts" component={Link} to='/admin/resorts' />

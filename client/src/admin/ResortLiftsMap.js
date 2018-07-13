@@ -2,13 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Map, TileLayer } from 'react-leaflet'
 
-import styled from 'styled-components';
-
-const FullMap = styled(Map) `
-    height: 1000px;
-    width: 1500px;
-`;
-
 class ResortLiftsMap extends React.Component {
     state = {};
 

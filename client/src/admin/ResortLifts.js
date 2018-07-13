@@ -5,6 +5,7 @@ import gql from 'graphql-tag';
 import { Polyline } from 'react-leaflet'
 
 import { withStyles } from '@material-ui/core/styles';
+import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -45,6 +46,12 @@ const updateAssignedLiftsMutation = gql`
         }
     }
 `;
+
+const styles = theme => ({
+    map: {
+        height: 'calc(100vh - 160px)',
+    },
+});
 
 class ResortLifts extends React.Component {
     state = {};
@@ -89,7 +96,7 @@ class ResortLifts extends React.Component {
     handleCancel = this.navigateBack;
 
     render() {
-        const { data: { resort, error } } = this.props;
+        const { data: { resort, error }, classes } = this.props;
         if (error) {
             console.log(error);
             return null;
@@ -103,43 +110,45 @@ class ResortLifts extends React.Component {
 
         const { assignedLiftIDs, topLeft, bottomRight } = this.state;
         return (
-            <Paper style={{ width: '100%', height: '800px' }}>
-                <Typography variant="display3" gutterBottom>
-                    {resort.name}
-                </Typography>
-                <Button color='primary' onClick={this.handleCancel}>Cancel</Button>
-                <Button variant='contained' color='primary' onClick={() => this.handleSave()}>Save</Button>
-                <ResortLiftsMap
-                    resortLocation={resort.location}
-                    bounds={resort.liftEnvelope}
-                    onBoundsChange={this.handleMapBoundsChange}
-                >
-                    {topLeft && <Query
-                        query={intersectingLiftsQuery}
-                        variables={{ topLeft, bottomRight }}
+            <Paper>
+                <Toolbar>
+                    <Typography variant='headline' style={{ flex: 'auto' }}>{`Assign ${resort.name} lifts`}</Typography>
+                    <Button color='primary' onClick={this.handleCancel}>Cancel</Button>
+                    <Button color='primary' variant='outlined' onClick={this.handleSave}>Save</Button>
+                </Toolbar>
+                <div className={classes.map}>
+                    <ResortLiftsMap
+                        resortLocation={resort.location}
+                        bounds={resort.liftEnvelope}
+                        onBoundsChange={this.handleMapBoundsChange}
                     >
-                        {({ error, data }) => {
-                            if (error) {
-                                console.log(error);
-                                return null;
-                            }
-                            if (data.intersectingLifts === undefined) {
-                                return null;
-                            }
+                        {topLeft && <Query
+                            query={intersectingLiftsQuery}
+                            variables={{ topLeft, bottomRight }}
+                        >
+                            {({ error, data }) => {
+                                if (error) {
+                                    console.log(error);
+                                    return null;
+                                }
+                                if (data.intersectingLifts === undefined) {
+                                    return null;
+                                }
 
-                            return data.intersectingLifts.map(lift => {
-                                const assigned = assignedLiftIDs.includes(lift.id);
-                                return <Polyline
-                                    positions={lift.stations.map(station => station.location)}
-                                    key={lift.id}
-                                    id={lift.id}
-                                    onClick={() => assigned ? this.handleUnassignLift(lift.id) : this.handleAssignLift(lift.id)}
-                                    color={assigned ? 'blue' : 'grey'}
-                                />;
-                            });
-                        }}
-                    </Query>}
-                </ResortLiftsMap>
+                                return data.intersectingLifts.map(lift => {
+                                    const assigned = assignedLiftIDs.includes(lift.id);
+                                    return <Polyline
+                                        positions={lift.stations.map(station => station.location)}
+                                        key={lift.id}
+                                        id={lift.id}
+                                        onClick={() => assigned ? this.handleUnassignLift(lift.id) : this.handleAssignLift(lift.id)}
+                                        color={assigned ? 'blue' : 'grey'}
+                                    />;
+                                });
+                            }}
+                        </Query>}
+                    </ResortLiftsMap>
+                </div>
             </Paper>
         );
     }
@@ -158,6 +167,7 @@ class ResortLifts extends React.Component {
 }
 
 export default compose(
+    withStyles(styles),
     withRouter,
     graphql(resortQuery, {
         options: ({ id }) => ({ variables: { resortID: id } }),

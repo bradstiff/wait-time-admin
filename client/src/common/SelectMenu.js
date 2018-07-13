@@ -46,7 +46,7 @@ class SelectMenu extends React.Component {
                 >
                     {options.map(option => (
                         <MenuItem
-                            key={option.value}
+                            key={option.text}
                             selected={selected.value === option.value}
                             onClick={event => this.handleMenuItemClick(event, option)}
                         >

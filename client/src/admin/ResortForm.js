@@ -4,10 +4,12 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { textFieldProps } from '../common/FormHelper';
 
+import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -29,7 +31,6 @@ const ResortForm = ({ resort, submit, close, title, classes }) => {
         longitude: Yup.number().min(-180).max(180).required().label('Longitude'),
     };
     return <Paper className={classes.root}>
-        <Typography variant='headline'>{title}</Typography>
         <Formik
             initialValues={resort}
             validationSchema={Yup.object().shape(model)}
@@ -38,6 +39,11 @@ const ResortForm = ({ resort, submit, close, title, classes }) => {
                 const { handleSubmit, isSubmitting, } = props;
                 return (
                     <form onSubmit={handleSubmit}>
+                        <Toolbar>
+                            <Typography variant='headline' style={{ flex: 'auto' }}>{title}</Typography>
+                            <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
+                            <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Save</Button>
+                        </Toolbar>
                         <div>
                             <TextField {...textFieldProps('name', props, 100) } label="Name" required style={{ width: 400 }} />
                         </div>
@@ -65,8 +71,6 @@ const ResortForm = ({ resort, submit, close, title, classes }) => {
                         <div>
                             <TextField {...textFieldProps('longitude', props) } label="Longitude" style={{ width: 200 }} />
                         </div>
-                        <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
-                        <Button type='submit' variant='contained' color='primary' disabled={isSubmitting}>Save</Button>
                     </form>
                 )
             }}

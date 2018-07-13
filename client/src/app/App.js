@@ -5,6 +5,9 @@ import { ApolloProvider } from 'react-apollo';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import lightBlue from '@material-ui/core/colors/lightBlue';
+import orange from '@material-ui/core/colors/orange';
+import grey from '@material-ui/core/colors/grey';
 
 import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';
@@ -32,7 +35,14 @@ const client = new ApolloClient({
 
 const theme = createMuiTheme({
     palette: {
-        type: 'dark'
+        type: 'dark',
+        primary: lightBlue,
+        secondary: orange,
+        background: {
+            paper: '#343434',
+            default: '#282828',
+        },
+        divider: 'rgba(230, 230, 230, 0.12)',
     }
 });
 
