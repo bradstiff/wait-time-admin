@@ -13,18 +13,21 @@ const Desktop = props => <Responsive {...props} minWidth={DESKTOP_BREAKPOINT} />
 const Mobile = props => <Responsive {...props} maxWidth={DESKTOP_BREAKPOINT - 1} />;
 
 const ResortName = styled.span`
-        text-transform: uppercase;
-        border: none;
-        font-family: "Gotham A", "Century Gothic", sans-serif;
-        font-weight: 800;
-        @media (min-width: ${DESKTOP_BREAKPOINT}px) {
-            font-size: 28px;
-            color: #FFF;
-            padding: 2px 5px 2px 5px;
-            margin-right: 10px;
-        }
-    `;
-const Centered = styled.div`text-align: center`;
+    vertical-align: middle;
+    text-transform: uppercase;
+    border: none;
+    font-family: "Gotham A", "Century Gothic", sans-serif;
+    font-weight: 800;
+    @media (min-width: ${DESKTOP_BREAKPOINT}px) {
+        font-size: 28px;
+        color: #FFF;
+        padding: 2px 5px 2px 5px;
+        margin-right: 10px;
+    }
+`;
+const Centered = styled.div`
+    text-align: center;
+`;
 
 class WaitTimeNav extends Component {
     handleSelectDate = date => {

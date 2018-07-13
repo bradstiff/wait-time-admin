@@ -3,30 +3,19 @@ import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import styled from 'styled-components';
 
+import IconButton from '@material-ui/core/IconButton';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import TodayIcon from '@material-ui/icons/Today';
+import { withStyles } from '@material-ui/core/styles';
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 const FlexContainer = styled.div`
     ${props => props.style}
     display: flex;
-    align-items: baseline;
+    align-items: center;
     padding: 2px;
-`;
-
-const GlyphiconButton = styled(props => (
-    <div
-        className={`glyphicon glyphicon-${props.glyphicon} ${props.className}`}
-        onClick={props.onClick}
-    >
-    </div>
-))`
-    flex: none;
-    padding: 2px;
-    color: #FFF;
-    font-size: 18px;
-    &:hover {
-        color: #D44126;
-        cursor: pointer;
-    }
 `;
 
 const SelectedDate = styled.div`
@@ -40,7 +29,21 @@ const SelectedDate = styled.div`
     font-family: "Gotham A", "Century Gothic", sans-serif;
 `;
 
-export default ({ dates, date, displayFormat, style, selectDate }) => {
+const styles = {
+    iconButton: {
+        flex: 'none',
+        width: 36,
+        height: 36,
+        padding: 2,
+        color: '#FFF',
+        fontSize: 18,
+        ['&:hover']: {
+            color: '#D44126',
+            cursor: 'pointer',
+        }
+    }
+}
+const DateNav = ({ dates, date, displayFormat, style, selectDate, classes }) => {
     if (!dates) {
         return null;
     }
@@ -71,16 +74,23 @@ export default ({ dates, date, displayFormat, style, selectDate }) => {
 
     return (
         <FlexContainer style={style}>
-            <GlyphiconButton glyphicon='chevron-left' onClick={makeScrollDateHandler(previousDate)} />
+            <div><IconButton onClick={makeScrollDateHandler(previousDate)} className={classes.iconButton}>
+                <ChevronLeftIcon />
+            </IconButton></div>
             <SelectedDate>{selectedDateDisplay}</SelectedDate>
             <DatePicker
                 includeDates={availableDates}
                 selected={selectedDate && selectedDate.isValid() ? selectedDate : null}
                 onChange={selectDate}
-                customInput={<GlyphiconButton glyphicon='calendar' />}
+                className={classes.iconButton}
+                customInput={<IconButton className={classes.iconButton}><TodayIcon /></IconButton>}
                 popperPlacement='auto-left'
             />
-            <GlyphiconButton glyphicon='chevron-right' onClick={makeScrollDateHandler(nextDate)} />
+            <IconButton onClick={makeScrollDateHandler(nextDate)} className={classes.iconButton}>
+                <ChevronRightIcon />
+            </IconButton>
         </FlexContainer>
     );
 };
+
+export default withStyles(styles)(DateNav);
