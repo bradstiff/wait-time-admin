@@ -25,7 +25,7 @@ class SearchInput extends React.Component {
     }
 
     render() {
-        const { value, onChange, placeholder, classes } = this.props;
+        const { value, onChange, placeholder } = this.props;
         const { focused } = this.state;
         const displayPlaceholder = focused ? placeholder : undefined;
         const style = {
@@ -55,13 +55,20 @@ class SearchInput extends React.Component {
     }
 }
 
-export default ({ value, onChange, placeholder, classes }) => (
+const Search = ({ value, onChange, placeholder }) => (
     <DebounceInput
         debounceTimeout={750}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
         element={SearchInput}
-        classes={classes}
     />
 );
+
+Search.propTypes = {
+    value: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
+    placeholder: PropTypes.string,
+}
+
+export default Search;

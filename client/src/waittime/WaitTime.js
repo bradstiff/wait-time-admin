@@ -93,9 +93,9 @@ class WaitTime extends Component {
                         <Background>
                             <Flex>
                                 <WaitTimeNav resortSlug={this.resortSlug} resort={resort} date={date} />
-                                {validationError === null ?
-                                    <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} /> :
-                                    <Alert bsStyle='danger'><h5>{validationError}</h5></Alert>
+                                {validationError === null
+                                    ? <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} />
+                                    : <Alert bsStyle='danger'><h5>{validationError}</h5></Alert>
                                 }
                             </Flex>
                         </Background>
@@ -105,4 +105,5 @@ class WaitTime extends Component {
         );
     }
 }
+
 export default WaitTime;

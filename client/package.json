@@ -25,7 +25,6 @@
     "react-debounce-input": "^3.2.0",
     "react-dom": "^16.4.1",
     "react-leaflet": "^2.0.0-rc.1",
-    "react-responsive": "^4.1.0",
     "react-responsive-pinch-zoom-pan": "0.0.11",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",

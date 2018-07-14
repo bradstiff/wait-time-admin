@@ -144,7 +144,7 @@ class Resort extends Component {
                                             <div><img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.resortLogo} /></div>
                                             <div className={classes.resortTitle}>
                                                 <Typography {...resortNameProps}>{resort.name}</Typography>
-                                                <Typography color='textSecondary'>{`${resort.lifts.length} lifts`}</Typography>
+                                                <Typography color='textSecondary'>{resort.lifts.length} lifts</Typography>
                                                 <Typography color='textSecondary'>{!resort.hasWaitTimes && 'No wait time data available'}</Typography>
                                             </div>
                                         </CardContent>

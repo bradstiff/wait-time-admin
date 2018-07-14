@@ -7,7 +7,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import lightBlue from '@material-ui/core/colors/lightBlue';
 import orange from '@material-ui/core/colors/orange';
-import grey from '@material-ui/core/colors/grey';
 
 import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';

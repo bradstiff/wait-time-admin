@@ -1,18 +1,25 @@
 ﻿import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import Responsive from 'react-responsive';
 import styled from 'styled-components';
-import { Navbar, Nav } from 'react-bootstrap';
+import { compose } from 'react-apollo';
 
-import ResortNavDesktop from './ResortNavDesktop';
-import ResortNavMobile from './ResortNavMobile';
+import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
+import { withStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import Hidden from '@material-ui/core/Hidden';
+import Drawer from '@material-ui/core/Drawer';
+
 import DateNav from './DateNav';
+import ResortList from '../common/ResortList';
 
-const DESKTOP_BREAKPOINT = 780;
-const Desktop = props => <Responsive {...props} minWidth={DESKTOP_BREAKPOINT} />;
-const Mobile = props => <Responsive {...props} maxWidth={DESKTOP_BREAKPOINT - 1} />;
+const DESKTOP_BREAKPOINT = 600;
 
 const ResortName = styled.span`
+    flex: auto;
     vertical-align: middle;
     text-transform: uppercase;
     border: none;
@@ -25,11 +32,25 @@ const ResortName = styled.span`
         margin-right: 10px;
     }
 `;
-const Centered = styled.div`
-    text-align: center;
-`;
+
+const styles = {
+    menuButton: {
+        marginLeft: -12,
+        marginRight: 20,
+    },
+};
 
 class WaitTimeNav extends Component {
+    state = {
+        showMenu: false,
+    }
+
+    handleToggleMenu = show => {
+        this.setState({
+            showMenu: show,
+        });
+    }
+
     handleSelectDate = date => {
         this.props.history.push(`/resorts/${this.props.resort.slug}?date=${date.format('YYYY-MM-DD')}`);
     }
@@ -38,47 +59,46 @@ class WaitTimeNav extends Component {
         const { resortSlug, resort, date } = this.props;
         const resortName = resort ? resort.name : 'Loading';
         const dateDisplayFormat = window.screen.width >= DESKTOP_BREAKPOINT ? 'dddd, LL' : 'ddd, LL';
+        const dateNavStyle = isWidthUp('sm')
+            ? { minWidth: '400px', display: 'inline-flex' }
+            : { padding: '0px 10px' };
 
-        return (
-            <header>
-                <Desktop>
-                    {resortSlug !== 'serre-chevalier-vallee' && <ResortNavDesktop selectedResortSlug={resortSlug} />}
-                    <Centered>
-                        <ResortName>{resortName} Wait Times</ResortName>
+        return ([
+            <AppBar position="static" color='default'>
+                <Toolbar>
+                    <IconButton className={this.props.classes.menuButton} aria-label="Menu" onClick={() => this.handleToggleMenu(true)}>
+                        <MenuIcon />
+                    </IconButton>
+                    <ResortName>{(resort && resort.name) || 'Loading'} Wait Times</ResortName>
+                    <Hidden smDown>
                         <DateNav
                             dates={resort && resort.dates}
                             date={date}
                             displayFormat={dateDisplayFormat}
-                            style={{ minWidth: '400px', display: 'inline-flex' }}
+                            style={dateNavStyle}
                             selectDate={this.handleSelectDate}
-                        />
-                    </Centered>
-                </Desktop>
-                <Mobile>
-                    <Navbar inverse collapseOnSelect>
-                        <Navbar.Header>
-                            <Navbar.Brand>
-                                <ResortName>{resortName} Wait Times</ResortName>
-                            </Navbar.Brand>
-                            <Navbar.Toggle />
-                        </Navbar.Header>
-                        <Navbar.Collapse>
-                            <Nav>
-                                <ResortNavMobile />
-                            </Nav>
-                        </Navbar.Collapse>
-                    </Navbar>
-                    <DateNav
-                        dates={resort && resort.dates}
-                        date={date}
-                        displayFormat={dateDisplayFormat}
-                        style={{ padding: '0px 10px' }}
-                        selectDate={this.handleSelectDate}
-                    />
-                </Mobile>
-            </header>
-        );
+                            />
+                    </Hidden>
+                </Toolbar>
+            </AppBar>,
+            <Hidden mdUp>
+                <DateNav
+                    dates={resort && resort.dates}
+                    date={date}
+                    displayFormat={dateDisplayFormat}
+                    style={dateNavStyle}
+                    selectDate={this.handleSelectDate}
+                />
+            </Hidden>,
+            <Drawer open={this.state.showMenu} onClose={() => this.handleToggleMenu(false)}>
+                <ResortList linkTo={resort => `/resorts/${resort.slug}`} onClick={() => this.handleToggleMenu(false)} />
+            </Drawer>
+        ]);
     };
 }
 
-export default withRouter(WaitTimeNav);
+export default compose(
+    withRouter,
+    withWidth(),
+    withStyles(styles),
+)(WaitTimeNav);

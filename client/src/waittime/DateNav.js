@@ -37,7 +37,7 @@ const styles = {
         padding: 2,
         color: '#FFF',
         fontSize: 18,
-        ['&:hover']: {
+        '&:hover': {
             color: '#D44126',
             cursor: 'pointer',
         }
