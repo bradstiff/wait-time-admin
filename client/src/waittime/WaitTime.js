@@ -4,7 +4,8 @@ import qs from 'querystringify';
 import moment from 'moment';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Alert } from 'react-bootstrap';
+
+import Typography from '@material-ui/core/Typography';
 
 import WaitTimeNav from './WaitTimeNav';
 import WaitTimeView from './WaitTimeView';
@@ -31,14 +32,24 @@ const Flex = styled.div`
     }
 
     > main {
+        padding-top: 10px;
         flex: auto;
         overflow: hidden;
     }
 `;
 
 class WaitTime extends Component {
+    state = {
+        showSnackbar: false,
+    }
     get resortSlug() {
         return this.props.match.params.resort;
+    }
+
+    handleSnackbarClose = () => {
+        this.setState({
+            showSnackbar: false,
+        })
     }
 
     render() {
@@ -72,9 +83,6 @@ class WaitTime extends Component {
             <Query query={resortQuery} variables={{ slug: this.resortSlug }}>
                 {({ loading, error, data }) => {
                     if (error) {
-                        return (<Alert bsStyle='danger'>
-                            <h5>{JSON.stringify(error)}</h5>
-                        </Alert>);
                     }
 
                     const { resort } = data;
@@ -83,19 +91,25 @@ class WaitTime extends Component {
                             resort.lastDate.date :
                             null);
 
-                    const validationError = loading ? null :
-                        this.resortSlug && resort === null ? 'The resort name in the address bar does not exist.' :
-                            searchDate && !moment.utc(searchDate).isValid() ? 'The date in the address bar is invalid. Date must be entered as YYYY-MM-DD.' :
-                                !resort.dates.length ? 'No wait time data exists for the selected resort. Please select either Steamboat or Winter Park.' :
-                                    searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate)) ? 'No wait time data exists for the selected date.' :
-                                        null;
+                    const validationError = loading
+                        ? null
+                        : this.resortSlug && resort === null
+                            ? 'The resort name in the address bar does not exist.'
+                            : searchDate && !moment.utc(searchDate).isValid()
+                                ? 'The date in the address bar is invalid. Date must be entered as YYYY-MM-DD.'
+                                : !resort.dates.length
+                                    ? 'No wait time data exists for the selected resort. Please select either Serre Chevalier Vallee, Steamboat or Winter Park.'
+                                    : searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate))
+                                        ? 'No wait time data exists for the selected date.'
+                                        : null;
+
                     return (
                         <Background>
                             <Flex>
                                 <WaitTimeNav resortSlug={this.resortSlug} resort={resort} date={date} />
                                 {validationError === null
                                     ? <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} />
-                                    : <Alert bsStyle='danger'><h5>{validationError}</h5></Alert>
+                                    : <Typography component='p' color='error'>{validationError}</Typography>
                                 }
                             </Flex>
                         </Background>

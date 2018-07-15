@@ -33,12 +33,15 @@ const ResortName = styled.span`
     }
 `;
 
-const styles = {
+const styles = theme => ({
+    resortDrawer: {
+        backgroundColor: theme.palette.background.default,
+    },
     menuButton: {
         marginLeft: -12,
         marginRight: 20,
     },
-};
+});
 
 class WaitTimeNav extends Component {
     state = {
@@ -56,17 +59,19 @@ class WaitTimeNav extends Component {
     }
 
     render() {
-        const { resortSlug, resort, date } = this.props;
+        const { resortSlug, resort, date, classes, width } = this.props;
         const resortName = resort ? resort.name : 'Loading';
-        const dateDisplayFormat = window.screen.width >= DESKTOP_BREAKPOINT ? 'dddd, LL' : 'ddd, LL';
-        const dateNavStyle = isWidthUp('sm')
-            ? { minWidth: '400px', display: 'inline-flex' }
-            : { padding: '0px 10px' };
+        const dateDisplayFormat = isWidthUp('sm', width)
+            ? 'dddd, LL'
+            : 'ddd, LL';
+        const dateNavStyle = isWidthUp('sm', width)
+            ? { minWidth: 400, display: 'inline-flex' }
+            : { padding: 10 };
 
         return ([
             <AppBar position="static" color='default'>
                 <Toolbar>
-                    <IconButton className={this.props.classes.menuButton} aria-label="Menu" onClick={() => this.handleToggleMenu(true)}>
+                    <IconButton className={classes.menuButton} aria-label="Menu" onClick={() => this.handleToggleMenu(true)}>
                         <MenuIcon />
                     </IconButton>
                     <ResortName>{(resort && resort.name) || 'Loading'} Wait Times</ResortName>
@@ -90,7 +95,7 @@ class WaitTimeNav extends Component {
                     selectDate={this.handleSelectDate}
                 />
             </Hidden>,
-            <Drawer open={this.state.showMenu} onClose={() => this.handleToggleMenu(false)}>
+            <Drawer open={this.state.showMenu} onClose={() => this.handleToggleMenu(false)} classes={{ paper: classes.resortDrawer }}>
                 <ResortList linkTo={resort => `/resorts/${resort.slug}`} onClick={() => this.handleToggleMenu(false)} />
             </Drawer>
         ]);

@@ -4,7 +4,6 @@ import ComicBubbles from '../comicbubbles/comicbubbles';
 
 class WaitTimeMap extends Component {
     render() {
-        console.log(`render ${this.props.resort.loading ? 'Loading ' : ''} ${this.props.resort.slug}, ${this.props.waitTimeDate ? this.props.waitTimeDate.date : 'Loading WaitTimeDate'}`);
         return (
             <PinchZoomPan initialScale={1}>
                 <canvas
@@ -28,12 +27,10 @@ class WaitTimeMap extends Component {
     }
 
     componentDidUpdate() {
-        console.log(`componentDidUpdate ${this.props.resort.loading ? 'Loading ' : ''} ${this.props.resort.slug}, ${this.props.waitTimeDate ? this.props.waitTimeDate.date : 'Loading WaitTimeDate'}`);
         this.ensureCanvas();
     }
 
     ensureCanvas() {
-        console.log(`ensureCanvas ${this.props.resort.loading ? 'Loading ' : ''} ${this.props.resort.slug}, ${this.props.waitTimeDate ? this.props.waitTimeDate.date : 'Loading WaitTimeDate'}`);
         if (!this.props.resort) {
             // need trail map filename; we will get updated when parent query finishes
             return;
@@ -47,7 +44,6 @@ class WaitTimeMap extends Component {
     }
 
     loadTrailMap = (trailMapFilename) => {
-        console.log(`loadTrailMap ${this.props.resort.loading ? 'Loading ' : ''} ${this.props.resort.slug}, ${this.props.waitTimeDate ? this.props.waitTimeDate.date : 'Loading WaitTimeDate'}`);
         const src = `${process.env.PUBLIC_URL}/trailmaps/${trailMapFilename}`;
         const image = new Image();
         this.trailMap = {
@@ -57,7 +53,6 @@ class WaitTimeMap extends Component {
         image.alt = 'Trail Map';
         image.src = src;
         image.onload = function() {
-            console.log(`image loaded ${this.props.resort.loading ? 'Loading ' : ''} ${this.props.resort.slug}, ${this.props.waitTimeDate ? this.props.waitTimeDate.date : 'Loading WaitTimeDate'}`);
             if (!this.canvas) {
                 // component unmounted before image loaded
                 return;
@@ -69,13 +64,11 @@ class WaitTimeMap extends Component {
     }
 
     drawCanvas = () => {
-        console.log(`drawCanvas ${this.props.resort.loading ? 'Loading ' : ''} ${this.props.resort.slug}, ${this.props.waitTimeDate ? this.props.waitTimeDate.date : 'Loading WaitTimeDate'}`);
         const context = this.canvas.getContext('2d');
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         context.drawImage(this.trailMap.image, 0, 0);
 
         if (this.props.waitTimeDate && this.props.waitTimeDate.timePeriods.length) {
-            console.log(`drawBubbles ${this.props.resort.loading ? 'Loading ' : ''} ${this.props.resort.slug}, ${this.props.waitTimeDate ? this.props.waitTimeDate.date : 'Loading WaitTimeDate'}`);
             this.drawBubbles();
         }
     }

@@ -4,6 +4,9 @@ body {
 html, body {
     height: 100%;
 }
+.rc-slider-mark-text {
+    font-size: 10px;
+}
 .rc-slider-mark-text-active {
     color: #D44126 !important;
 }

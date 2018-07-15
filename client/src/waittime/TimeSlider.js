@@ -24,19 +24,11 @@ class TimeSlider extends Component {
                 timeFormat = 'LT';
                 minutesPerMark = 15;
                 break;
-            case widthPerTimePeriod > 40:
-                timeFormat = 'LT';
-                minutesPerMark = 15;
-                break;
             case widthPerTimePeriod > 30:
                 timeFormat = 'LT';
                 minutesPerMark = 30;
                 break;
             case widthPerTimePeriod > 20:
-                timeFormat = 'LT';
-                minutesPerMark = 30;
-                break;
-            case widthPerTimePeriod > 10:
                 timeFormat = 'LT';
                 minutesPerMark = 45;
                 break;
