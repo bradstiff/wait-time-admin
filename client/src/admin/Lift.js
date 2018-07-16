@@ -106,7 +106,7 @@ class Lift extends Component {
                                             <Typography variant="headline">{`${lift.name} ${!lift.isActive ? ' (Inactive)' : ''}`}</Typography>
                                             <Typography color='textSecondary'>{lift.type.description}</Typography>
                                             <Typography color='textSecondary'>{lift.occupancy ? lift.occupancy + ' passengers' : null}</Typography>
-                                            <Typography color='textSecondary'>{upliftGroupings.length == 0 && 'No wait time data available'}</Typography>
+                                            <Typography color='textSecondary'>{upliftGroupings.length === 0 && 'No wait time data available'}</Typography>
                                             <Typography color='textSecondary'>{lift.resort ? lift.resort.name : 'No resort assigned'}</Typography>
                                         </CardContent>
                                         <CardActions className={classes.liftActions}>

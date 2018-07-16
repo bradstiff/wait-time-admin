@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Query, compose } from 'react-apollo';
+import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import List from '@material-ui/core/List';
@@ -43,7 +43,7 @@ const styles = theme => ({
     },
 });
 
-const ResortList = ({ classes, linkTo, onClick, showChevron }) => {
+const ResortList = ({ classes, linkTo, onClick, chevron }) => {
     return <Query query={resortsQuery}>
         {({ loading, error, data }) => {
             if (error) {
@@ -67,7 +67,7 @@ const ResortList = ({ classes, linkTo, onClick, showChevron }) => {
                                     <img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.logo} />
                                 </div>
                                 <ListItemText primary={resort.name} secondary={secondaryText} />
-                                {showChevron &&
+                                {chevron &&
                                     <ListItemIcon>
                                         <ChevronRightIcon />
                                     </ListItemIcon>
@@ -84,11 +84,12 @@ const ResortList = ({ classes, linkTo, onClick, showChevron }) => {
 ResortList.propTypes = {
     linkTo: PropTypes.func.isRequired,
     onClick: PropTypes.func,
-    showChevron: PropTypes.bool,
+    chevron: PropTypes.bool,
 };
 
 ResortList.defaultProps = {
-    showChevron: false,
+    //display right-aligned chevron (>)
+    chevron: false,
 };
 
 export default withStyles(styles)(ResortList);

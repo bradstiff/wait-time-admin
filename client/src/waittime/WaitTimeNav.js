@@ -7,7 +7,6 @@ import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Hidden from '@material-ui/core/Hidden';
@@ -59,8 +58,7 @@ class WaitTimeNav extends Component {
     }
 
     render() {
-        const { resortSlug, resort, date, classes, width } = this.props;
-        const resortName = resort ? resort.name : 'Loading';
+        const { resort, date, classes, width } = this.props;
         const dateDisplayFormat = isWidthUp('sm', width)
             ? 'dddd, LL'
             : 'ddd, LL';

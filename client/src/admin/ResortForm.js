@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { textFieldProps } from '../common/FormHelper';
+import bindProps from '../common/FormikFieldHelper';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -34,8 +34,9 @@ const ResortForm = ({ resort, submit, close, title, classes }) => {
             initialValues={resort}
             validationSchema={Yup.object().shape(model)}
             onSubmit={submit}
-            render={props => {
-                const { handleSubmit, isSubmitting, } = props;
+            render={formikProps => {
+                const { handleSubmit, isSubmitting, } = formikProps;
+                const textFieldPropKeys = ['value', 'error', 'helperText', 'onChange', 'onBlur'];
                 return (
                     <form onSubmit={handleSubmit}>
                         <Toolbar>
@@ -44,19 +45,19 @@ const ResortForm = ({ resort, submit, close, title, classes }) => {
                             <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Save</Button>
                         </Toolbar>
                         <div>
-                            <TextField {...textFieldProps('name', props, 100) } label="Name" required style={{ width: 400 }} />
+                            <TextField {...bindProps('name', textFieldPropKeys, formikProps) } label="Name" required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('slug', props, 100) } label='Slug' required style={{ width: 400 }} />
+                            <TextField {...bindProps('slug', textFieldPropKeys, formikProps) } label='Slug' required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('logoFilename', props, 50) } label="Logo filename" style={{ width: 200 }} />
+                            <TextField {...bindProps('logoFilename', textFieldPropKeys, formikProps) } label="Logo filename" style={{ width: 200 }} inputProps={{ maxLength: 50 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('trailMapFilename', props, 50) } label="Trail map filename" style={{ width: 200 }} />
+                            <TextField {...bindProps('trailMapFilename', textFieldPropKeys, formikProps) } label="Trail map filename" style={{ width: 200 }} inputProps={{ maxLength: 50 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('timezone', props) } label="Time zone" select style={{ width: 400 }}>
+                            <TextField {...bindProps('timezone', textFieldPropKeys, formikProps) } label="Time zone" select style={{ width: 400 }} margin='normal' >
                                 {TimezoneData.map(timezone => (
                                     <MenuItem key={timezone.id} value={timezone.id}>
                                         {timezone.description}
@@ -65,10 +66,10 @@ const ResortForm = ({ resort, submit, close, title, classes }) => {
                             </TextField>
                         </div>
                         <div>
-                            <TextField {...textFieldProps('latitude', props) } label="Latitude" style={{ width: 200 }} />
+                            <TextField {...bindProps('latitude', textFieldPropKeys, formikProps) } label="Latitude" style={{ width: 200 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...textFieldProps('longitude', props) } label="Longitude" style={{ width: 200 }} />
+                            <TextField {...bindProps('longitude', textFieldPropKeys, formikProps) } label="Longitude" style={{ width: 200 }} margin='normal' />
                         </div>
                     </form>
                 )

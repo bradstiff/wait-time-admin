@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import amber from '@material-ui/core/colors/amber';
@@ -42,5 +44,14 @@ const UserErrorMessage = ({ message: { text, severity }, classes }) => {
         <Typography>{text}</Typography>
     </Paper>
 }
+
+UserErrorMessage.propTypes = {
+    message: PropTypes
+        .shape({
+            text: PropTypes.string.isRequired,
+            severity: PropTypes.oneOf([1, 2, 3]),
+        })
+        .isRequired,
+};
 
 export default withStyles(styles)(UserErrorMessage);

@@ -11,7 +11,7 @@ const styles = theme => ({
 
 const Resorts = ({ classes }) => (
     <div className={classes.container}>
-        <ResortList linkTo={resort => `/admin/resorts/${resort.id}`} showChevron />
+        <ResortList linkTo={resort => `/admin/resorts/${resort.id}`} chevron />
     </div>
 );
 
