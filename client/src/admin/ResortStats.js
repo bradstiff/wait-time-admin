@@ -17,7 +17,7 @@ import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableH
 import UserErrorMessage from '../common/UserErrorMessage';
 
 const upliftsQuery = gql`
-    query UpliftStatsByResort($resortID: Int!, $groupBy: String!) {
+    query UpliftStatsByResort($resortID: Int!, $groupBy: UpliftGroupBy!) {
         resort(id: $resortID) { 
             id,
             name,

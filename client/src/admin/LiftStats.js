@@ -16,7 +16,7 @@ import SelectMenu from '../common/SelectMenu';
 import UserErrorMessage from '../common/UserErrorMessage';
 
 const upliftsQuery = gql`
-    query UpliftStatsByLift($liftID: Int!, $groupBy: String!) {
+    query UpliftStatsByLift($liftID: Int!, $groupBy: UpliftGroupBy!) {
         lift(id: $liftID) { 
             id,
             name,

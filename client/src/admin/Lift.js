@@ -26,7 +26,7 @@ const query = gql`
             resort { id, name },
             occupancy,
             stations {number, name, location { lat, lng} },
-            upliftGroupings(groupBy: "hour", groupBy2: "season") {
+            upliftGroupings(groupBy: Hour, groupBy2: Season) {
                 groupKey,
                 groupDescription,
                 group2Key,
