@@ -8,15 +8,6 @@ import gql from 'graphql-tag';
 import UserErrorMessage from '../common/UserErrorMessage';
 import WaitTimeNav from './WaitTimeNav';
 import WaitTimeView from './WaitTimeView';
-import BackgroundImage from '../assets/resort-carousel-bg.jpg';
-
-const Background = styled.div`
-    background-image: url(${BackgroundImage});
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat; 
-    background-attachment: fixed;
-`;
 
 const Flex = styled.div`
     height: 100vh;
@@ -103,15 +94,13 @@ class WaitTime extends Component {
                                         : null;
 
                     return (
-                        <Background>
-                            <Flex>
-                                <WaitTimeNav resortSlug={this.resortSlug} resort={resort} date={date} />
-                                {!userErrorMessage
-                                    ? <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} />
-                                    : <UserErrorMessage message={userErrorMessage} />
-                                }
-                            </Flex>
-                        </Background>
+                        <Flex>
+                            <WaitTimeNav resortSlug={this.resortSlug} resort={resort} date={date} />
+                            {!userErrorMessage
+                                ? <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} />
+                                : <UserErrorMessage message={userErrorMessage} />
+                            }
+                        </Flex>
                     );
                 }}
             </Query>

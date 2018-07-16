@@ -3,6 +3,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 
+import styled from 'styled-components';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import lightBlue from '@material-ui/core/colors/lightBlue';
@@ -10,6 +11,8 @@ import orange from '@material-ui/core/colors/orange';
 
 import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';
+import NotFound from './NotFound';
+import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
 const client = new ApolloClient({
     clientState: {
@@ -47,15 +50,26 @@ const theme = createMuiTheme({
 
 const DefaultResort = () => <Redirect to='/resorts/steamboat' />;
 
+const Background = styled.div`
+    background-image: url(${BackgroundImage});
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat; 
+    background-attachment: fixed;
+`;
+
 const App = () => (
     <ApolloProvider client={client}>
         <CssBaseline>
             <MuiThemeProvider theme={theme}>
-                <Switch>
-                    <Route path='/admin' component={Admin} />
-                    <Route exact path='/resorts/:resort?' component={WaitTime} />
-                    <Route exact path='/' component={DefaultResort} />
-                </Switch>
+                <Background>
+                    <Switch>
+                        <Route path='/admin' component={Admin} />
+                        <Route exact path='/resorts/:resort?' component={WaitTime} />
+                        <Route exact path='/' component={DefaultResort} />
+                        <Route component={NotFound} />
+                    </Switch>
+                </Background>
             </MuiThemeProvider>
         </CssBaseline>
     </ApolloProvider>
