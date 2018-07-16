@@ -13,6 +13,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import TableHead from '@material-ui/core/TableHead';
 
 import SelectMenu from '../common/SelectMenu';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 const upliftsQuery = gql`
     query UpliftStatsByLift($liftID: Int!, $groupBy: String!) {
@@ -80,7 +81,7 @@ class LiftStats extends Component {
                     return null;
                 }
                 if (lift === null) {
-                    return <p>Lift not found</p>;
+                    return <UserErrorMessage message={{ text: 'The lift in the address bar does not exist.', severity: 1 }} />;
                 }
 
                 const { upliftGroupings } = lift;

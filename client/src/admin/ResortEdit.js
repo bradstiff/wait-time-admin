@@ -4,6 +4,7 @@ import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import ResortForm from './ResortForm';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 const resortQuery = gql`
     query Resort($id: Int!) {
@@ -45,7 +46,7 @@ const EditResort = ({ id, submit, close }) => {
                 return null;
             }
             if (resort === null) {
-                return <p>Resort not found</p>;
+                return <UserErrorMessage message={{ text: 'The resort in the address bar does not exist.', severity: 1 }} />;
             }
             const resortValues = {
                 latitude: resort.location.lat,

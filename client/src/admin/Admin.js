@@ -20,6 +20,7 @@ import Lift from './Lift';
 import LiftEdit from './LiftEdit';
 import LiftUplifts from './LiftUplifts';
 import LiftStats from './LiftStats';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
@@ -72,7 +73,7 @@ class Admin extends Component {
                             <Route path='/admin/resorts/:id' children={({ match }) => {
                                 const id = parseInt(match.params.id);
                                 if (isNaN(id)) {
-                                    //todo
+                                    return <UserErrorMessage message={{ text: 'The resort ID in the address bar is invalid. Resort ID must be a whole number.', severity: 1}} />
                                 }
                                 return <Switch>
                                     <Route exact path='/admin/resorts/:id/stats' component={() => <ResortStats id={id} />} />
@@ -85,7 +86,7 @@ class Admin extends Component {
                             <Route path='/admin/lifts/:id' children={({ match }) => {
                                 const id = parseInt(match.params.id);
                                 if (isNaN(id)) {
-                                    //todo
+                                    return <UserErrorMessage message={{ text: 'The lift ID in the address bar is invalid. Lift ID must be a whole number.', severity: 1}} />
                                 }
                                 return <Switch>
                                     <Route exact path='/admin/lifts/:id/stats' component={() => <LiftStats id={id} />} />

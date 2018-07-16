@@ -4,6 +4,7 @@ import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import LiftForm from './LiftForm';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 const query = gql`
     query Lift($id: Int!) {
@@ -45,7 +46,7 @@ const LiftEdit = ({ id, submit, close }) => {
                 return null;
             }
             if (lift === null) {
-                return <p>Lift not found</p>;
+                return <UserErrorMessage message={{ text: 'The lift in the address bar does not exist.', severity: 1 }} />;
             }
             const stationCoordinates = lift.stations.reduce((acc, station) => {
                 //flatten stations' locations into unique properties for editing, e.g., { station1Lat, station1Lng, station2Lat, station2Lng, } etc.

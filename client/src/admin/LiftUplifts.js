@@ -16,6 +16,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 import SortEnabledTableHead from '../common/SortEnabledTableHead';
 import SelectMenu from '../common/SelectMenu';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 const upliftsQuery = gql`
     query UpliftsByLift($liftID: Int!, $offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
@@ -146,7 +147,7 @@ class LiftUplifts extends Component {
                     return null;
                 }
                 if (lift === null) {
-                    return <p>Lift not found</p>;
+                    return <UserErrorMessage message={{ text: 'The lift in the address bar does not exist.', severity: 1 }} />;
                 }
 
                 const { upliftList } = lift;

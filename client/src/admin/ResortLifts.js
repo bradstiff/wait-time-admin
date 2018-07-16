@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
 import ResortLiftsMap from './ResortLiftsMap';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 const resortQuery = gql`
     query Resort($resortID: Int!) {
@@ -105,7 +106,7 @@ class ResortLifts extends React.Component {
             return null;
         }
         if (resort === null) {
-            return <p>Resort not found</p>;
+            return <UserErrorMessage message={{ text: 'The resort in the address bar does not exist.', severity: 1 }} />;
         }
 
         const { assignedLiftIDs, topLeft, bottomRight } = this.state;

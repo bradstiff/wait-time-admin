@@ -16,6 +16,7 @@ import Button from '@material-ui/core/Button';
 
 import ResortLiftsMap from './ResortLiftsMap';
 import UpliftStatChart from './UpliftStatChart';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 const query = gql`
     query ResortAndStatsByHourAndSeason($resortID: Int!) {
@@ -112,7 +113,7 @@ class Resort extends Component {
                     return null;
                 }
                 if (resort === null) {
-                    return <p>Resort not found</p>; //todo
+                    return <UserErrorMessage message={{ text: 'The resort in the address bar does not exist.', severity: 1 }} />;
                 }
 
                 const { upliftGroupings } = resort;

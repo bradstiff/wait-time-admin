@@ -14,6 +14,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import SelectMenu from '../common/SelectMenu';
 import LinkButton from '../common/LinkButton';
 import SortEnabledTableHead, { makeCompareFn } from '../common/SortEnabledTableHead';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 const upliftsQuery = gql`
     query UpliftStatsByResort($resortID: Int!, $groupBy: String!) {
@@ -89,7 +90,7 @@ class ResortStats extends Component {
                     return null;
                 }
                 if (resort === null) {
-                    return <p>Resort not found</p>;
+                    return <UserErrorMessage message={{ text: 'The resort in the address bar does not exist.', severity: 1 }} />;
                 }
 
                 const { upliftGroupings } = resort;

@@ -5,8 +5,7 @@ import moment from 'moment';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import Typography from '@material-ui/core/Typography';
-
+import UserErrorMessage from '../common/UserErrorMessage';
 import WaitTimeNav from './WaitTimeNav';
 import WaitTimeView from './WaitTimeView';
 import BackgroundImage from '../assets/resort-carousel-bg.jpg';
@@ -91,25 +90,25 @@ class WaitTime extends Component {
                             resort.lastDate.date :
                             null);
 
-                    const validationError = loading
+                    const userErrorMessage = loading
                         ? null
                         : this.resortSlug && resort === null
-                            ? 'The resort name in the address bar does not exist.'
+                            ? { text: 'The resort name in the address bar does not exist.', severity: 1 }
                             : searchDate && !moment.utc(searchDate).isValid()
-                                ? 'The date in the address bar is invalid. Date must be entered as YYYY-MM-DD.'
+                                ? { text: 'The date in the address bar is invalid. Date must be entered as YYYY-MM-DD.', severity: 1 }
                                 : !resort.dates.length
-                                    ? 'No wait time data exists for the selected resort. Please select either Serre Chevalier Vallee, Steamboat or Winter Park.'
+                                    ? { text: 'No wait time data exists for the selected resort. Please select either Serre Chevalier Vallee, Steamboat or Winter Park.', severity: 2 }
                                     : searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate))
-                                        ? 'No wait time data exists for the selected date.'
+                                        ? { text: 'No wait time data exists for the selected date. Please select a highlighted date from the calendar.', severity: 2 }
                                         : null;
 
                     return (
                         <Background>
                             <Flex>
                                 <WaitTimeNav resortSlug={this.resortSlug} resort={resort} date={date} />
-                                {validationError === null
+                                {!userErrorMessage
                                     ? <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} />
-                                    : <Typography component='p' color='error'>{validationError}</Typography>
+                                    : <UserErrorMessage message={userErrorMessage} />
                                 }
                             </Flex>
                         </Background>

@@ -14,6 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 import UpliftStatChart from './UpliftStatChart';
+import UserErrorMessage from '../common/UserErrorMessage';
 
 const query = gql`
     query LiftAndStatsByHourAndSeason($liftID: Int!) {
@@ -84,7 +85,7 @@ class Lift extends Component {
                     return null;
                 }
                 if (lift === null) {
-                    return <p>Lift not found</p>;//todo
+                    return <UserErrorMessage message={{ text: 'The lift in the address bar does not exist.', severity: 1 }} />;
                 }
 
                 const { upliftGroupings } = lift;
