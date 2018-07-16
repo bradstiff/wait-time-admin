@@ -1,6 +1,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import ResortList from '../common/ResortList';
+import ResortList from '../../common/ResortList';
 
 const styles = theme => ({
     container: {

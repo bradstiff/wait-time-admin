@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import bindProps from '../common/FormikFieldHelper';
+import bindProps from '../../common/FormikFieldHelper';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -12,7 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 
-import TimezoneData from '../common/TimezoneData';
+import TimezoneData from '../../common/TimezoneData';
 
 const styles = theme => ({
     root: {

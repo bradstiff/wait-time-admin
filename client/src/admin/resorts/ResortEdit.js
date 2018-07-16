@@ -1,12 +1,11 @@
 import React from 'react';
 import { withRouter } from 'react-router';
-import { Query, graphql, compose } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import ResortForm from './ResortForm';
-import UserErrorMessage from '../common/UserErrorMessage';
 
-const resortQuery = gql`
+export const query = gql`
     query Resort($id: Int!) {
         resort(id: $id) { 
             id,
@@ -34,28 +33,13 @@ const resortMutation = gql`
     }
 `;
 
-const EditResort = ({ id, submit, close }) => {
-    return <Query query={resortQuery} variables={{ id }}>
-        {({ error, data }) => {
-            if (error) {
-                console.log(error);
-                return null;
-            }
-            const { resort } = data;
-            if (resort === undefined) {
-                return null;
-            }
-            if (resort === null) {
-                return <UserErrorMessage message={{ text: 'The resort in the address bar does not exist.', severity: 1 }} />;
-            }
-            const resortValues = {
-                latitude: resort.location.lat,
-                longitude: resort.location.lng,
-                ...resort,
-            };
-            return <ResortForm resort={resortValues} title='Edit resort' submit={submit} close={close} />
-        }}
-    </Query>
+const EditResort = ({ id, resort, submit, close }) => {
+    const resortValues = {
+        latitude: resort.location.lat,
+        longitude: resort.location.lng,
+        ...resort,
+    };
+    return <ResortForm resort={resortValues} title='Edit resort' submit={submit} close={close} />
 };
 
 export default compose(

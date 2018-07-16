@@ -8,6 +8,8 @@ import gql from 'graphql-tag';
 import UserErrorMessage from '../common/UserErrorMessage';
 import WaitTimeNav from './WaitTimeNav';
 import WaitTimeView from './WaitTimeView';
+import ResortNotFound from '../app/ResortNotFound';
+import NotFound from '../app/NotFound';
 
 const Flex = styled.div`
     height: 100vh;
@@ -81,17 +83,18 @@ class WaitTime extends Component {
                             resort.lastDate.date :
                             null);
 
+                    if (this.resortSlug && resort === null) {
+                        return <ResortNotFound />;
+                    } else if (searchDate && !moment.utc(searchDate).isValid()) {
+                        return <NotFound />;
+                    }
                     const userErrorMessage = loading
                         ? null
-                        : this.resortSlug && resort === null
-                            ? { text: 'The resort name in the address bar does not exist.', severity: 1 }
-                            : searchDate && !moment.utc(searchDate).isValid()
-                                ? { text: 'The date in the address bar is invalid. Date must be entered as YYYY-MM-DD.', severity: 1 }
-                                : !resort.dates.length
-                                    ? { text: 'No wait time data exists for the selected resort. Please select either Serre Chevalier Vallee, Steamboat or Winter Park.', severity: 2 }
-                                    : searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate))
-                                        ? { text: 'No wait time data exists for the selected date. Please select a highlighted date from the calendar.', severity: 2 }
-                                        : null;
+                            : !resort.dates.length
+                                ? { text: 'No wait time data exists for the selected resort. Please select either Serre Chevalier Vallee, Steamboat or Winter Park.', severity: 2 }
+                                : searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate))
+                                    ? { text: 'No wait time data exists for the selected date. Please select a highlighted date from the calendar.', severity: 2 }
+                                    : null;
 
                     return (
                         <Flex>

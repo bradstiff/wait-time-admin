@@ -4,7 +4,7 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import ResortForm from './ResortForm';
-import { resortsQuery } from '../common/ResortList';
+import { resortsQuery } from '../../common/ResortList';
 
 const resortMutation = gql`
     mutation createResort($name: String!, $slug: String!, $logoFilename: String!, $trailMapFilename: String!, $latitude: Float!, $longitude: Float!, $timezone: String!) {

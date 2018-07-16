@@ -9,20 +9,18 @@ import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
-import Resorts from './Resorts';
-import Resort from './Resort';
-import ResortLifts from './ResortLifts';
-import ResortEdit from './ResortEdit';
-import ResortCreate from './ResortCreate';
-import ResortStats from './ResortStats';
+import Resorts from './resorts/Resorts';
+import ResortCreate from './resorts//ResortCreate';
+import { ResortController, ResortEditController, ResortLiftsController, ResortStatsController } from './resorts';
+
 import Lifts from './Lifts';
 import Lift from './Lift';
 import LiftEdit from './LiftEdit';
 import LiftUplifts from './LiftUplifts';
 import LiftStats from './LiftStats';
-import NotFound from '../app/NotFound';
 
-import UserErrorMessage from '../common/UserErrorMessage';
+import NotFound from '../app/NotFound';
+import LiftNotFound from '../app/LiftNotFound';
 
 const styles = theme => ({
     container: {
@@ -45,6 +43,7 @@ class Admin extends Component {
         } else if (pathname.toLowerCase().indexOf('/admin/lifts') > -1) {
             activeTab = 1;
         }
+
         return (
             <div className={classes.container}>
                 <AppBar position="static" color='default'>
@@ -60,25 +59,17 @@ class Admin extends Component {
                 </AppBar>
                 <div className={classes.content}>
                     <Switch>
-                        <Route exact path='/admin/resorts/create' component={ResortCreate} />
-                        <Route path='/admin/resorts/:id' children={({ match }) => {
-                            const id = parseInt(match.params.id);
-                            if (isNaN(id)) {
-                                return <UserErrorMessage message={{ text: 'The resort ID in the address bar is invalid. Resort ID must be a whole number.', severity: 1}} />
-                            }
-                            return <Switch>
-                                <Route exact path='/admin/resorts/:id/stats' component={() => <ResortStats id={id} />} />
-                                <Route exact path='/admin/resorts/:id/lifts' component={() => <ResortLifts id={id} />} />
-                                <Route exact path='/admin/resorts/:id/edit' component={() => <ResortEdit id={id} />} />
-                                <Route exact path='/admin/resorts/:id' component={() => <Resort id={id} />} />
-                                <Route component={NotFound} />
-                            </Switch>
-                        }} />
                         <Route exact path='/admin/resorts' component={Resorts} />
+                        <Route exact path='/admin/resorts/create' component={ResortCreate} />
+                        <Route exact path='/admin/resorts/:id' component={ResortController} />
+                        <Route exact path='/admin/resorts/:id/lifts' component={ResortLiftsController} />
+                        <Route exact path='/admin/resorts/:id/edit' component={ResortEditController} />
+                        <Route exact path='/admin/resorts/:id/stats' component={ResortStatsController} />
+
                         <Route path='/admin/lifts/:id' children={({ match }) => {
                             const id = parseInt(match.params.id);
                             if (isNaN(id)) {
-                                return <UserErrorMessage message={{ text: 'The lift ID in the address bar is invalid. Lift ID must be a whole number.', severity: 1}} />
+                                return <LiftNotFound />
                             }
                             return <Switch>
                                 <Route exact path='/admin/lifts/:id/stats' component={() => <LiftStats id={id} />} />

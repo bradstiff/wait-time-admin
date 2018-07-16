@@ -11,11 +11,10 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
 import ResortLiftsMap from './ResortLiftsMap';
-import UserErrorMessage from '../common/UserErrorMessage';
 
-const resortQuery = gql`
-    query Resort($resortID: Int!) {
-        resort(id: $resortID) { 
+export const query = gql`
+    query ResortAndLifts($id: Int!) {
+        resort(id: $id) { 
             id,
             name,
             location { lat, lng },
@@ -85,30 +84,19 @@ class ResortLifts extends React.Component {
     };
 
     navigateBack = () => {
-        const nextLocation = `/admin/resorts/${this.props.data.resort.id}`;
+        const nextLocation = `/admin/resorts/${this.props.id}`;
         this.props.history.push(nextLocation);
     }
 
     handleSave = () => {
-        this.props.saveAssignedLifts(this.props.data.resort.id, this.state.assignedLiftIDs);
+        this.props.saveAssignedLifts(this.props.id, this.state.assignedLiftIDs);
         this.navigateBack();
     }
 
     handleCancel = this.navigateBack;
 
     render() {
-        const { data: { resort, error }, classes } = this.props;
-        if (error) {
-            console.log(error);
-            return null;
-        }
-        if (resort === undefined) {
-            return null;
-        }
-        if (resort === null) {
-            return <UserErrorMessage message={{ text: 'The resort in the address bar does not exist.', severity: 1 }} />;
-        }
-
+        const { id, resort, classes } = this.props;
         const { assignedLiftIDs, topLeft, bottomRight } = this.state;
         return (
             <Paper>
@@ -156,7 +144,7 @@ class ResortLifts extends React.Component {
 
     static getDerivedStateFromProps(props, state) {
         const { assignedLiftIDs } = state || {};
-        const { resort } = props.data || {};
+        const { resort } = props;
         if (resort && assignedLiftIDs === undefined) {
             return {
                 assignedLiftIDs: resort.lifts.map(lift => lift.id),
@@ -170,9 +158,6 @@ class ResortLifts extends React.Component {
 export default compose(
     withStyles(styles),
     withRouter,
-    graphql(resortQuery, {
-        options: ({ id }) => ({ variables: { resortID: id } }),
-    }),
     graphql(updateAssignedLiftsMutation, {
         name: 'updateAssignedLifts',
         props: ({ updateAssignedLifts }) => ({
