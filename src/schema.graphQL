@@ -28,7 +28,7 @@ type Resort {
     dates: [WaitTimeDate!]
 	lastDate: WaitTimeDate
     lifts: [Lift!]
-	upliftGroupings(groupBy: String!, groupBy2: String): [UpliftGrouping!]
+	upliftGroupings(groupBy: UpliftGroupBy!, groupBy2: UpliftGroupBy): [UpliftGrouping!]
 }
 type Lift {
     id: Int!
@@ -39,7 +39,7 @@ type Lift {
 	isActive: Boolean!
 	stations: [LiftStation!]!
 	upliftList(offset: Int!, limit: Int!, orderBy: String!, order: String!, seasonYear: Int, month: Int, day: Int, hour: Int): UpliftList!
-	upliftGroupings(groupBy: String!, groupBy2: String): [UpliftGrouping!]
+	upliftGroupings(groupBy: UpliftGroupBy!, groupBy2: UpliftGroupBy): [UpliftGrouping!]
 }
 type WaitTimeDate {
 	id: String!
@@ -99,6 +99,13 @@ type Season {
 type LiftType {
 	id: Int!
 	description: String!
+}
+enum UpliftGroupBy {
+  Season
+  Month
+  Day
+  Hour
+  Lift
 }
 
 scalar Date

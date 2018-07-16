@@ -123,6 +123,7 @@ const Resort = {
     getByLift: (lift, args, context) => lift.resortID ? context.dataLoaders.resortsByIDs.load(lift.resortID) : null,
     getWaitTimeDates: (resort, args, context) => context.dataLoaders.waitTimeDatesByResortIDs.load(resort.id),
     getUpliftGroupings: async (resort, args, context) => {
+        //groupBy is validated by schema
         let groupBy = args.groupBy.toLowerCase();
         if (groupBy === 'season') {
             groupBy = 'seasonYear';
@@ -337,6 +338,7 @@ const Lift = {
         );
     },
     getUpliftGroupings: async (lift, args, context) => {
+        //groupBy is validated by schema
         let groupBy = args.groupBy.toLowerCase();
         if (groupBy === 'season') {
             groupBy = 'seasonYear';
