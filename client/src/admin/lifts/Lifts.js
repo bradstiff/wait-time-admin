@@ -15,13 +15,14 @@ import Collapse from '@material-ui/core/Collapse';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import Hidden from '@material-ui/core/Hidden';
 
-import Search from '../common/Search';
-import ToggleIconButton from '../common/ToggleIconButton';
-import SortEnabledTableHead from '../common/SortEnabledTableHead';
-import LinkButton from '../common/LinkButton';
-import SelectMenu from '../common/SelectMenu';
-import LiftTypeData from '../common/LiftTypeData';
-import ResortData from '../common/ResortData';
+import Search from '../../common/Search';
+import ToggleIconButton from '../../common/ToggleIconButton';
+import SortEnabledTableHead from '../../common/SortEnabledTableHead';
+import LinkButton from '../../common/LinkButton';
+import SelectMenu from '../../common/SelectMenu';
+import LiftTypeData from '../../common/LiftTypeData';
+import ResortData from '../../common/ResortData';
+import Locations from '../../app/Locations';
 
 const query = gql`
     query LiftList($offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $name: String, $typeID: Int, $resortID: Int, $isActive: Boolean) {
@@ -239,7 +240,7 @@ class Lifts extends Component {
                                             .slice()
                                             .map(lift => (
                                                 <TableRow key={lift.id} className={classes.row}>
-                                                    <TableCell component="th" scope="row"><LinkButton to={`/admin/lifts/${lift.id}`}>{lift.name}</LinkButton></TableCell>
+                                                    <TableCell component="th" scope="row"><LinkButton to={Locations.Lift.toUrl({ id: lift.id })}>{lift.name}</LinkButton></TableCell>
                                                     <TableCell>{lift.type.description}</TableCell>
                                                     <TableCell>{lift.resort ? lift.resort.name : ''}</TableCell>
                                                     <TableCell>{lift.isActive ? '✓' : ''}</TableCell>

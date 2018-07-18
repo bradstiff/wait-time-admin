@@ -4,7 +4,9 @@ import { Query, graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import LiftForm from './LiftForm';
-import UserErrorMessage from '../common/UserErrorMessage';
+import Locations from '../../app/Locations';
+import LiftNotFound from '../../app/LiftNotFound';
+import withQuery from '../../common/withQuery';
 
 const query = gql`
     query Lift($id: Int!) {
@@ -34,50 +36,35 @@ const mutation = gql`
     }
 `;
 
-const LiftEdit = ({ id, submit, close }) => {
-    return <Query query={query} variables={{ id }}>
-        {({ error, data }) => {
-            if (error) {
-                console.log(error);
-                return null;
-            }
-            const { lift } = data;
-            if (lift === undefined) {
-                return null;
-            }
-            if (lift === null) {
-                return <UserErrorMessage message={{ text: 'The lift in the address bar does not exist.', severity: 1 }} />;
-            }
-            const stationCoordinates = lift.stations.reduce((acc, station) => {
-                //flatten stations' locations into unique properties for editing, e.g., { station1Lat, station1Lng, station2Lat, station2Lng, } etc.
-                acc[`station${station.number}Lat`] = station.location.lat;
-                acc[`station${station.number}Lng`] = station.location.lng;
-                return acc;
-            }, {});
-            const liftValues = {
-                typeID: lift.type.id,
-                resortID: lift.resort && lift.resort.id,
-                ...stationCoordinates,
-                ...lift,
-            };
-            return <LiftForm lift={liftValues} title='Edit lift' submit={submit} close={close} />
-        }}
-    </Query>
+const LiftEdit = ({ id, lift, submit, close }) => {
+    const stationCoordinates = lift.stations.reduce((acc, station) => {
+        //flatten stations' locations into unique properties for editing, e.g., { station1Lat, station1Lng, station2Lat, station2Lng, } etc.
+        acc[`station${station.number}Lat`] = station.location.lat;
+        acc[`station${station.number}Lng`] = station.location.lng;
+        return acc;
+    }, {});
+    const liftValues = {
+        typeID: lift.type.id,
+        resortID: lift.resort && lift.resort.id,
+        ...stationCoordinates,
+        ...lift,
+    };
+    return <LiftForm lift={liftValues} title='Edit lift' submit={submit} close={close} />
 };
 
 export default compose(
     withRouter,
+    withQuery(query, 'lift', LiftNotFound),
     graphql(mutation, {
         name: 'updateLift',
         props: ({ updateLift, ownProps: { history, id } }) => {
-            const nextLocation = `/admin/lifts/${id}`;
             return {
                 id,
                 submit: (values, actions) => {
                     updateLift({ variables: values })
-                        .then(() => history.push(nextLocation));
+                        .then(() => history.push(Locations.Lift.toUrl({ id })));
                 },
-                close: () => history.push(nextLocation),
+                close: () => history.push(Locations.Lift.toUrl({ id })),
             };
         }
     })

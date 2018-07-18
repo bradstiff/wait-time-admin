@@ -17,6 +17,7 @@ import LinkButton from '../../common/LinkButton';
 import SortEnabledTableHead, { makeCompareFn } from '../../common/SortEnabledTableHead';
 import ResortNotFound from '../../app/ResortNotFound';
 import withQuery from '../../common/withQuery';
+import Locations from '../../app/Locations';
 
 const query = gql`
     query UpliftStatsByResort($id: Int!, $groupBy: UpliftGroupBy!) {
@@ -57,7 +58,7 @@ class ResortStats extends Component {
 
     handleSelectGroupBy = groupBy => {
         const { history, id } = this.props;
-        history.push(`/admin/resorts/${id}/stats?groupBy=${groupBy}`);
+        history.push(Locations.ResortStats.toUrl({ id, groupBy }));
     }
 
     handleRequestSort = (event, fieldName) => {
@@ -120,7 +121,7 @@ class ResortStats extends Component {
                                         <TableRow key={grouping.groupKey}>
                                             <TableCell component="th" scope="row">
                                                 {groupBy === 'Lift'
-                                                    ? <LinkButton to={`/admin/lifts/${grouping.groupKey}`}>{grouping.groupDescription}</LinkButton>
+                                                    ? <LinkButton to={Locations.Lift.toUrl({ id: grouping.groupKey })}>{grouping.groupDescription}</LinkButton>
                                                     : grouping.groupDescription
                                                 }
                                             </TableCell>

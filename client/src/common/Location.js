@@ -1,5 +1,6 @@
 import React from 'react';
-import { Route, Link, matchPath, generatePath } from 'react-router';
+import { Route, matchPath, generatePath } from 'react-router';
+import { Link } from 'react-router-dom';
 import warning from 'warning';
 import * as Yup from 'yup';
 import qs from 'querystringify';
@@ -100,6 +101,8 @@ class Location {
             ? `${path}?${qs.stringify(qsTokens)}`
             : path;
     }
+
+    toLink = tokens => props => <Link {...props} to={this.toUrl(tokens)} />;
 
     parseParams = location => {
         const match = matchPath(location.pathname, { path: this._path });

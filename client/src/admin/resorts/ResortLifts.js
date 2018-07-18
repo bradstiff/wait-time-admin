@@ -13,6 +13,7 @@ import Button from '@material-ui/core/Button';
 import ResortLiftsMap from './ResortLiftsMap';
 import ResortNotFound from '../../app/ResortNotFound';
 import withQuery from '../../common/withQuery';
+import Locations from '../../app/Locations';
 
 export const query = gql`
     query ResortAndLifts($id: Int!) {
@@ -86,8 +87,8 @@ class ResortLifts extends React.Component {
     };
 
     navigateBack = () => {
-        const nextLocation = `/admin/resorts/${this.props.id}`;
-        this.props.history.push(nextLocation);
+        const { id, history } = this.props;
+        history.push(Locations.Resort.toUrl({ id }));
     }
 
     handleSave = () => {

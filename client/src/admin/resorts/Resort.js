@@ -1,7 +1,6 @@
 import React from 'react';
 import { compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Link } from 'react-router-dom';
 import { Polyline } from 'react-leaflet'
 
 import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
@@ -14,6 +13,7 @@ import CardActions from '@material-ui/core/CardActions';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
+import Locations from '../../app/Locations';
 import ResortNotFound from '../../app/ResortNotFound';
 import withQuery from '../../common/withQuery';
 import ResortLiftsMap from './ResortLiftsMap';
@@ -128,8 +128,8 @@ const Resort = ({ id, resort, classes, width }) => {
                                 </div>
                             </CardContent>
                             <CardActions className={classes.resortActions}>
-                                <Button component={Link} to={`/admin/resorts/${resort.id}/edit`}>Edit</Button>
-                                <Button component={Link} to={`/admin/resorts/${resort.id}/lifts`}>Assign Lifts</Button>
+                                <Button component={Locations.ResortEdit.toLink({ id })}>Edit</Button>
+                                <Button component={Locations.ResortLifts.toLink({ id })}>Assign Lifts</Button>
                             </CardActions>
                         </div>
                     </Card>
@@ -145,7 +145,7 @@ const Resort = ({ id, resort, classes, width }) => {
                                 <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='upliftCount' />
                             </CardMedia>
                             <CardActions>
-                                <Button component={Link} to={`/admin/resorts/${resort.id}/stats`}>More</Button>
+                                <Button component={Locations.ResortStats.toLink({ id })}>More</Button>
                             </CardActions>
                         </Card>
                     </Grid>,
@@ -159,7 +159,7 @@ const Resort = ({ id, resort, classes, width }) => {
                                 <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='waitTimeAverage' />
                             </CardMedia>
                             <CardActions>
-                                <Button component={Link} to={`/admin/resorts/${resort.id}/stats`}>More</Button>
+                                <Button component={Locations.ResortStats.toLink({ id })}>More</Button>
                             </CardActions>
                         </Card>
                     </Grid>

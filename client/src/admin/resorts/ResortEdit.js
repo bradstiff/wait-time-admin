@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import ResortForm from './ResortForm';
 import ResortNotFound from '../../app/ResortNotFound';
 import withQuery from '../../common/withQuery';
+import Locations from '../../app/Locations';
 
 const query = gql`
     query Resort($id: Int!) {
@@ -50,12 +51,11 @@ export default compose(
     graphql(resortMutation, {
         name: 'updateResort',
         props: ({ updateResort, ownProps: { history, id } }) => {
-            const nextLocation = `/admin/resorts/${id}`;
             return {
                 submit: (values, actions) =>
                     updateResort({ variables: values })
-                        .then(() => history.push(nextLocation)),
-                close: () => history.push(nextLocation)
+                        .then(() => history.push(Locations.Resort.toUrl({ id }))),
+                close: () => history.push(Locations.Resort.toUrl({ id }))
             };
         }
     })

@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import ResortList from '../../common/ResortList';
+import Locations from '../../app/Locations';
 
 const styles = theme => ({
     container: {
@@ -11,7 +12,7 @@ const styles = theme => ({
 
 const Resorts = ({ classes }) => (
     <div className={classes.container}>
-        <ResortList linkTo={resort => `/admin/resorts/${resort.id}`} chevron />
+        <ResortList linkTo={resort => Locations.Resort.toUrl({ id: resort.id })} chevron />
     </div>
 );
 

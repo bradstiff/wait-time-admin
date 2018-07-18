@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import bindProps from '../common/FormikFieldHelper';
+import bindProps from '../../common/FormikFieldHelper';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
@@ -14,8 +14,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 
-import LiftTypeData from '../common/LiftTypeData';
-import ResortData from '../common/ResortData';
+import LiftTypeData from '../../common/LiftTypeData';
+import ResortData from '../../common/ResortData';
 
 const styles = theme => ({
     root: {

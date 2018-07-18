@@ -16,11 +16,11 @@ import ResortEdit from './resorts/ResortEdit';
 import ResortLifts from './resorts/ResortLifts';
 import ResortStats from './resorts/ResortStats';
 
-import Lifts from './Lifts';
-import Lift from './Lift';
-import LiftEdit from './LiftEdit';
-import LiftUplifts from './LiftUplifts';
-import LiftStats from './LiftStats';
+import Lifts from './lifts/Lifts';
+import Lift from './lifts/Lift';
+import LiftEdit from './lifts/LiftEdit';
+import LiftUplifts from './lifts/LiftUplifts';
+import LiftStats from './lifts/LiftStats';
 
 import Locations from '../app/Locations';
 import NotFound from '../app/NotFound';
@@ -63,27 +63,16 @@ class Admin extends Component {
                 </AppBar>
                 <div className={classes.content}>
                     <Switch>
-                        <Route exact path='/admin/resorts' component={Resorts} />
-                        <Route exact path='/admin/resorts/create' component={ResortCreate} />
+                        {Locations.Resorts.toRoute({ component: Resorts }, true)}
                         {Locations.Resort.toRoute({ component: Resort }, true)}
                         {Locations.ResortEdit.toRoute({ component: ResortEdit }, true)}
                         {Locations.ResortLifts.toRoute({ component: ResortLifts }, true)}
                         {Locations.ResortStats.toRoute({ component: ResortStats }, true)}
-
-                        <Route path='/admin/lifts/:id' children={({ match }) => {
-                            const id = parseInt(match.params.id);
-                            if (isNaN(id)) {
-                                return <LiftNotFound />
-                            }
-                            return <Switch>
-                                <Route exact path='/admin/lifts/:id/stats' component={() => <LiftStats id={id} />} />
-                                <Route exact path='/admin/lifts/:id/uplifts' component={() => <LiftUplifts id={id} />} />
-                                <Route exact path='/admin/lifts/:id/edit' component={() => <LiftEdit id={id} />} />
-                                <Route exact path='/admin/lifts/:id' component={() => <Lift id={id} />} />
-                                <Route component={NotFound} />
-                            </Switch>
-                        }} />
-                        <Route exact path='/admin/lifts' component={Lifts} />
+                        {Locations.Lifts.toRoute({ component: Lifts }, true)}
+                        {Locations.Lift.toRoute({ component: Lift }, true)}
+                        {Locations.LiftEdit.toRoute({ component: LiftEdit }, true)}
+                        {Locations.LiftUplifts.toRoute({ component: LiftUplifts }, true)}
+                        {Locations.LiftStats.toRoute({ component: LiftStats }, true)}
                         <Route component={NotFound} />
                     </Switch>
                 </div>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Query } from 'react-apollo';
+import { Query, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import moment from 'moment';
 
@@ -14,13 +14,16 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
 
-import SortEnabledTableHead from '../common/SortEnabledTableHead';
-import SelectMenu from '../common/SelectMenu';
-import UserErrorMessage from '../common/UserErrorMessage';
+import SortEnabledTableHead from '../../common/SortEnabledTableHead';
+import SelectMenu from '../../common/SelectMenu';
+import Locations from '../../app/Locations';
+import LiftNotFound from '../../app/LiftNotFound';
+import withQuery from '../../common/withQuery';
+import UserErrorMessage from '../../common/UserErrorMessage';
 
-const upliftsQuery = gql`
-    query UpliftsByLift($liftID: Int!, $offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
-        lift(id: $liftID) { 
+const query = gql`
+    query UpliftsByLift($id: Int!, $offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
+        lift(id: $id) { 
             id,
             name,
             upliftList(offset: $offset, limit: $limit, orderBy: $orderBy, order: $order, seasonYear: $seasonYear, month: $month, day: $day, hour: $hour) {
@@ -121,12 +124,12 @@ class LiftUplifts extends Component {
     };
 
     render() {
-        const { classes, id } = this.props;
+        const { id, classes, } = this.props;
         const { page, rowsPerPage, order, orderBy, seasonYear, month, day, hour } = this.state;
         return <Query
-            query={upliftsQuery}
+            query={query}
             variables={{
-                liftID: id,
+                id,
                 offset: page * rowsPerPage,
                 limit: rowsPerPage,
                 orderBy,
@@ -272,4 +275,7 @@ class LiftUplifts extends Component {
     };
 }
 
-export default withStyles(styles)(LiftUplifts);
+export default compose(
+    withStyles(styles),
+    //withQuery(query, 'lift', LiftNotFound),
+)(LiftUplifts);
