@@ -14,12 +14,14 @@ class Location {
 
         //todo: check for collisions
         if (pathTokenDefs && !isEmptyObject(pathTokenDefs)) {
-            this._pathKeys = Object.keys(pathTokenDefs);
+            this._pathTokenKeys = Object.keys(pathTokenDefs);
+            this._pathTokens = pathTokenDefs;
             this._pathSchema = Yup.object().shape(pathTokenDefs);
         }
 
         if (qsTokenDefs && !isEmptyObject(qsTokenDefs)) {
-            this._qsKeys = Object.keys(qsTokenDefs);
+            this._qsTokenKeys = Object.keys(qsTokenDefs);
+            this._qsTokens = qsTokenDefs;
             this._qsSchema = Yup.object().shape(qsTokenDefs);
         }
     }
@@ -87,14 +89,20 @@ class Location {
     toUrl = tokens => {
         const path = generatePath(this._path, tokens);
 
-        const qsTokens = this._qsKeys
+        const qsTokens = this._qsTokenKeys
             ? Object
                 .keys(tokens)
-                .filter(key => this._qsKeys.includes(key))
-                .reduce((acc, key) => ({
-                    [key]: tokens[key],
-                    ...acc
-                }), null)
+                .filter(key => this._qsTokenKeys.includes(key))
+                .reduce((acc, key) => {
+                    const value = tokens[key];
+                    const tokenDef = this._qsTokens[key];
+                    return tokenDef.default() === value
+                        ? acc //avoid query string clutter: don't serialize values that are the same as the default
+                        : {
+                            [key]: tokens[key],
+                            ...acc
+                        }
+                }, null)
             : null;
 
         return qsTokens
@@ -111,17 +119,19 @@ class Location {
         }
         const qsParams = qs.parse(location.search);
 
-        if ((this._pathSchema && !this._pathSchema.isValidSync(match.params))
-            || (this._qsSchema && !this._qsSchema.isValidSync(qsParams))) {
+        let pathValues, qsValues;
+        try {
+            pathValues = this._pathSchema
+                ? this._pathSchema.validateSync(match.params)
+                : {};
+            qsValues = this._qsSchema
+                ? this._qsSchema.validateSync(qsParams)
+                : {};
+        } catch (err) {
+            console.log(err);
             return null;
         }
 
-        const pathValues = this._pathSchema
-            ? this._pathSchema.cast(match.params)
-            : {};
-        const qsValues = this._qsSchema
-            ? this._qsSchema.cast(qsParams)
-            : {};
         return {
             ...pathValues,
             ...qsValues,

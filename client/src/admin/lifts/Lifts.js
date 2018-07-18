@@ -77,19 +77,12 @@ const styles = theme => ({
 
 
 class Lifts extends Component {
-    state = {
-        page: 0,
-        rowsPerPage: 25,
-        order: 'asc',
-        orderBy: 'name',
-        showFilter: false,
-        isActive: true,
-    };
-
-    handleSelectType = typeID => 
-        this.setState({
-            typeID,
-        });
+    handleSelectType = typeID => {
+        this.props.history.push(Locations.Lifts.toUrl({
+            ...this.props,
+            typeID
+        }));
+    }
 
     handleSearchName = event => {
         const value = event.target.value || undefined;
@@ -132,8 +125,7 @@ class Lifts extends Component {
     }
 
     render() {
-        const { classes } = this.props;
-        const { page, rowsPerPage, order, orderBy, showFilter, name, typeID, resortID, isActive } = this.state;
+        const { classes, page, rowsPerPage, order, orderBy, showFilter, name, typeID, resortID, isActive } = this.props;
         return <Query
             query={query}
             variables={{
