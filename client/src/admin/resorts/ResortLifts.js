@@ -11,6 +11,8 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
 import ResortLiftsMap from './ResortLiftsMap';
+import ResortNotFound from '../../app/ResortNotFound';
+import withQuery from '../../common/withQuery';
 
 export const query = gql`
     query ResortAndLifts($id: Int!) {
@@ -158,6 +160,7 @@ class ResortLifts extends React.Component {
 export default compose(
     withStyles(styles),
     withRouter,
+    withQuery(query, 'resort', ResortNotFound),
     graphql(updateAssignedLiftsMutation, {
         name: 'updateAssignedLifts',
         props: ({ updateAssignedLifts }) => ({

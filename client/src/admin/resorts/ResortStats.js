@@ -15,9 +15,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 import SelectMenu from '../../common/SelectMenu';
 import LinkButton from '../../common/LinkButton';
 import SortEnabledTableHead, { makeCompareFn } from '../../common/SortEnabledTableHead';
-import UserErrorMessage from '../../common/UserErrorMessage';
+import ResortNotFound from '../../app/ResortNotFound';
+import withQuery from '../../common/withQuery';
 
-export const query = gql`
+const query = gql`
     query UpliftStatsByResort($id: Int!, $groupBy: UpliftGroupBy!) {
         resort(id: $id) { 
             id,
@@ -139,4 +140,5 @@ class ResortStats extends Component {
 export default compose(
     withRouter,
     withStyles(styles),
+    withQuery(query, 'resort', ResortNotFound),
 )(ResortStats);

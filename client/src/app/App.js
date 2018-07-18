@@ -12,6 +12,8 @@ import orange from '@material-ui/core/colors/orange';
 import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';
 import NotFound from './NotFound';
+import Locations from './Locations';
+
 import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
 const client = new ApolloClient({

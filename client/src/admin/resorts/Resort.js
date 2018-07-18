@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Link } from 'react-router-dom';
@@ -14,10 +14,12 @@ import CardActions from '@material-ui/core/CardActions';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
+import ResortNotFound from '../../app/ResortNotFound';
+import withQuery from '../../common/withQuery';
 import ResortLiftsMap from './ResortLiftsMap';
 import UpliftStatChart from '../UpliftStatChart';
 
-export const query = gql`
+const query = gql`
     query ResortAndStatsByHourAndSeason($id: Int!) {
         resort(id: $id) { 
             id,
@@ -170,4 +172,5 @@ const Resort = ({ id, resort, classes, width }) => {
 export default compose(
     withStyles(styles),
     withWidth(),
+    withQuery(query, 'resort', ResortNotFound),
 )(Resort);

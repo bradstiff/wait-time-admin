@@ -11,7 +11,10 @@ import Tab from '@material-ui/core/Tab';
 
 import Resorts from './resorts/Resorts';
 import ResortCreate from './resorts//ResortCreate';
-import { ResortController, ResortEditController, ResortLiftsController, ResortStatsController } from './resorts';
+import Resort from './resorts/Resort';
+import ResortEdit from './resorts/ResortEdit';
+import ResortLifts from './resorts/ResortLifts';
+import ResortStats from './resorts/ResortStats';
 
 import Lifts from './Lifts';
 import Lift from './Lift';
@@ -19,6 +22,7 @@ import LiftEdit from './LiftEdit';
 import LiftUplifts from './LiftUplifts';
 import LiftStats from './LiftStats';
 
+import Locations from '../app/Locations';
 import NotFound from '../app/NotFound';
 import LiftNotFound from '../app/LiftNotFound';
 
@@ -61,10 +65,10 @@ class Admin extends Component {
                     <Switch>
                         <Route exact path='/admin/resorts' component={Resorts} />
                         <Route exact path='/admin/resorts/create' component={ResortCreate} />
-                        <Route exact path='/admin/resorts/:id' component={ResortController} />
-                        <Route exact path='/admin/resorts/:id/lifts' component={ResortLiftsController} />
-                        <Route exact path='/admin/resorts/:id/edit' component={ResortEditController} />
-                        <Route exact path='/admin/resorts/:id/stats' component={ResortStatsController} />
+                        {Locations.Resort.toRoute({ component: Resort }, true)}
+                        {Locations.ResortEdit.toRoute({ component: ResortEdit }, true)}
+                        {Locations.ResortLifts.toRoute({ component: ResortLifts }, true)}
+                        {Locations.ResortStats.toRoute({ component: ResortStats }, true)}
 
                         <Route path='/admin/lifts/:id' children={({ match }) => {
                             const id = parseInt(match.params.id);

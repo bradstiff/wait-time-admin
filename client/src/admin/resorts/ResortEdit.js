@@ -4,8 +4,10 @@ import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import ResortForm from './ResortForm';
+import ResortNotFound from '../../app/ResortNotFound';
+import withQuery from '../../common/withQuery';
 
-export const query = gql`
+const query = gql`
     query Resort($id: Int!) {
         resort(id: $id) { 
             id,
@@ -33,7 +35,7 @@ const resortMutation = gql`
     }
 `;
 
-const EditResort = ({ id, resort, submit, close }) => {
+const EditResort = ({ id, resort, submit, close, match }) => {
     const resortValues = {
         latitude: resort.location.lat,
         longitude: resort.location.lng,
@@ -44,6 +46,7 @@ const EditResort = ({ id, resort, submit, close }) => {
 
 export default compose(
     withRouter,
+    withQuery(query, 'resort', ResortNotFound),
     graphql(resortMutation, {
         name: 'updateResort',
         props: ({ updateResort, ownProps: { history, id } }) => {
