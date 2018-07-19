@@ -80,7 +80,7 @@ const styles = theme => ({
 
 class Lifts extends Component {
     replaceLocation = qsParams => {
-        const nextLocation = Locations.LiftUplifts.toUrl({
+        const nextLocation = Locations.Lifts.toUrl({
             ...this.props,
             ...qsParams
         });

@@ -58,7 +58,7 @@ class ResortStats extends Component {
 
     handleSelectGroupBy = groupBy => {
         const { history, id } = this.props;
-        history.push(Locations.ResortStats.toUrl({ id, groupBy }));
+        history.replace(Locations.ResortStats.toUrl({ id, groupBy }));
     }
 
     handleRequestSort = (event, fieldName) => {

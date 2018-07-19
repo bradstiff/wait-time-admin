@@ -51,7 +51,7 @@ const styles = theme => ({
 class LiftStats extends React.Component {
     handleSelectGroupBy = groupBy => {
         const { history, id } = this.props;
-        history.push(Locations.LiftStats.toUrl({ id, groupBy }));
+        history.replace(Locations.LiftStats.toUrl({ id, groupBy }));
     }
 
     render() {
