@@ -50,8 +50,6 @@ const theme = createMuiTheme({
     }
 });
 
-const DefaultResort = () => <Redirect to='/resorts/steamboat' />;
-
 const Background = styled.div`
     background-image: url(${BackgroundImage});
     background-position: center;
@@ -67,8 +65,8 @@ const App = () => (
                 <Background>
                     <Switch>
                         <Route path='/admin' component={Admin} />
-                        <Route exact path='/resorts/:resort?' component={WaitTime} />
-                        <Route exact path='/' component={DefaultResort} />
+                        {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
+                        <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
                         <Route component={NotFound} />
                     </Switch>
                 </Background>

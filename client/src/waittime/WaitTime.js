@@ -1,4 +1,4 @@
-﻿import React, { Component } from 'react';
+﻿import React from 'react';
 import styled from 'styled-components';
 import qs from 'querystringify';
 import moment from 'moment';
@@ -10,6 +10,7 @@ import WaitTimeNav from './WaitTimeNav';
 import WaitTimeView from './WaitTimeView';
 import ResortNotFound from '../app/ResortNotFound';
 import NotFound from '../app/NotFound';
+import withQuery from '../common/withQuery';
 
 const Flex = styled.div`
     height: 100vh;
@@ -30,85 +31,58 @@ const Flex = styled.div`
     }
 `;
 
-class WaitTime extends Component {
-    state = {
-        showSnackbar: false,
-    }
-    get resortSlug() {
-        return this.props.match.params.resort;
-    }
-
-    handleSnackbarClose = () => {
-        this.setState({
-            showSnackbar: false,
-        })
-    }
-
-    render() {
-        const { date: searchDate } = this.props.location.search ? qs.parse(this.props.location.search) : {};
-        const resortQuery = gql`
-            query ResortBySlug($slug: String!) {
-                resort: resortBySlug(slug: $slug) { 
-                    id, 
-                    name, 
-                    slug, 
-                    trailMapFilename, 
-                    dates { 
-                        date 
-                    }, 
-                    lastDate { 
-                        id,
-                        date, 
-                        timePeriods { 
-                            timestamp, 
-                            waitTimes { 
-                                liftID, 
-                                seconds 
-                            } 
-                        }
-                    }
+const query = gql`
+    query ResortBySlug($slug: String!) {
+        resort: resortBySlug(slug: $slug) { 
+            id, 
+            name, 
+            slug, 
+            trailMapFilename, 
+            dates { 
+                date 
+            }, 
+            lastDate { 
+                id,
+                date, 
+                timePeriods { 
+                    timestamp, 
+                    waitTimes { 
+                        liftID, 
+                        seconds 
+                    } 
                 }
             }
-        `;
-
-        return (
-            <Query query={resortQuery} variables={{ slug: this.resortSlug }}>
-                {({ loading, error, data }) => {
-                    if (error) {
-                    }
-
-                    const { resort } = data;
-                    const date = searchDate ||
-                        (resort && resort.slug === this.resortSlug && resort.lastDate ?
-                            resort.lastDate.date :
-                            null);
-
-                    if (this.resortSlug && resort === null) {
-                        return <ResortNotFound />;
-                    } else if (searchDate && !moment.utc(searchDate).isValid()) {
-                        return <NotFound />;
-                    }
-                    const userErrorMessage = loading
-                        ? null
-                            : !resort.dates.length
-                                ? { text: 'No wait time data exists for the selected resort. Please select either Serre Chevalier Vallee, Steamboat or Winter Park.', severity: 2 }
-                                : searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate))
-                                    ? { text: 'No wait time data exists for the selected date. Please select a highlighted date from the calendar.', severity: 2 }
-                                    : null;
-
-                    return (
-                        <Flex>
-                            <WaitTimeNav resortSlug={this.resortSlug} resort={resort} date={date} />
-                            {!userErrorMessage
-                                ? <WaitTimeView resortSlug={this.resortSlug} resort={resort} date={date} />
-                                : <UserErrorMessage message={userErrorMessage} />
-                            }
-                        </Flex>
-                    );
-                }}
-            </Query>
-        );
+        }
     }
+`;
+
+const WaitTime = ({ slug, date: searchDate, resort, loading }) => {
+    const date = searchDate || (resort && resort.slug === slug && resort.lastDate
+        ? resort.lastDate.date
+        : null);
+
+    if (slug && resort === null) {
+        return <ResortNotFound />;
+    } else if (searchDate && !moment.utc(searchDate).isValid()) {
+        return <NotFound />;
+    }
+    const userErrorMessage = loading
+        ? null
+            : !resort.dates.length
+                ? { text: 'No wait time data exists for the selected resort. Please select either Serre Chevalier Vallee, Steamboat or Winter Park.', severity: 2 }
+                : searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate))
+                    ? { text: 'No wait time data exists for the selected date. Please select a highlighted date from the calendar.', severity: 2 }
+                    : null;
+
+    return (
+        <Flex>
+            <WaitTimeNav resortSlug={slug} resort={resort} date={date} />
+            {!userErrorMessage
+                ? <WaitTimeView resortSlug={slug} resort={resort} date={date} />
+                : <UserErrorMessage message={userErrorMessage} />
+            }
+        </Flex>
+    );
 }
 
-export default WaitTime;
+export default withQuery(query, 'resort', ResortNotFound)(WaitTime);

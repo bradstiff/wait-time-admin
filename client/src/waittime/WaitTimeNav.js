@@ -14,6 +14,7 @@ import Drawer from '@material-ui/core/Drawer';
 
 import DateNav from './DateNav';
 import ResortList from '../common/ResortList';
+import Locations from '../app/Locations';
 
 const DESKTOP_BREAKPOINT = 600;
 
@@ -54,7 +55,11 @@ class WaitTimeNav extends Component {
     }
 
     handleSelectDate = date => {
-        this.props.history.push(`/resorts/${this.props.resort.slug}?date=${date.format('YYYY-MM-DD')}`);
+        const locationProps = {
+            slug: this.props.resort.slug,
+            date: date.format('YYYY-MM-DD'),
+        };
+        this.props.history.push(Locations.WaitTime.toUrl(locationProps));
     }
 
     render() {
@@ -94,7 +99,7 @@ class WaitTimeNav extends Component {
                 />
             </Hidden>,
             <Drawer open={this.state.showMenu} onClose={() => this.handleToggleMenu(false)} classes={{ paper: classes.resortDrawer }}>
-                <ResortList linkTo={resort => `/resorts/${resort.slug}`} onClick={() => this.handleToggleMenu(false)} />
+                <ResortList linkTo={resort => Locations.WaitTime.toUrl({ slug: resort.slug })} onClick={() => this.handleToggleMenu(false)} />
             </Drawer>
         ]);
     };

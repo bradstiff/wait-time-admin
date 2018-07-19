@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Query, compose } from 'react-apollo';
+import { compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import moment from 'moment';
 
@@ -13,13 +13,16 @@ import TableRow from '@material-ui/core/TableRow';
 import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
+import Collapse from '@material-ui/core/Collapse';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import Hidden from '@material-ui/core/Hidden';
 
 import SortEnabledTableHead from '../../common/SortEnabledTableHead';
 import SelectMenu from '../../common/SelectMenu';
 import Locations from '../../app/Locations';
 import LiftNotFound from '../../app/LiftNotFound';
 import withQuery from '../../common/withQuery';
-import UserErrorMessage from '../../common/UserErrorMessage';
+import ToggleIconButton from '../../common/ToggleIconButton';
 
 const query = gql`
     query UpliftsByLift($id: Int!, $offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
@@ -70,212 +73,175 @@ const styles = theme => ({
 });
 
 class LiftUplifts extends Component {
-    state = {
-        page: 0,
-        rowsPerPage: 25,
-        order: 'asc',
-        orderBy: 'date',
-        seasonYear: null,
-        month: null,
-        day: null,
-        hour: null,
-    };
-
-    handleSelectSeason = seasonYear => {
-        this.setState({
-            seasonYear,
+    replaceLocation = qsParams => {
+        const nextLocation = Locations.LiftUplifts.toUrl({
+            ...this.props,
+            ...qsParams
         });
-    };
+        this.props.history.replace(nextLocation);
+    }
 
-    handleSelectMonth = month => {
-        this.setState({
-            month,
-        });
-    };
-
-    handleSelectDay = day => {
-        this.setState({
-            day,
-        });
-    };
-
-    handleSelectHour = hour => {
-        this.setState({
-            hour,
-        });
-    };
-
-    handleChangePage = (event, page) => {
-        this.setState({ page });
-    };
-
-    handleChangeRowsPerPage = event => {
-        this.setState({ rowsPerPage: event.target.value });
-    };
+    handleSelectSeason = seasonYear => this.replaceLocation({ seasonYear });
+    handleSelectMonth = month => this.replaceLocation({ month });
+    handleSelectDay = day => this.replaceLocation({ day });
+    handleSelectHour = hour => this.replaceLocation({ hour });
+    handleToggleFilter = () => this.replaceLocation({ showFilter: !this.props.showFilter });
+    handleChangePage = (event, page) => this.replaceLocation({ page });
+    handleChangeRowsPerPage = event => this.replaceLocation({ rowsPerPage: event.target.value });
 
     handleRequestSort = (event, fieldName) => {
-        const order = this.state.orderBy === fieldName && this.state.order === 'asc'
+        const order = this.props.orderBy === fieldName && this.props.order === 'asc'
             ? 'desc'
             : 'asc';
-        this.setState({
-            order,
-            orderBy: fieldName
-        });
+        this.replaceLocation({ order, orderBy: fieldName, });
     };
 
     render() {
-        const { id, classes, } = this.props;
-        const { page, rowsPerPage, order, orderBy, seasonYear, month, day, hour } = this.state;
-        return <Query
-            query={query}
-            variables={{
-                id,
-                offset: page * rowsPerPage,
-                limit: rowsPerPage,
-                orderBy,
-                order,
-                seasonYear,
-                month,
-                day,
-                hour,
-            }}
-        >
-            {({ error, data }) => {
-                if (error) {
-                    console.log(error);
-                    return null;
-                }
-                const { lift } = data;
-                if (lift === undefined) {
-                    return null;
-                }
-                if (lift === null) {
-                    return <UserErrorMessage message={{ text: 'The lift in the address bar does not exist.', severity: 1 }} />;
-                }
+        const { id, classes, lift, page, rowsPerPage, order, orderBy, showFilter, seasonYear, month, day, hour } = this.props;
+        const { upliftList } = lift;
+        const filterControls = [
+            <SelectMenu
+                id='season'
+                options={[
+                    { text: 'All seasons' },
+                    { text: '2014 - 2015', value: 2014 },
+                    { text: '2015 - 2016', value: 2015 },
+                    { text: '2016 - 2017', value: 2016 },
+                    { text: '2017 - 2018', value: 2017 },
+                ]}
+                value={seasonYear}
+                onSelect={this.handleSelectSeason}
+            />,
+            <SelectMenu
+                id='month'
+                options={[
+                    { text: 'All months' },
+                    { text: 'January', value: 1 },
+                    { text: 'February', value: 2 },
+                    { text: 'March', value: 3 },
+                    { text: 'April', value: 4 },
+                    { text: 'May', value: 5 },
+                    { text: 'June', value: 6 },
+                    { text: 'July', value: 7 },
+                    { text: 'August', value: 8 },
+                    { text: 'September', value: 9 },
+                    { text: 'October', value: 10 },
+                    { text: 'November', value: 11 },
+                    { text: 'December', value: 12 },
+                ]}
+                value={month}
+                onSelect={this.handleSelectMonth}
+            />,
+            <SelectMenu
+                id='day'
+                options={[
+                    { text: 'All days' },
+                    { text: 'Sunday', value: 1 },
+                    { text: 'Monday', value: 2 },
+                    { text: 'Tuesday', value: 3 },
+                    { text: 'Wednesday', value: 4 },
+                    { text: 'Thursday', value: 5 },
+                    { text: 'Friday', value: 6 },
+                    { text: 'Saturday', value: 7 },
+                ]}
+                value={day}
+                onSelect={this.handleSelectDay}
+            />,
+            <SelectMenu
+                id='hour'
+                options={[
+                    { text: 'All hours' },
+                    { text: '8AM - 9AM', value: 8 },
+                    { text: '9AM - 10AM', value: 9 },
+                    { text: '10AM - 11AM', value: 10 },
+                    { text: '11AM - 12PM', value: 11 },
+                    { text: '12PM - 1PM', value: 12 },
+                    { text: '1PM - 2PM', value: 13 },
+                    { text: '2PM - 3PM', value: 14 },
+                    { text: '3PM - 4PM', value: 15 },
+                    { text: '4PM - 5PM', value: 16 },
+                ]}
+                value={hour}
+                onSelect={this.handleSelectHour}
+            />,
+        ];
 
-                const { upliftList } = lift;
-                return (
-                    <Paper>
-                        <Toolbar className={classes.toolbar}>
-                            <div className={classes.title}>
-                                <Typography variant="headline" gutterBottom>
-                                    {lift.name} Uplifts
-                                </Typography>
-                            </div>
-                            <div className={classes.spacer} />
-                            <div className={classes.actions}>
-                                <SelectMenu
-                                    id='season'
-                                    options={[
-                                        { text: 'All seasons', value: null },
-                                        { text: '2014 - 2015', value: 2014 },
-                                        { text: '2015 - 2016', value: 2015 },
-                                        { text: '2016 - 2017', value: 2016 },
-                                        { text: '2017 - 2018', value: 2017 },
-                                    ]}
-                                    value={seasonYear}
-                                    onSelect={this.handleSelectSeason}
-                                />
-                                <SelectMenu
-                                    id='month'
-                                    options={[
-                                        { text: 'All months', value: null },
-                                        { text: 'January', value: 1 },
-                                        { text: 'February', value: 2 },
-                                        { text: 'March', value: 3 },
-                                        { text: 'April', value: 4 },
-                                        { text: 'May', value: 5 },
-                                        { text: 'June', value: 6 },
-                                        { text: 'July', value: 7 },
-                                        { text: 'August', value: 8 },
-                                        { text: 'September', value: 9 },
-                                        { text: 'October', value: 10 },
-                                        { text: 'November', value: 11 },
-                                        { text: 'December', value: 12 },
-                                    ]}
-                                    value={month}
-                                    onSelect={this.handleSelectMonth}
-                                />
-                                <SelectMenu
-                                    id='day'
-                                    options={[
-                                        { text: 'All days', value: null },
-                                        { text: 'Sunday', value: 1 },
-                                        { text: 'Monday', value: 2 },
-                                        { text: 'Tuesday', value: 3 },
-                                        { text: 'Wednesday', value: 4 },
-                                        { text: 'Thursday', value: 5 },
-                                        { text: 'Friday', value: 6 },
-                                        { text: 'Saturday', value: 7 },
-                                    ]}
-                                    value={day}
-                                    onSelect={this.handleSelectDay}
-                                />
-                                <SelectMenu
-                                    id='hour'
-                                    options={[
-                                        { text: 'All hours', value: null },
-                                        { text: '8AM - 9AM', value: 8 },
-                                        { text: '9AM - 10AM', value: 9 },
-                                        { text: '10AM - 11AM', value: 10 },
-                                        { text: '11AM - 12PM', value: 11 },
-                                        { text: '12PM - 1PM', value: 12 },
-                                        { text: '1PM - 2PM', value: 13 },
-                                        { text: '2PM - 3PM', value: 14 },
-                                        { text: '3PM - 4PM', value: 15 },
-                                        { text: '4PM - 5PM', value: 16 },
-                                    ]}
-                                    value={hour}
-                                    onSelect={this.handleSelectHour}
-                                />
-                            </div>
-                        </Toolbar>
-                        {upliftList.count && (
-                            <div>
-                                <Table>
-                                    <SortEnabledTableHead
-                                        order={order}
-                                        orderBy={orderBy}
-                                        onRequestSort={this.handleRequestSort}
-                                        columns={columnData}
-                                    />
-                                    <TableBody>
-                                        {upliftList.uplifts
-                                            .slice()
-                                            .map(uplift => (
-                                                <TableRow key={uplift.id}>
-                                                    <TableCell component="th" scope="row">{moment.utc(uplift.date).format('llll')}</TableCell>
-                                                    <TableCell numeric>{uplift.waitSeconds}</TableCell>
-                                                </TableRow>
-                                            ))
-                                        }
-                                    </TableBody>
-                                </Table>
-                                <TablePagination
-                                    component="div"
-                                    count={upliftList.count}
-                                    rowsPerPage={rowsPerPage}
-                                    rowsPerPageOptions={[25, 50, 100, 200]}
-                                    page={page}
-                                    backIconButtonProps={{
-                                        'aria-label': 'Previous Page',
-                                    }}
-                                    nextIconButtonProps={{
-                                        'aria-label': 'Next Page',
-                                    }}
-                                    onChangePage={this.handleChangePage}
-                                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                                />
-                            </div>
-                        )}
-                    </Paper>
-                );
-            }}
-        </Query>
+        return (
+            <Paper>
+                <Toolbar className={classes.toolbar}>
+                    <div className={classes.title}>
+                        <Typography variant="headline" gutterBottom>
+                            {lift.name} Uplifts
+                        </Typography>
+                    </div>
+                    <div className={classes.spacer} />
+                    <div className={classes.actions}>
+                        <Hidden xsDown>
+                            {filterControls}
+                        </Hidden>
+                        <Hidden smUp>
+                            <ToggleIconButton isOn={showFilter} onTip='Show filters' offTip='Hide filters' onToggle={this.handleToggleFilter}>
+                                <FilterListIcon />
+                            </ToggleIconButton>
+                        </Hidden>
+                    </div>
+                </Toolbar>
+                <Hidden smUp>
+                    <Collapse in={showFilter}>
+                        {filterControls}
+                    </Collapse>
+                </Hidden>
+                {upliftList.count > 0 && (
+                    <div>
+                        <Table>
+                            <SortEnabledTableHead
+                                order={order}
+                                orderBy={orderBy}
+                                onRequestSort={this.handleRequestSort}
+                                columns={columnData}
+                            />
+                            <TableBody>
+                                {upliftList.uplifts
+                                    .slice()
+                                    .map(uplift => (
+                                        <TableRow key={uplift.id}>
+                                            <TableCell component="th" scope="row">{moment.utc(uplift.date).format('llll')}</TableCell>
+                                            <TableCell numeric>{uplift.waitSeconds}</TableCell>
+                                        </TableRow>
+                                    ))
+                                }
+                            </TableBody>
+                        </Table>
+                        <TablePagination
+                            component="div"
+                            count={upliftList.count}
+                            rowsPerPage={rowsPerPage}
+                            rowsPerPageOptions={[25, 50, 100, 200]}
+                            page={page}
+                            backIconButtonProps={{
+                                'aria-label': 'Previous Page',
+                            }}
+                            nextIconButtonProps={{
+                                'aria-label': 'Next Page',
+                            }}
+                            onChangePage={this.handleChangePage}
+                            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                        />
+                    </div>
+                )}
+            </Paper>
+        );
     };
 }
 
 export default compose(
     withStyles(styles),
-    //withQuery(query, 'lift', LiftNotFound),
+    withQuery(query, {
+        selector: 'lift',
+        variables: props => ({
+            ...props,
+            offset: props.page * props.rowsPerPage,
+            limit: props.rowsPerPage,
+        }),
+    }, LiftNotFound),
 )(LiftUplifts);
