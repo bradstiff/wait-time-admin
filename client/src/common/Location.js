@@ -107,7 +107,7 @@ class Location {
 
         const qsTokens = this._qsTokenKeys
             ? Object
-                .keys(tokens)
+                .keys(tokens || {})
                 .filter(key => this._qsTokenKeys.includes(key))
                 .reduce((acc, key) => {
                     const value = tokens[key];

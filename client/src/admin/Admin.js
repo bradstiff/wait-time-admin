@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Switch, Route, Link } from 'react-router-dom';
+import { matchPath } from 'react-router';
+import { Switch, Route } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -38,12 +39,11 @@ const styles = theme => ({
 
 class Admin extends Component {
     render() {
-        const { classes } = this.props;
+        const { classes, location } = this.props;
         let activeTab = null;
-        const pathname = this.props.location.pathname;
-        if (pathname.toLowerCase().indexOf('/admin/resorts') > -1) {
+        if (matchPath(location.pathname, '/admin/resorts')) {
             activeTab = 0;
-        } else if (pathname.toLowerCase().indexOf('/admin/lifts') > -1) {
+        } else if (matchPath(location.pathname, '/admin/lifts')) {
             activeTab = 1;
         }
 
@@ -55,8 +55,8 @@ class Admin extends Component {
                             Wait Time Admin
                         </Typography>
                         <Tabs value={activeTab}>
-                            <Tab label="Resorts" component={Link} to='/admin/resorts' />
-                            <Tab label="Lifts" component={Link} to='/admin/lifts' />
+                            <Tab label="Resorts" component={Locations.Resorts.toLink()} />
+                            <Tab label="Lifts" component={Locations.Lifts.toLink()} />
                         </Tabs>
                     </Toolbar>
                 </AppBar>
