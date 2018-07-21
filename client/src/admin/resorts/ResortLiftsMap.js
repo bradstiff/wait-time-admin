@@ -39,22 +39,22 @@ class ResortLiftsMap extends React.Component {
             </Map>
         );
     }
-}
 
-ResortLiftsMap.propTypes = {
-    resortLocation: PropTypes
-        .shape({
-            lat: PropTypes.number.isRequired,
-            lng: PropTypes.number.isRequired,
-        })
-        .isRequired,
-    bounds: PropTypes
-        .arrayOf(PropTypes.shape({
-            lat: PropTypes.number.isRequired,
-            lng: PropTypes.number.isRequired,
-        })),
-    onBoundsChange: PropTypes.func,
-    children: PropTypes.arrayOf(PropTypes.node),
+    static propTypes = {
+        resortLocation: PropTypes
+            .shape({
+                lat: PropTypes.number.isRequired,
+                lng: PropTypes.number.isRequired,
+            })
+            .isRequired,
+        bounds: PropTypes
+            .arrayOf(PropTypes.shape({
+                lat: PropTypes.number.isRequired,
+                lng: PropTypes.number.isRequired,
+            })),
+        onBoundsChange: PropTypes.func,
+        children: PropTypes.arrayOf(PropTypes.node),
+    }
 }
 
 export default ResortLiftsMap;

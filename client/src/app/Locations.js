@@ -2,7 +2,6 @@ import * as Yup from 'yup';
 import Location from '../common/Location';
 
 const isNullableDate = Yup.string().test('is-date', '${path}:${value} is not a valid date', date => !date || !isNaN(Date.parse(date))); 
-const date = Yup.date();
 const string = Yup.string();
 const integer = Yup.number().integer();
 const naturalNbr = integer.moreThan(-1);
@@ -17,7 +16,9 @@ const Locations = {
     Resort: new Location('/admin/resorts/:id', { id: identity }),
     ResortEdit: new Location('/admin/resorts/:id/edit', { id: identity }),
     ResortLifts: new Location('/admin/resorts/:id/lifts', { id: identity }),
-    ResortStats: new Location('/admin/resorts/:id/stats', { id: identity }, { groupBy: Yup.string().default('Season') }),
+    ResortStats: new Location('/admin/resorts/:id/stats', { id: identity }, {
+        groupBy: Yup.string().oneOf(['Season', 'Month', 'Day', 'Hour', 'Lift']).default('Season')
+    }),
     Lifts: new Location('/admin/lifts', null, {
         page: naturalNbr.default(0),
         rowsPerPage: Yup.number().oneOf([25, 50, 75, 100]).default(25),
@@ -42,7 +43,9 @@ const Locations = {
         day: wholeNbr,
         hour: wholeNbr,
     }),
-    LiftStats: new Location('/admin/lifts/:id/stats', { id: identity }, { groupBy: Yup.string().default('Season') }),
+    LiftStats: new Location('/admin/lifts/:id/stats', { id: identity }, {
+        groupBy: Yup.string().oneOf(['Season', 'Month', 'Day', 'Hour']).default('Season')
+    }),
 };
 
 console.log('Locations created');

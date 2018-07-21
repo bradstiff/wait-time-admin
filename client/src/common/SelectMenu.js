@@ -57,18 +57,18 @@ class SelectMenu extends React.Component {
             </span>
         );
     }
-}
 
-SelectMenu.propTypes = {
-    id: PropTypes.string.isRequired,
-    onSelect: PropTypes.func.isRequired,
-    options: PropTypes
-        .arrayOf(PropTypes.shape({
-            value: PropTypes.any,
-            text: PropTypes.string.isRequired,
-        }))
-        .isRequired,
-    value: PropTypes.any,
-};
+    static propTypes = {
+        id: PropTypes.string.isRequired,
+        onSelect: PropTypes.func.isRequired,
+        options: PropTypes
+            .arrayOf(PropTypes.shape({
+                value: PropTypes.any,
+                text: PropTypes.string.isRequired,
+            }))
+            .isRequired,
+        value: PropTypes.any,
+    };
+}
 
 export default SelectMenu;

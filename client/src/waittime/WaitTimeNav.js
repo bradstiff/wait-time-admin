@@ -71,37 +71,39 @@ class WaitTimeNav extends Component {
             ? { minWidth: 400, display: 'inline-flex' }
             : { padding: 10 };
 
-        return ([
-            <AppBar position="static" color='default'>
-                <Toolbar>
-                    <IconButton className={classes.menuButton} aria-label="Menu" onClick={() => this.handleToggleMenu(true)}>
-                        <MenuIcon />
-                    </IconButton>
-                    <ResortName>{(resort && resort.name) || 'Loading'} Wait Times</ResortName>
-                    <Hidden smDown>
-                        <DateNav
-                            dates={resort && resort.dates}
-                            date={date}
-                            displayFormat={dateDisplayFormat}
-                            style={dateNavStyle}
-                            selectDate={this.handleSelectDate}
+        return (
+            <div>
+                <AppBar position="static" color='default'>
+                    <Toolbar>
+                        <IconButton className={classes.menuButton} aria-label="Menu" onClick={() => this.handleToggleMenu(true)}>
+                            <MenuIcon />
+                        </IconButton>
+                        <ResortName>{(resort && resort.name) || 'Loading'} Wait Times</ResortName>
+                        <Hidden smDown>
+                            <DateNav
+                                dates={resort && resort.dates}
+                                date={date}
+                                displayFormat={dateDisplayFormat}
+                                style={dateNavStyle}
+                                selectDate={this.handleSelectDate}
                             />
-                    </Hidden>
-                </Toolbar>
-            </AppBar>,
-            <Hidden mdUp>
-                <DateNav
-                    dates={resort && resort.dates}
-                    date={date}
-                    displayFormat={dateDisplayFormat}
-                    style={dateNavStyle}
-                    selectDate={this.handleSelectDate}
-                />
-            </Hidden>,
-            <Drawer open={this.state.showMenu} onClose={() => this.handleToggleMenu(false)} classes={{ paper: classes.resortDrawer }}>
-                <ResortList linkTo={resort => Locations.WaitTime.toUrl({ slug: resort.slug })} onClick={() => this.handleToggleMenu(false)} />
-            </Drawer>
-        ]);
+                        </Hidden>
+                    </Toolbar>
+                </AppBar>
+                <Hidden mdUp>
+                    <DateNav
+                        dates={resort && resort.dates}
+                        date={date}
+                        displayFormat={dateDisplayFormat}
+                        style={dateNavStyle}
+                        selectDate={this.handleSelectDate}
+                    />
+                </Hidden>
+                <Drawer open={this.state.showMenu} onClose={() => this.handleToggleMenu(false)} classes={{ paper: classes.resortDrawer }}>
+                    <ResortList linkTo={resort => Locations.WaitTime.toUrl({ slug: resort.slug })} onClick={() => this.handleToggleMenu(false)} />
+                </Drawer>
+            </div>
+        );
     };
 }
 

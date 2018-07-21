@@ -11,8 +11,10 @@ import orange from '@material-ui/core/colors/orange';
 
 import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';
+import ProgressContext from './ProgressContext';
 import NotFound from './NotFound';
 import Locations from './Locations';
+import QueryProgress from '../common/QueryProgress';
 
 import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
@@ -58,21 +60,48 @@ const Background = styled.div`
     background-attachment: fixed;
 `;
 
-const App = () => (
-    <ApolloProvider client={client}>
-        <CssBaseline>
-            <MuiThemeProvider theme={theme}>
-                <Background>
-                    <Switch>
-                        <Route path='/admin' component={Admin} />
-                        {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
-                        <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
-                        <Route component={NotFound} />
-                    </Switch>
-                </Background>
-            </MuiThemeProvider>
-        </CssBaseline>
-    </ApolloProvider>
-);
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.handleStartProgress = () => {
+            if (!this.state.inProgress) {
+                this.setState({ inProgress: true })
+            }
+        };
+        this.handleEndProgress = () => this.setState({ inProgress: false });
+
+        //use state for value instead of literal object to avoid remounting
+        this.state = {
+            inProgress: false,
+            startProgress: this.handleStartProgress,
+            endProgress: this.handleEndProgress,
+        };
+    }
+
+    render() {
+        return (
+            <ApolloProvider client={client} >
+                <CssBaseline>
+                    <MuiThemeProvider theme={theme}>
+                        <ProgressContext.Provider value={this.state}>
+                            <Background>
+                                <div>
+                                    <Switch>
+                                        <Route path='/admin' component={Admin} />
+                                        {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
+                                        <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
+                                        <Route component={NotFound} />
+                                    </Switch>
+                                    <QueryProgress />
+                                </div>
+                            </Background>
+                        </ProgressContext.Provider>
+                    </MuiThemeProvider>
+                </CssBaseline>
+            </ApolloProvider>
+        );
+    }
+}
 
 export default App;

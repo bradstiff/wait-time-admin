@@ -1,8 +1,6 @@
 ﻿import React from 'react';
 import styled from 'styled-components';
-import qs from 'querystringify';
 import moment from 'moment';
-import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import UserErrorMessage from '../common/UserErrorMessage';
@@ -61,11 +59,6 @@ const WaitTime = ({ slug, date: searchDate, resort, loading }) => {
         ? resort.lastDate.date
         : null);
 
-    if (slug && resort === null) {
-        return <ResortNotFound />;
-    } else if (searchDate && !moment.utc(searchDate).isValid()) {
-        return <NotFound />;
-    }
     const userErrorMessage = loading
         ? null
             : !resort.dates.length

@@ -72,7 +72,7 @@ class ResortStats extends Component {
     };
 
     render() {
-        const { id, groupBy, resort, classes } = this.props;
+        const { id, groupBy, resort, loading, classes } = this.props;
         const { order, orderBy } = this.state;
         const { upliftGroupings } = resort;
         const columnData = [
@@ -120,7 +120,7 @@ class ResortStats extends Component {
                                     .map(grouping => (
                                         <TableRow key={grouping.groupKey}>
                                             <TableCell component="th" scope="row">
-                                                {groupBy === 'Lift'
+                                                {groupBy === 'Lift' && !loading
                                                     ? <LinkButton to={Locations.Lift.toUrl({ id: grouping.groupKey })}>{grouping.groupDescription}</LinkButton>
                                                     : grouping.groupDescription
                                                 }

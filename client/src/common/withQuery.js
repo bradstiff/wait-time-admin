@@ -9,19 +9,20 @@
 
 import React from 'react';
 import { Query } from 'react-apollo';
+import ProgressContext from '../app/ProgressContext';
 
-export default (query, options, notFound) => component => props => {
-    if (typeof options === 'string') {
-        options = { selector: options };
-    }
-    const variables = typeof options.variables === 'function'
-        ? options.variables(props)
-        : options.variables || props;
-    return <Query query={query} variables={variables}>
-        {({ data, loading, error }) => {
+const withQuery = (query, options, notFound) => component => {
+    class WrappedComponent extends React.Component {
+        state = {
+            loading: false,
+        };
+
+        render() {
+            const { data, loading, error } = this.props;
             if (error) {
                 return null; //todo
             }
+
             const root = data[options.selector];
             if (root === undefined) {
                 return null; //todo
@@ -31,10 +32,47 @@ export default (query, options, notFound) => component => props => {
             }
 
             return React.createElement(component, {
-                ...props,
+                ...this.props,
                 [options.selector]: root,
-                loading,
             });
-        }}
-    </Query>;
+        }
+
+        static getDerivedStateFromProps = (props, state) => {
+            if (props.loading && !state.loading) {
+                props.onStartLoading();
+                return { loading: true };
+            } else if (!props.loading && state.loading) {
+                props.onEndLoading();
+                return { loading: false };
+            }
+            return null;
+        }
+    }
+
+    return props => {
+        if (typeof options === 'string') {
+            options = { selector: options };
+        }
+        const variables = typeof options.variables === 'function'
+            ? options.variables(props)
+            : options.variables || props;
+        return <Query query={query} variables={variables}>
+            {({ data, loading, error }) => (
+                <ProgressContext.Consumer>
+                    {({ startProgress, endProgress }) => (
+                        <WrappedComponent
+                            {...props}
+                            data={data}
+                            loading={loading}
+                            error={error}
+                            onStartLoading={startProgress}
+                            onEndLoading={endProgress}
+                        />
+                    )}
+                </ProgressContext.Consumer>
+            )}
+        </Query>;
+    };
 }
+
+export default withQuery;

@@ -46,21 +46,21 @@ class SortEnabledTableHead extends Component {
             </TableHead>
         );
     }
-}
 
-SortEnabledTableHead.propTypes = {
-    onRequestSort: PropTypes.func.isRequired,
-    order: PropTypes.string.isRequired,
-    orderBy: PropTypes.string.isRequired,
-    columns: PropTypes.arrayOf(
-        PropTypes.shape({
-            field: PropTypes.string.isRequired,
-            label: PropTypes.string.isRequired,
-            numeric: PropTypes.bool,
-            disablePadding: PropTypes.bool,
-            compareField: PropTypes.string,
-        })).isRequired
-};
+    static propTypes = {
+        onRequestSort: PropTypes.func.isRequired,
+        order: PropTypes.string.isRequired,
+        orderBy: PropTypes.string.isRequired,
+        columns: PropTypes.arrayOf(
+            PropTypes.shape({
+                field: PropTypes.string.isRequired,
+                label: PropTypes.string.isRequired,
+                numeric: PropTypes.bool,
+                disablePadding: PropTypes.bool,
+                compareField: PropTypes.string,
+            })).isRequired
+    };
+}
 
 export default SortEnabledTableHead;
 

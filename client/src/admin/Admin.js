@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { matchPath } from 'react-router';
 import { Switch, Route } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
