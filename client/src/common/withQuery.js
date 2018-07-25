@@ -20,12 +20,13 @@ const withQuery = (query, options, notFound) => component => {
         render() {
             const { data, loading, error } = this.props;
             if (error) {
+                throw Error('hi');
                 return null; //todo
             }
 
             const root = data[options.selector];
             if (root === undefined) {
-                return null; //todo
+                return null; 
             }
             if (!loading && root === null) {
                 return React.createElement(notFound);

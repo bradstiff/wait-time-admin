@@ -48,6 +48,4 @@ const Locations = {
     }),
 };
 
-console.log('Locations created');
-
 export default Locations;

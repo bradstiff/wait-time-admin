@@ -1,13 +1,11 @@
 ﻿import React from 'react';
 import styled from 'styled-components';
-import moment from 'moment';
 import gql from 'graphql-tag';
 
 import UserErrorMessage from '../common/UserErrorMessage';
 import WaitTimeNav from './WaitTimeNav';
 import WaitTimeView from './WaitTimeView';
 import ResortNotFound from '../app/ResortNotFound';
-import NotFound from '../app/NotFound';
 import withQuery from '../common/withQuery';
 
 const Flex = styled.div`

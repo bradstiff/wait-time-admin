@@ -84,7 +84,7 @@ const DateNav = ({ dates, date, displayFormat, style, selectDate, classes }) => 
                 onChange={selectDate}
                 className={classes.iconButton}
                 customInput={<IconButton className={classes.iconButton}><TodayIcon /></IconButton>}
-                popperPlacement='auto-left'
+                popperPlacement='bottom-end'
             />
             <IconButton onClick={makeScrollDateHandler(nextDate)} className={classes.iconButton}>
                 <ChevronRightIcon />

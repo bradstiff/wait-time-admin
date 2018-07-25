@@ -14,6 +14,8 @@ import Admin from '../admin/Admin';
 import ProgressContext from './ProgressContext';
 import NotFound from './NotFound';
 import Locations from './Locations';
+import Error from './Error';
+import ErrorBoundary from '../common/ErrorBoundary';
 import QueryProgress from '../common/QueryProgress';
 
 import BackgroundImage from '../assets/resort-carousel-bg.jpg';
@@ -22,7 +24,7 @@ const client = new ApolloClient({
     clientState: {
         resolvers: {
             Mutation: {
-                selectTimePeriod: (_, { waitTimeDateID, timestamp}, { cache, getCacheKey }) => {
+                selectTimePeriod: (_, { waitTimeDateID, timestamp }, { cache, getCacheKey }) => {
                     const id = getCacheKey({ __typename: 'WaitTimeDate', id: waitTimeDateID });
                     const data = {
                         __typename: 'WaitTimeDate',
@@ -84,9 +86,9 @@ class App extends React.Component {
             <ApolloProvider client={client} >
                 <CssBaseline>
                     <MuiThemeProvider theme={theme}>
-                        <ProgressContext.Provider value={this.state}>
-                            <Background>
-                                <div>
+                        <Background>
+                            <ErrorBoundary component={Error}>
+                                <ProgressContext.Provider value={this.state}>
                                     <Switch>
                                         <Route path='/admin' component={Admin} />
                                         {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
@@ -94,9 +96,9 @@ class App extends React.Component {
                                         <Route component={NotFound} />
                                     </Switch>
                                     <QueryProgress />
-                                </div>
-                            </Background>
-                        </ProgressContext.Provider>
+                                </ProgressContext.Provider>
+                            </ErrorBoundary>
+                        </Background>
                     </MuiThemeProvider>
                 </CssBaseline>
             </ApolloProvider>
