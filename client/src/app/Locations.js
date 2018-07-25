@@ -14,7 +14,7 @@ const Locations = {
     WaitTime: new Location('/resorts/:slug?', { slug: string.required() }, { date: isNullableDate }), //validate the date but don't parse it; we will parse it later as utc
     Resorts: new Location('/admin/resorts'),
     Resort: new Location('/admin/resorts/:id', { id: identity }),
-    ResortEdit: new Location('/admin/resorts/:id/edit', { id: identity }),
+    ResortDetails: new Location('/admin/resorts/:id/details', { id: identity }),
     ResortLifts: new Location('/admin/resorts/:id/lifts', { id: identity }),
     ResortStats: new Location('/admin/resorts/:id/stats', { id: identity }, {
         groupBy: Yup.string().oneOf(['Season', 'Month', 'Day', 'Hour', 'Lift']).default('Season')
@@ -31,7 +31,7 @@ const Locations = {
         name: Yup.string(),
     }),
     Lift: new Location('/admin/lifts/:id', { id: identity }),
-    LiftEdit: new Location('/admin/lifts/:id/edit', { id: identity }),
+    LiftDetails: new Location('/admin/lifts/:id/details', { id: identity }),
     LiftUplifts: new Location('/admin/lifts/:id/uplifts', { id: identity }, {
         page: naturalNbr.default(0),
         rowsPerPage: Yup.number().oneOf([25, 50, 75, 100]).default(25),

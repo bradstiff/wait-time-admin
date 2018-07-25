@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import ResortForm from './ResortForm';
 import ResortNotFound from '../../app/ResortNotFound';
 import withQuery from '../../common/withQuery';
+import UserContext from '../../app/UserContext';
 import Locations from '../../app/Locations';
 
 const query = gql`
@@ -36,13 +37,19 @@ const resortMutation = gql`
     }
 `;
 
-const EditResort = ({ id, resort, submit, close, match }) => {
+const ResortProperties = ({ id, resort, submit, close, match }) => {
     const resortValues = {
         latitude: resort.location.lat,
         longitude: resort.location.lng,
         ...resort,
     };
-    return <ResortForm resort={resortValues} title='Edit resort' submit={submit} close={close} />
+    return (
+        <UserContext.Consumer>
+            {({ isAdmin }) => (
+                <ResortForm resort={resortValues} title='Resort details' canEdit={isAdmin} submit={submit} close={close} />
+            )}
+        </UserContext.Consumer>
+    );
 };
 
 export default compose(
@@ -59,4 +66,4 @@ export default compose(
             };
         }
     })
-)(EditResort);
+)(ResortProperties);

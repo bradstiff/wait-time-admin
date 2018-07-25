@@ -23,7 +23,7 @@ const styles = theme => ({
     },
 })
 
-const LiftForm = ({ lift, submit, close, title, classes }) => {
+const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
     const model = {
         name: Yup.string().min(2).max(100).required().label('Name'),
         typeID: Yup.number().integer().required().label('Type'),
@@ -52,18 +52,21 @@ const LiftForm = ({ lift, submit, close, title, classes }) => {
             onSubmit={submit}
             render={formikProps => {
                 const { handleSubmit, isSubmitting, } = formikProps;
-                const textFieldPropKeys = ['value', 'error', 'helperText', 'onChange', 'onBlur'];
-
+                const textFieldPropKeys = ['value', 'error', 'helperText', 'onChange', 'onBlur', 'disabled'];
+                const formProps = {
+                    ...formikProps,
+                    disabled: !canEdit,
+                };
                 return (
                     <form onSubmit={handleSubmit}>
                         <Toolbar>
                             <Typography variant='headline' style={{ flex: 'auto' }}>{title}</Typography>
-                            <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
-                            <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Save</Button>
+                            <Button color='primary' disabled={isSubmitting} onClick={close}>{canEdit ? 'Cancel' : 'Close'}</Button>
+                            {canEdit && <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Save</Button>}
                         </Toolbar>
-                        <div><TextField {...bindProps('name', textFieldPropKeys, formikProps) } label='Name' required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' /></div>
+                        <div><TextField {...bindProps('name', textFieldPropKeys, formProps) } label='Name' required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' /></div>
                         <div>
-                            <TextField {...bindProps('typeID', textFieldPropKeys, formikProps) } label='Type' select required style={{ width: 200 }} margin='normal' > 
+                            <TextField {...bindProps('typeID', textFieldPropKeys, formProps) } label='Type' select required style={{ width: 200 }} margin='normal' > 
                                 {LiftTypeData.map(type => (
                                     <MenuItem key={type.id} value={type.id}>
                                         {type.description}
@@ -71,11 +74,11 @@ const LiftForm = ({ lift, submit, close, title, classes }) => {
                                 ))}
                             </TextField>
                         </div>
-                        <div><TextField {...bindProps('occupancy', textFieldPropKeys, formikProps) } label='Occupancy' style={{ width: 200 }} margin='normal' /></div>
+                        <div><TextField {...bindProps('occupancy', textFieldPropKeys, formProps) } label='Occupancy' style={{ width: 200 }} margin='normal' /></div>
                         <div>
                             <ResortData>
                                 {({ options }) => (
-                                    <TextField {...bindProps('resortID', textFieldPropKeys, formikProps) } label='Resort' select style={{ width: 400 }} margin='normal' >
+                                    <TextField {...bindProps('resortID', textFieldPropKeys, formProps) } label='Resort' select style={{ width: 400 }} margin='normal' >
                                         {options && options.map(option => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.text}
@@ -87,11 +90,11 @@ const LiftForm = ({ lift, submit, close, title, classes }) => {
                         </div>
                         {stationMeta.map(station => (
                             <div key={station.name}>
-                                <TextField {...bindProps(station.latField, textFieldPropKeys, formikProps) } label={station.latLabel} required style={{ width: 195 }} margin='normal' />
-                                <TextField {...bindProps(station.lngField, textFieldPropKeys, formikProps) } label={station.lngLabel} required style={{ width: 195, marginLeft: 10 }} margin='normal' />
+                                <TextField {...bindProps(station.latField, textFieldPropKeys, formProps) } label={station.latLabel} required style={{ width: 195 }} margin='normal' />
+                                <TextField {...bindProps(station.lngField, textFieldPropKeys, formProps) } label={station.lngLabel} required style={{ width: 195, marginLeft: 10 }} margin='normal' />
                             </div>
                         ))}
-                        <div><FormControlLabel control={<Checkbox {...bindProps('isActive', ['checked', 'onChange'], formikProps) } />} label='Active' margin='normal'/></div>
+                        <div><FormControlLabel control={<Checkbox {...bindProps('isActive', ['checked', 'onChange', 'disabled'], formProps) } />} label='Active' margin='normal'/></div>
                     </form>
                 );
             }}

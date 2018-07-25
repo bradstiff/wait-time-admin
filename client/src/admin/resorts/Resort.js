@@ -14,6 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 import Locations from '../../app/Locations';
+import UserContext from '../../app/UserContext';
 import ResortNotFound from '../../app/ResortNotFound';
 import withQuery from '../../common/withQuery';
 import ResortLiftsMap from './ResortLiftsMap';
@@ -103,69 +104,71 @@ const Resort = ({ id, resort, classes, width }) => {
         };
 
     return (
-        <div>
-            <Grid container spacing={16}>
-                <Grid item xs={12}>
-                    <Card className={classes.resortCard}>
-                        <CardMedia className={classes.resortMap}>
-                            <ResortLiftsMap
-                                resortLocation={resort.location}
-                                bounds={resort.liftEnvelope}
-                            >
-                                {resort.lifts.map(lift => <Polyline
-                                    key={lift.id}
-                                    positions={lift.stations.map(station => station.location)}
-                                />)}
-                            </ResortLiftsMap>
-                        </CardMedia>
-                        <div className={classes.resortContent}>
-                            <CardContent className={classes.resortHeading}>
-                                <div><img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.resortLogo} /></div>
-                                <div className={classes.resortTitle}>
-                                    <Typography {...resortNameProps}>{resort.name}</Typography>
-                                    <Typography color='textSecondary'>{resort.lifts.length} lifts</Typography>
-                                    <Typography color='textSecondary'>{!resort.hasWaitTimes && 'No wait time data available'}</Typography>
-                                </div>
-                            </CardContent>
-                            <CardActions className={classes.resortActions}>
-                                <Button component={Locations.ResortEdit.toLink({ id })}>Edit</Button>
-                                <Button component={Locations.ResortLifts.toLink({ id })}>Assign Lifts</Button>
-                            </CardActions>
-                        </div>
-                    </Card>
-                </Grid>
-                {resort.hasWaitTimes && [
-                    <Grid item xs={12} md={6} key='uplifts'>
-                        <Card>
-                            <CardContent>
-                                <Typography variant='headline'>Uplifts</Typography>
-                                <Typography color='textSecondary'>Current season versus previous</Typography>
-                            </CardContent>
-                            <CardMedia>
-                                <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='upliftCount' />
+        <UserContext.Consumer>
+            {({ isAdmin }) => (
+                <Grid container spacing={16}>
+                    <Grid item xs={12}>
+                        <Card className={classes.resortCard}>
+                            <CardMedia className={classes.resortMap}>
+                                <ResortLiftsMap
+                                    resortLocation={resort.location}
+                                    bounds={resort.liftEnvelope}
+                                >
+                                    {resort.lifts.map(lift => <Polyline
+                                        key={lift.id}
+                                        positions={lift.stations.map(station => station.location)}
+                                    />)}
+                                </ResortLiftsMap>
                             </CardMedia>
-                            <CardActions>
-                                <Button component={Locations.ResortStats.toLink({ id })}>More</Button>
-                            </CardActions>
-                        </Card>
-                    </Grid>,
-                    <Grid item xs={12} md={6} key='stats'>
-                        <Card>
-                            <CardContent>
-                                <Typography variant='headline'>Average Wait Time (seconds)</Typography>
-                                <Typography color='textSecondary'>Current season versus previous</Typography>
-                            </CardContent>
-                            <CardMedia>
-                                <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='waitTimeAverage' />
-                            </CardMedia>
-                            <CardActions>
-                                <Button component={Locations.ResortStats.toLink({ id })}>More</Button>
-                            </CardActions>
+                            <div className={classes.resortContent}>
+                                <CardContent className={classes.resortHeading}>
+                                    <div><img alt={resort.name} src={`${process.env.PUBLIC_URL}/logos/${resort.logoFilename}`} className={classes.resortLogo} /></div>
+                                    <div className={classes.resortTitle}>
+                                        <Typography {...resortNameProps}>{resort.name}</Typography>
+                                        <Typography color='textSecondary'>{resort.lifts.length} lifts</Typography>
+                                        <Typography color='textSecondary'>{!resort.hasWaitTimes && 'No wait time data available'}</Typography>
+                                    </div>
+                                </CardContent>
+                                <CardActions className={classes.resortActions}>
+                                    <Button component={Locations.ResortDetails.toLink({ id })}>Details</Button>
+                                    {isAdmin && <Button component={Locations.ResortLifts.toLink({ id })}>Assign Lifts</Button>}
+                                </CardActions>
+                            </div>
                         </Card>
                     </Grid>
-                ]}
-            </Grid>
-        </div>
+                    {resort.hasWaitTimes && [
+                        <Grid item xs={12} md={6} key='uplifts'>
+                            <Card>
+                                <CardContent>
+                                    <Typography variant='headline'>Uplifts</Typography>
+                                    <Typography color='textSecondary'>Current season versus previous</Typography>
+                                </CardContent>
+                                <CardMedia>
+                                    <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='upliftCount' />
+                                </CardMedia>
+                                <CardActions>
+                                    <Button component={Locations.ResortStats.toLink({ id })}>More</Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>,
+                        <Grid item xs={12} md={6} key='stats'>
+                            <Card>
+                                <CardContent>
+                                    <Typography variant='headline'>Average Wait Time (seconds)</Typography>
+                                    <Typography color='textSecondary'>Current season versus previous</Typography>
+                                </CardContent>
+                                <CardMedia>
+                                    <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='waitTimeAverage' />
+                                </CardMedia>
+                                <CardActions>
+                                    <Button component={Locations.ResortStats.toLink({ id })}>More</Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                    ]}
+                </Grid>
+            )}
+        </UserContext.Consumer>
     );
 };
 

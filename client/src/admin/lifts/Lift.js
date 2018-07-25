@@ -88,7 +88,7 @@ const Lift = ({ id, lift, classes }) => {
                                 <Typography color='textSecondary'>{lift.resort ? lift.resort.name : 'No resort assigned'}</Typography>
                             </CardContent>
                             <CardActions className={classes.liftActions}>
-                                <Button component={Locations.LiftEdit.toLink({ id })}>Edit</Button>
+                                <Button component={Locations.LiftDetails.toLink({ id })}>Details</Button>
                             </CardActions>
                         </div>
                     </Card>

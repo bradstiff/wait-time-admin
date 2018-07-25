@@ -20,7 +20,7 @@ const styles = theme => ({
     }
 })
 
-const ResortForm = ({ resort, submit, close, title, classes }) => {
+const ResortForm = ({ resort, title, canEdit, submit, close, classes }) => {
     const model = {
         name: Yup.string().min(2).max(100).required().label('Name'),
         slug: Yup.string().min(2).max(100).required().label('Slug'),
@@ -36,28 +36,32 @@ const ResortForm = ({ resort, submit, close, title, classes }) => {
             onSubmit={submit}
             render={formikProps => {
                 const { handleSubmit, isSubmitting, } = formikProps;
-                const textFieldPropKeys = ['value', 'error', 'helperText', 'onChange', 'onBlur'];
+                const formProps = {
+                    ...formikProps,
+                    disabled: !canEdit,
+                };
+                const textFieldPropKeys = ['value', 'error', 'helperText', 'onChange', 'onBlur', 'disabled',];
                 return (
                     <form onSubmit={handleSubmit}>
                         <Toolbar>
                             <Typography variant='headline' style={{ flex: 'auto' }}>{title}</Typography>
-                            <Button color='primary' disabled={isSubmitting} onClick={close}>Cancel</Button>
-                            <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Save</Button>
+                            <Button color='primary' disabled={isSubmitting} onClick={close}>{canEdit ? 'Cancel' : 'Close'}</Button>
+                            {canEdit && <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Save</Button>}
                         </Toolbar>
                         <div>
-                            <TextField {...bindProps('name', textFieldPropKeys, formikProps) } label="Name" required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' />
+                            <TextField {...bindProps('name', textFieldPropKeys, formProps) } label="Name" required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...bindProps('slug', textFieldPropKeys, formikProps) } label='Slug' required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' />
+                            <TextField {...bindProps('slug', textFieldPropKeys, formProps) } label='Slug' required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...bindProps('logoFilename', textFieldPropKeys, formikProps) } label="Logo filename" style={{ width: 200 }} inputProps={{ maxLength: 50 }} margin='normal' />
+                            <TextField {...bindProps('logoFilename', textFieldPropKeys, formProps) } label="Logo filename" style={{ width: 200 }} inputProps={{ maxLength: 50 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...bindProps('trailMapFilename', textFieldPropKeys, formikProps) } label="Trail map filename" style={{ width: 200 }} inputProps={{ maxLength: 50 }} margin='normal' />
+                            <TextField {...bindProps('trailMapFilename', textFieldPropKeys, formProps) } label="Trail map filename" style={{ width: 200 }} inputProps={{ maxLength: 50 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...bindProps('timezone', textFieldPropKeys, formikProps) } label="Time zone" select style={{ width: 400 }} margin='normal' >
+                            <TextField {...bindProps('timezone', textFieldPropKeys, formProps) } label="Time zone" select style={{ width: 400 }} margin='normal' >
                                 {TimezoneData.map(timezone => (
                                     <MenuItem key={timezone.id} value={timezone.id}>
                                         {timezone.description}
@@ -66,10 +70,10 @@ const ResortForm = ({ resort, submit, close, title, classes }) => {
                             </TextField>
                         </div>
                         <div>
-                            <TextField {...bindProps('latitude', textFieldPropKeys, formikProps) } label="Latitude" style={{ width: 200 }} margin='normal' />
+                            <TextField {...bindProps('latitude', textFieldPropKeys, formProps) } label="Latitude" style={{ width: 200 }} margin='normal' />
                         </div>
                         <div>
-                            <TextField {...bindProps('longitude', textFieldPropKeys, formikProps) } label="Longitude" style={{ width: 200 }} margin='normal' />
+                            <TextField {...bindProps('longitude', textFieldPropKeys, formProps) } label="Longitude" style={{ width: 200 }} margin='normal' />
                         </div>
                     </form>
                 )

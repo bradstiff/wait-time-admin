@@ -5,6 +5,7 @@ import gql from 'graphql-tag';
 
 import LiftForm from './LiftForm';
 import Locations from '../../app/Locations';
+import UserContext from '../../app/UserContext';
 import LiftNotFound from '../../app/LiftNotFound';
 import withQuery from '../../common/withQuery';
 
@@ -36,7 +37,7 @@ const mutation = gql`
     }
 `;
 
-const LiftEdit = ({ id, lift, submit, close }) => {
+const LiftProperties = ({ id, lift, submit, close }) => {
     const stationCoordinates = lift.stations.reduce((acc, station) => {
         //flatten stations' locations into unique properties for editing, e.g., { station1Lat, station1Lng, station2Lat, station2Lng, } etc.
         acc[`station${station.number}Lat`] = station.location.lat;
@@ -49,7 +50,12 @@ const LiftEdit = ({ id, lift, submit, close }) => {
         ...stationCoordinates,
         ...lift,
     };
-    return <LiftForm lift={liftValues} title='Edit lift' submit={submit} close={close} />
+    return (
+        <UserContext.Consumer>
+            {({ isAdmin }) => (
+                <LiftForm lift={liftValues} title='Lift details' canEdit={isAdmin} submit={submit} close={close} />
+            )}
+        </UserContext.Consumer>);
 };
 
 export default compose(
@@ -68,4 +74,4 @@ export default compose(
             };
         }
     })
-)(LiftEdit);
+)(LiftProperties);

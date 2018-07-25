@@ -12,13 +12,13 @@ import Tab from '@material-ui/core/Tab';
 import Resorts from './resorts/Resorts';
 import ResortCreate from './resorts//ResortCreate';
 import Resort from './resorts/Resort';
-import ResortEdit from './resorts/ResortEdit';
+import ResortDetails from './resorts/ResortDetails';
 import ResortLifts from './resorts/ResortLifts';
 import ResortStats from './resorts/ResortStats';
 
 import Lifts from './lifts/Lifts';
 import Lift from './lifts/Lift';
-import LiftEdit from './lifts/LiftEdit';
+import LiftDetails from './lifts/LiftDetails';
 import LiftUplifts from './lifts/LiftUplifts';
 import LiftStats from './lifts/LiftStats';
 
@@ -63,12 +63,12 @@ class Admin extends Component {
                     <Switch>
                         {Locations.Resorts.toRoute({ component: Resorts, notFound: NotFound }, true)}
                         {Locations.Resort.toRoute({ component: Resort, notFound: NotFound }, true)}
-                        {Locations.ResortEdit.toRoute({ component: ResortEdit, notFound: NotFound }, true)}
+                        {Locations.ResortDetails.toRoute({ component: ResortDetails, notFound: NotFound }, true)}
                         {Locations.ResortLifts.toRoute({ component: ResortLifts, notFound: NotFound }, true)}
                         {Locations.ResortStats.toRoute({ component: ResortStats, notFound: NotFound }, true)}
                         {Locations.Lifts.toRoute({ component: Lifts, notFound: NotFound }, true)}
                         {Locations.Lift.toRoute({ component: Lift, notFound: NotFound }, true)}
-                        {Locations.LiftEdit.toRoute({ component: LiftEdit, notFound: NotFound }, true)}
+                        {Locations.LiftDetails.toRoute({ component: LiftDetails, notFound: NotFound }, true)}
                         {Locations.LiftUplifts.toRoute({ component: LiftUplifts, notFound: NotFound }, true)}
                         {Locations.LiftStats.toRoute({ component: LiftStats, notFound: NotFound }, true)}
                         <Route component={NotFound} />

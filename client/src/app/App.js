@@ -9,9 +9,10 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import lightBlue from '@material-ui/core/colors/lightBlue';
 import orange from '@material-ui/core/colors/orange';
 
+import ProgressContext from './ProgressContext';
+import UserContext from './UserContext';
 import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';
-import ProgressContext from './ProgressContext';
 import NotFound from './NotFound';
 import Locations from './Locations';
 import Error from './Error';
@@ -78,6 +79,8 @@ class App extends React.Component {
             inProgress: false,
             startProgress: this.handleStartProgress,
             endProgress: this.handleEndProgress,
+            user: null,
+            isAdmin: true,
         };
     }
 
@@ -88,15 +91,17 @@ class App extends React.Component {
                     <MuiThemeProvider theme={theme}>
                         <Background>
                             <ErrorBoundary component={Error}>
-                                <ProgressContext.Provider value={this.state}>
-                                    <Switch>
-                                        <Route path='/admin' component={Admin} />
-                                        {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
-                                        <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
-                                        <Route component={NotFound} />
-                                    </Switch>
-                                    <QueryProgress />
-                                </ProgressContext.Provider>
+                                <UserContext.Provider value={this.state}>
+                                    <ProgressContext.Provider value={this.state}>
+                                        <Switch>
+                                            <Route path='/admin' component={Admin} />
+                                            {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
+                                            <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
+                                            <Route component={NotFound} />
+                                        </Switch>
+                                        <QueryProgress />
+                                    </ProgressContext.Provider>
+                                </UserContext.Provider>
                             </ErrorBoundary>
                         </Background>
                     </MuiThemeProvider>
