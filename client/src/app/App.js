@@ -9,7 +9,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import lightBlue from '@material-ui/core/colors/lightBlue';
 import orange from '@material-ui/core/colors/orange';
 
-import ProgressContext from './ProgressContext';
+import { QueryProgressProvider } from './ProgressContext';
 import UserContext from './UserContext';
 import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';
@@ -17,7 +17,6 @@ import NotFound from './NotFound';
 import Locations from './Locations';
 import Error from './Error';
 import ErrorBoundary from '../common/ErrorBoundary';
-import QueryProgress from '../common/QueryProgress';
 
 import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
@@ -64,25 +63,13 @@ const Background = styled.div`
 `;
 
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.handleStartProgress = () => {
-            if (!this.state.inProgress) {
-                this.setState({ inProgress: true })
-            }
-        };
-        this.handleEndProgress = () => this.setState({ inProgress: false });
-
-        //use state for value instead of literal object to avoid remounting
-        this.state = {
-            inProgress: false,
-            startProgress: this.handleStartProgress,
-            endProgress: this.handleEndProgress,
+    //use state for context values instead of literal object to avoid remounting
+    state = {
+        userContext: {
             user: null,
             isAdmin: true,
-        };
-    }
+        },
+    };
 
     render() {
         return (
@@ -91,16 +78,15 @@ class App extends React.Component {
                     <MuiThemeProvider theme={theme}>
                         <Background>
                             <ErrorBoundary component={Error}>
-                                <UserContext.Provider value={this.state}>
-                                    <ProgressContext.Provider value={this.state}>
+                                <UserContext.Provider value={this.state.userContext}>
+                                    <QueryProgressProvider>
                                         <Switch>
                                             <Route path='/admin' component={Admin} />
                                             {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
                                             <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
                                             <Route component={NotFound} />
                                         </Switch>
-                                        <QueryProgress />
-                                    </ProgressContext.Provider>
+                                    </QueryProgressProvider>
                                 </UserContext.Provider>
                             </ErrorBoundary>
                         </Background>

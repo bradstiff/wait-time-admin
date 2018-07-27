@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { Query } from 'react-apollo';
-import ProgressContext from '../app/ProgressContext';
+import { QueryProgressConsumer } from '../app/ProgressContext';
 
 const withQuery = (query, options, notFound) => component => {
     class WrappedComponent extends React.Component {
@@ -59,7 +59,7 @@ const withQuery = (query, options, notFound) => component => {
             : options.variables || props;
         return <Query query={query} variables={variables}>
             {({ data, loading, error }) => (
-                <ProgressContext.Consumer>
+                <QueryProgressConsumer>
                     {({ startProgress, endProgress }) => (
                         <WrappedComponent
                             {...props}
@@ -70,7 +70,7 @@ const withQuery = (query, options, notFound) => component => {
                             onEndLoading={endProgress}
                         />
                     )}
-                </ProgressContext.Consumer>
+                </QueryProgressConsumer>
             )}
         </Query>;
     };
