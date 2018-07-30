@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Rollbar from 'rollbar';
 
 class ErrorBoundary extends React.Component {
     state = {
@@ -7,6 +8,7 @@ class ErrorBoundary extends React.Component {
     };
 
     componentDidCatch(error, info) {
+        Rollbar.error(error);
         this.setState({ hasError: true });
     }
 

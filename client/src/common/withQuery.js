@@ -20,8 +20,7 @@ const withQuery = (query, options, notFound) => component => {
         render() {
             const { data, loading, error } = this.props;
             if (error) {
-                throw Error('hi');
-                return null; //todo
+                throw error;
             }
 
             const root = data[options.selector];

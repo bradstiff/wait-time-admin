@@ -2,6 +2,7 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
+import Rollbar from 'rollbar';
 
 import styled from 'styled-components';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -15,31 +16,52 @@ import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';
 import NotFound from './NotFound';
 import Locations from './Locations';
-import Error from './Error';
+import ErrorPage from './Error';
 import ErrorBoundary from '../common/ErrorBoundary';
 
 import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
-const client = new ApolloClient({
-    clientState: {
-        resolvers: {
-            Mutation: {
-                selectTimePeriod: (_, { waitTimeDateID, timestamp }, { cache, getCacheKey }) => {
-                    const id = getCacheKey({ __typename: 'WaitTimeDate', id: waitTimeDateID });
-                    const data = {
-                        __typename: 'WaitTimeDate',
-                        selectedTimestamp: timestamp,
-                    };
-                    cache.writeData({ id, data });
-                    return null;
+let client;
+try {
+    client = new ApolloClient({
+        clientState: {
+            resolvers: {
+                Mutation: {
+                    selectTimePeriod: (_, { waitTimeDateID, timestamp }, { cache, getCacheKey }) => {
+                        const id = getCacheKey({ __typename: 'WaitTimeDate', id: waitTimeDateID });
+                        const data = {
+                            __typename: 'WaitTimeDate',
+                            selectedTimestamp: timestamp,
+                        };
+                        cache.writeData({ id, data });
+                        return null;
+                    },
+                },
+                WaitTimeDate: {
+                    selectedTimestamp: (waitTimeDate) => waitTimeDate.timePeriods && waitTimeDate.timePeriods.length && waitTimeDate.timePeriods[0].timestamp,
                 },
             },
-            WaitTimeDate: {
-                selectedTimestamp: (waitTimeDate) => waitTimeDate.timePeriods && waitTimeDate.timePeriods.length && waitTimeDate.timePeriods[0].timestamp,
-            },
         },
-    },
-});
+        onError: ({ graphQLErrors, networkError, operation, response, forward }) => {
+            const logError = (error, type) => {
+                Rollbar.error(error, {
+                    type,
+                    operation,
+                });
+            };
+            if (graphQLErrors) {
+                graphQLErrors.forEach(error => logError(error, 'GraphQL Error'));
+            }
+            if (networkError) {
+                logError(networkError, 'Network Error');
+            }
+            throw new Error('ApolloClient.onError');
+        },
+    });
+}
+catch (error) {
+    Rollbar.error(error)
+}
 
 const theme = createMuiTheme({
     palette: {
@@ -77,7 +99,7 @@ class App extends React.Component {
                 <CssBaseline>
                     <MuiThemeProvider theme={theme}>
                         <Background>
-                            <ErrorBoundary component={Error}>
+                            <ErrorBoundary component={ErrorPage}>
                                 <UserContext.Provider value={this.state.userContext}>
                                     <QueryProgressProvider>
                                         <Switch>
