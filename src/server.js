@@ -11,11 +11,21 @@ import { makeExecutableSchema } from 'graphql-tools';
 import cors from 'cors';
 import compression from 'compression';
 import sql from 'mssql';
+import Rollbar from 'rollbar';
 
 import resolvers from './resolvers';
 import { makeDataLoaders } from './connectors';
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+const rollbar = new Rollbar({
+    accessToken: '3f2da1bcb6b94fd6b710c351efcd137d',
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+    payload: {
+        environment: process.env.NODE_ENV
+    }
+});
 
 // .env file required with environment-specific connection string, e.g, for MSSQL:
 // CONNECTION_STRING=Server=<server>,<port>;Database=<db>;UID=<username>;PWD=<password>;encrypt=true
@@ -26,13 +36,14 @@ const db = new sql.ConnectionPool({
     password: process.env.DB_PWD,
     port: process.env.DB_PORT,
 });
-db.on('error', err => console.log(err));
+db.on('error', error => rollbar.error(error));
 
 const schemaFile = path.join(__dirname, 'schema.graphQL');
 const typeDefs = fs.readFileSync(schemaFile, 'utf8');
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express()
+    .use(rollbar.errorHandler())
     .use(compression())
     .use(config.app.graphqlPath, bodyParser.json(), graphqlExpress(req => ({
         schema,
@@ -69,4 +80,4 @@ db.connect()
         app.listen(port);
         console.log(`Express server running in ${process.env.NODE_ENV} mode.`);
     })
-    .catch(err => console.log(err));
+    .catch(error => rollbar.error(error));

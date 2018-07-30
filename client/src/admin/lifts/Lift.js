@@ -75,7 +75,7 @@ const Lift = ({ id, lift, classes }) => {
                     <Card className={classes.liftCard}>
                         <CardMedia className={classes.liftMap}>
                             <Map bounds={route} style={{ width: '100%', height: '100%' }}>
-                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" crossOrigin={null} />
+                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" crossOrigin={false} />
                                 <Polyline positions={route} />
                             </Map>
                         </CardMedia>

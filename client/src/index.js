@@ -15,7 +15,7 @@ Rollbar.init({
     captureUncaught: true,
     captureUnhandledRejections: true,
     payload: {
-        environment: "production"
+        environment: process.env.NODE_ENV
     }
 });
 
