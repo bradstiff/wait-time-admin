@@ -34,7 +34,7 @@ class ResortLiftsMap extends React.Component {
                 onViewportChanged={event => this.handleMapBoundsChange(event)}
                 style={{ width: '100%', height: '100%' }}
             >
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" crossOrigin={null} />
                 {children}
             </Map>
         );
