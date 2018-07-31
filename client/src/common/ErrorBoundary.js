@@ -8,7 +8,7 @@ class ErrorBoundary extends React.Component {
     };
 
     componentDidCatch(error, info) {
-        Rollbar.error(error);
+        Rollbar.error(error, info);
         this.setState({ hasError: true });
     }
 

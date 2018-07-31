@@ -37,7 +37,11 @@ const styles = theme => ({
     },
     content: {
         marginTop: theme.spacing.unit * 2,
-    }
+    },
+    toolbarTabs: {
+        flex: 'auto',
+        paddingLeft: theme.spacing.unit * 2,
+    },
 });
 
 class Admin extends Component {
@@ -71,7 +75,7 @@ class Admin extends Component {
                         <Typography variant="title">
                             Wait Time Admin
                         </Typography>
-                        <Tabs value={activeTab}>
+                        <Tabs value={activeTab} className={classes.toolbarTabs}>
                             <Tab label="Resorts" component={Locations.Resorts.toLink()} />
                             <Tab label="Lifts" component={Locations.Lifts.toLink()} />
                         </Tabs>

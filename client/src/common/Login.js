@@ -2,7 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import bindProps from '../common/FormikFieldHelper';
+import Rollbar from 'rollbar';
+
+import bindProps from './FormikFieldHelper';
+import UserErrorMessage from './UserErrorMessage';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -20,20 +23,44 @@ const styles = theme => ({
 })
 
 class Login extends React.Component {
-    handleSubmit = (username, password) => {
+    state = {
+        message: null,
+    };
+
+    handleSubmit = async (values, actions) => {
         const options = {
-            method: 'POST'
+            method: 'POST',
+            body: JSON.stringify(values),
+            headers: { "Content-Type": "application/json; charset=utf-8" },
         };
-        fetch('/login', options)
-            .then(res => {
-                this.props.onLogin();
-            })
-            .catch(error => { });
+        try {
+            const res = await fetch('/authenticate', options);
+            if (res.ok) {
+                const result = await res.text();
+                if (result === 'OK') {
+                    this.setState({ message: null });
+                    this.props.onLogin();
+                } else {
+                    this.setState({
+                        message: {
+                            text: 'The username and password combination does not match our records.',
+                            severity: 1
+                        },
+                    });
+                }
+            } else {
+                throw new Error(`${options.method} ${res.url} ${res.status} (${res.statusText})`);
+            }
+            actions.setSubmitting(false);
+        } catch (error) {
+            this.setState((s, p) => { throw error }); //throw to error boundary
+        }        
     }
 
     render() {
         const { onCancel, classes, open } = this.props;
-        return <LoginDialog open={open} onSubmit={this.handleSubmit} onCancel={onCancel} classes={classes} />;
+        const { message } = this.state;
+        return <LoginDialog open={open} message={message} onSubmit={this.handleSubmit} onCancel={onCancel} classes={classes} />;
     }
 
     static propTypes = {
@@ -43,13 +70,13 @@ class Login extends React.Component {
     }
 }
 
-const LoginDialog = ({ open, onSubmit, onCancel, classes }) => {
+const LoginDialog = ({ open, message, onSubmit, onCancel, classes }) => {
     const model = {
         username: Yup.string().min(2).max(100).required().label('Username'),
         password: Yup.string().min(2).max(100).required().label('Password'),
     };
 
-    return <Dialog open={open}>
+    return <Dialog open={open} message={message}>
         <DialogTitle>Login</DialogTitle>
         <DialogContent>
         <Formik
@@ -58,25 +85,25 @@ const LoginDialog = ({ open, onSubmit, onCancel, classes }) => {
                 password: '',
             }}
             validationSchema={Yup.object().shape(model)}
-            onSubmit={onSubmit}
+            onSubmit={(values, actions) => onSubmit(values, actions)}
             render={formikProps => {
                 const { handleSubmit, isSubmitting, } = formikProps;
-                const textFieldPropKeys = ['value', 'error', 'helperText', 'onChange', 'onBlur', 'disabled'];
+                const textFieldPropKeys = ['value', 'error', 'helperText', 'onChange', 'onBlur',];
                 const formProps = {
                     ...formikProps,
                 };
                 return (
                     <form onSubmit={handleSubmit}>
-                        <div><TextField {...bindProps('username', textFieldPropKeys, formProps) } label='Username' style={{ width: 400 }} inputProps={{ maxLength: 100, autocomplete: 'off' }} margin='normal' /></div>
-                        <div><TextField {...bindProps('password', textFieldPropKeys, formProps) } label='Password' style={{ width: 400 }} inputProps={{ maxLength: 100, autocomplete: 'off' }} margin='normal' /></div>
+                        <div><TextField {...bindProps('username', textFieldPropKeys, formProps) } label='Username' style={{ width: 400 }} inputProps={{ maxLength: 100, autoComplete: 'off' }} margin='normal' /></div>
+                        <div><TextField {...bindProps('password', textFieldPropKeys, formProps) } label='Password' style={{ width: 400 }} inputProps={{ maxLength: 100, autoComplete: 'off' }} margin='normal' /></div>
                         <div>
                             <Button color='primary' onClick={onCancel} disabled={isSubmitting}>Cancel</Button>
                             <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Login</Button>
                         </div>
+                        <UserErrorMessage message={message} />
                     </form>
                 );
-            }}
-            />
+            }}/>
         </DialogContent>
     </Dialog>
 };

@@ -12,7 +12,6 @@ import cors from 'cors';
 import compression from 'compression';
 import sql from 'mssql';
 import Rollbar from 'rollbar';
-
 import resolvers from './resolvers';
 import { makeDataLoaders } from './connectors';
 
@@ -51,8 +50,14 @@ const app = express()
         tracing: !isProduction,
         cacheControl: !isProduction,
     })))
-    .post('/login', (req, res) => {
-        res.send('OK');
+    .use(bodyParser.json())
+    .post('/authenticate', (req, res) => {
+        //just a placeholder to support the client workflow (which is also a placeholder)
+        if (req.body.username === 'admin' && req.body.password === '@dm1n') {
+            res.end('OK');
+        } else {
+            res.end('Invalid');
+        }
     });
 
 if (isProduction) {

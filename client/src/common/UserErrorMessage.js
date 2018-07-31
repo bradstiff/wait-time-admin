@@ -26,7 +26,11 @@ const styles = theme => ({
     },
 });
 
-const UserErrorMessage = ({ message: { text, severity }, classes }) => {
+const UserErrorMessage = ({ message, classes }) => {
+    if (!message) {
+        return null;
+    }
+    const { text, severity } = message;
     let className;
     switch (severity) {
         case 1:
@@ -50,8 +54,7 @@ UserErrorMessage.propTypes = {
         .shape({
             text: PropTypes.string.isRequired,
             severity: PropTypes.oneOf([1, 2, 3]),
-        })
-        .isRequired,
+        }),
 };
 
 export default withStyles(styles)(UserErrorMessage);

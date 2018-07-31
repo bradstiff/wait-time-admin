@@ -10,10 +10,14 @@ export default (name, fieldPropKeys, formProps) => {
         if (['value', 'checked'].includes(propKey)) {
             warning(formProps.values, "Formik 'values' prop not provided");
             boundProps[propKey] = formProps.values[name];
-        } else if (['error', 'helperText'].includes(propKey)) {
+        } else if (propKey === 'error') {
             warning(formProps.touched, "Formik 'touched' prop not provided");
             warning(formProps.errors, "Formik 'errors' prop not provided");
-            boundProps[propKey] = formProps.touched[name] && formProps.errors[name];
+            boundProps.error = formProps.touched[name] && !!formProps.errors[name];
+        } else if (propKey === 'helperText') {
+            warning(formProps.touched, "Formik 'touched' prop not provided");
+            warning(formProps.errors, "Formik 'errors' prop not provided");
+            boundProps.helperText = formProps.touched[name] ? formProps.errors[name] : null;
         } else if (propKey === 'onChange') {
             warning(formProps.handleChange, "Formik 'handleChange' prop not provided");
             boundProps.onChange = formProps.handleChange;
