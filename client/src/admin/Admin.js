@@ -8,6 +8,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
 
 import Resorts from './resorts/Resorts';
 import ResortCreate from './resorts//ResortCreate';
@@ -22,6 +24,8 @@ import LiftDetails from './lifts/LiftDetails';
 import LiftUplifts from './lifts/LiftUplifts';
 import LiftStats from './lifts/LiftStats';
 
+import { UserConsumer } from '../app/UserContext';
+import Login from '../common/Login';
 import Locations from '../app/Locations';
 import NotFound from '../app/NotFound';
 
@@ -37,8 +41,22 @@ const styles = theme => ({
 });
 
 class Admin extends Component {
+    state = {
+        showLogin: false,
+    }
+
+    handleShowLogin = () => this.setState({ showLogin: true });
+    handleCancelLogin = () => this.setState({ showLogin: false });
+
+    handleLogin = callback => {
+        this.setState({ showLogin: false });
+        callback();
+    }
+
     render() {
         const { classes, location } = this.props;
+        const { showLogin } = this.state;
+
         let activeTab = null;
         if (matchPath(location.pathname, '/admin/resorts')) {
             activeTab = 0;
@@ -57,6 +75,12 @@ class Admin extends Component {
                             <Tab label="Resorts" component={Locations.Resorts.toLink()} />
                             <Tab label="Lifts" component={Locations.Lifts.toLink()} />
                         </Tabs>
+                        <UserConsumer>
+                            {({ user, onLogout }) => user
+                                ? <Button onClick={onLogout} color="inherit">Logout</Button>
+                                : <Button onClick={this.handleShowLogin} color="inherit">Login</Button>
+                            }
+                        </UserConsumer>
                     </Toolbar>
                 </AppBar>
                 <div className={classes.content}>
@@ -74,6 +98,9 @@ class Admin extends Component {
                         <Route component={NotFound} />
                     </Switch>
                 </div>
+                <UserConsumer>
+                    {({ onLogin }) => <Login open={showLogin} onLogin={() => this.handleLogin(onLogin)} onCancel={this.handleCancelLogin} />}
+                </UserConsumer>
             </div>
         );
     }

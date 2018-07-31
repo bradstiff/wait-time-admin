@@ -10,8 +10,8 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import lightBlue from '@material-ui/core/colors/lightBlue';
 import orange from '@material-ui/core/colors/orange';
 
-import { QueryProgressProvider } from './ProgressContext';
-import UserContext from './UserContext';
+import { QueryProgressProvider } from './QueryProgressContext';
+import { UserProvider } from './UserContext';
 import WaitTime from '../waittime/WaitTime';
 import Admin from '../admin/Admin';
 import NotFound from './NotFound';
@@ -85,14 +85,6 @@ const Background = styled.div`
 `;
 
 class App extends React.Component {
-    //use state for context values instead of literal object to avoid remounting
-    state = {
-        userContext: {
-            user: null,
-            isAdmin: true,
-        },
-    };
-
     render() {
         return (
             <ApolloProvider client={client} >
@@ -100,7 +92,7 @@ class App extends React.Component {
                     <MuiThemeProvider theme={theme}>
                         <Background>
                             <ErrorBoundary component={ErrorPage}>
-                                <UserContext.Provider value={this.state.userContext}>
+                                <UserProvider>
                                     <QueryProgressProvider>
                                         <Switch>
                                             <Route path='/admin' component={Admin} />
@@ -109,7 +101,7 @@ class App extends React.Component {
                                             <Route component={NotFound} />
                                         </Switch>
                                     </QueryProgressProvider>
-                                </UserContext.Provider>
+                                </UserProvider>
                             </ErrorBoundary>
                         </Background>
                     </MuiThemeProvider>

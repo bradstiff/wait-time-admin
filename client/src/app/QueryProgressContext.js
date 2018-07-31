@@ -1,11 +1,10 @@
 import React from 'react';
-import Modal from '@material-ui/core/Modal';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import ModalCircularProgress from '../common/ModalCircularProgress';
 
 const QueryProgressContext = React.createContext({
     inProgress: false,
-    startProgress: () => { },
-    endProgress: () => { },
+    onStart: () => { },
+    onEnd: () => { },
 });
 
 export class QueryProgressProvider extends React.Component {
@@ -15,31 +14,25 @@ export class QueryProgressProvider extends React.Component {
         //use state for context values instead of literal object to avoid remounting
         this.state = {
             inProgress: false,
-            startProgress: this.handleStartProgress,
-            endProgress: this.handleEndProgress,
+            onStart: this.handleQueryStart,
+            onEnd: this.handleQueryEnd,
         };
     }
 
-    handleStartProgress = () => {
+    handleQueryStart = () => {
         if (!this.state.inProgress) {
             this.setState({ inProgress: true })
         }
     }
 
-    handleEndProgress = () => this.setState({ inProgress: false })
+    handleQueryEnd = () => this.setState({ inProgress: false })
 
     render() {
         return (
             <QueryProgressContext.Provider value={this.state}>
                 {this.props.children}
                 <QueryProgressContext.Consumer>
-                    {({ inProgress }) => (
-                        <Modal open={inProgress} style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
-                            <div style={{ flex: 'auto', textAlign: 'center', outline: 'none' }}>
-                                <CircularProgress color='secondary' />
-                            </div>
-                        </Modal>
-                    )}
+                    {({ inProgress }) => <ModalCircularProgress open={inProgress} />}
                 </QueryProgressContext.Consumer>
             </QueryProgressContext.Provider>
         );

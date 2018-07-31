@@ -14,7 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 import Locations from '../../app/Locations';
-import UserContext from '../../app/UserContext';
+import { UserConsumer } from '../../app/UserContext';
 import ResortNotFound from '../../app/ResortNotFound';
 import withQuery from '../../common/withQuery';
 import ResortLiftsMap from './ResortLiftsMap';
@@ -104,7 +104,7 @@ const Resort = ({ id, resort, classes, width }) => {
         };
 
     return (
-        <UserContext.Consumer>
+        <UserConsumer>
             {({ isAdmin }) => (
                 <Grid container spacing={16}>
                     <Grid item xs={12}>
@@ -168,7 +168,7 @@ const Resort = ({ id, resort, classes, width }) => {
                     ]}
                 </Grid>
             )}
-        </UserContext.Consumer>
+        </UserConsumer>
     );
 };
 

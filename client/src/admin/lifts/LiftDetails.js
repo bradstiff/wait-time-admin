@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 
 import LiftForm from './LiftForm';
 import Locations from '../../app/Locations';
-import UserContext from '../../app/UserContext';
+import { UserConsumer } from '../../app/UserContext';
 import LiftNotFound from '../../app/LiftNotFound';
 import withQuery from '../../common/withQuery';
 
@@ -51,11 +51,11 @@ const LiftProperties = ({ id, lift, submit, close }) => {
         ...lift,
     };
     return (
-        <UserContext.Consumer>
+        <UserConsumer>
             {({ isAdmin }) => (
                 <LiftForm lift={liftValues} title='Lift details' canEdit={isAdmin} submit={submit} close={close} />
             )}
-        </UserContext.Consumer>);
+        </UserConsumer>);
 };
 
 export default compose(

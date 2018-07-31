@@ -50,7 +50,10 @@ const app = express()
         context: { db, dataLoaders: makeDataLoaders(db) },
         tracing: !isProduction,
         cacheControl: !isProduction,
-    })));
+    })))
+    .post('/login', (req, res) => {
+        res.send('OK');
+    });
 
 if (isProduction) {
     const staticPath = path.join(__dirname, 'client');

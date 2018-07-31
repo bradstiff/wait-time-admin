@@ -4,12 +4,12 @@
  * If variables is undefined, props will be passed as variables. Apollo ignores variable values that are not used by the query.
  * If the query runs and the selected value is null, renders the indicated NotFound component.
  * 
- * Eliminates a ton of boilerplate.
+ * Eliminates a bunch of boilerplate.
  * ***********************************************************************************************/
 
 import React from 'react';
 import { Query } from 'react-apollo';
-import { QueryProgressConsumer } from '../app/ProgressContext';
+import { QueryProgressConsumer } from '../app/QueryProgressContext';
 
 const withQuery = (query, options, notFound) => component => {
     class WrappedComponent extends React.Component {
@@ -59,14 +59,14 @@ const withQuery = (query, options, notFound) => component => {
         return <Query query={query} variables={variables}>
             {({ data, loading, error }) => (
                 <QueryProgressConsumer>
-                    {({ startProgress, endProgress }) => (
+                    {({ onStart, onEnd }) => (
                         <WrappedComponent
                             {...props}
                             data={data}
                             loading={loading}
                             error={error}
-                            onStartLoading={startProgress}
-                            onEndLoading={endProgress}
+                            onStartLoading={onStart}
+                            onEndLoading={onEnd}
                         />
                     )}
                 </QueryProgressConsumer>

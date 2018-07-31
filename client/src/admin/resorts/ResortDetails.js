@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 import ResortForm from './ResortForm';
 import ResortNotFound from '../../app/ResortNotFound';
 import withQuery from '../../common/withQuery';
-import UserContext from '../../app/UserContext';
+import { UserConsumer } from '../../app/UserContext';
 import Locations from '../../app/Locations';
 
 const query = gql`
@@ -44,11 +44,11 @@ const ResortProperties = ({ id, resort, submit, close, match }) => {
         ...resort,
     };
     return (
-        <UserContext.Consumer>
+        <UserConsumer>
             {({ isAdmin }) => (
                 <ResortForm resort={resortValues} title='Resort details' canEdit={isAdmin} submit={submit} close={close} />
             )}
-        </UserContext.Consumer>
+        </UserConsumer>
     );
 };
 
