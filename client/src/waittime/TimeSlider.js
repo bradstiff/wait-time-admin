@@ -1,8 +1,9 @@
 ﻿import React, { Component } from 'react';
 import Slider from 'rc-slider';
 import moment from 'moment';
-import { graphql } from 'react-apollo';
+import { compose, graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import withWidth from '@material-ui/core/withWidth';
 
 import 'rc-slider/assets/index.css';
 
@@ -17,26 +18,12 @@ class TimeSlider extends Component {
             return null;
         }
 
-        let timeFormat, minutesPerMark;
-        const widthPerTimePeriod = window.innerWidth / timePeriods.length;
-        switch (true) {
-            case widthPerTimePeriod > 50:
-                timeFormat = 'LT';
-                minutesPerMark = 15;
-                break;
-            case widthPerTimePeriod > 30:
-                timeFormat = 'LT';
-                minutesPerMark = 30;
-                break;
-            case widthPerTimePeriod > 20:
-                timeFormat = 'LT';
-                minutesPerMark = 45;
-                break;
-            default:
-                timeFormat = 'LT';
-                minutesPerMark = 60;
-                break;
-        };
+        const timeFormat = 'LT';
+        const availableWidth = Math.min(window.innerWidth, 1550) - 50;
+        const maxMarks = availableWidth / 50; //~50 pixels per mark
+        const periodsPerMarkOptions = [1, 2, 3, 4, 5, 6];
+        const periodsPerMark = periodsPerMarkOptions.find(intervalsPerMark => timePeriods.length / maxMarks < intervalsPerMark);
+        const minutesPerMark = 15 * periodsPerMark; //each period is 15 minutes; for small screens we have to decrease the granularity
 
         let minutesAtPreviousMark = 0;
         const endTimePeriod = timePeriods[timePeriods.length - 1];
@@ -89,8 +76,11 @@ const selectTimePeriodMutation = gql`
     }
 `;
 
-export default graphql(selectTimePeriodMutation, {
-    props: ({ mutate }) => ({
-        selectTimePeriod: (waitTimeDate, timestamp) => mutate({ variables: { waitTimeDateID: waitTimeDate.id, timestamp} }),
+export default compose(
+    graphql(selectTimePeriodMutation, {
+        props: ({ mutate }) => ({
+            selectTimePeriod: (waitTimeDate, timestamp) => mutate({ variables: { waitTimeDateID: waitTimeDate.id, timestamp} }),
+        }),
     }),
-})(TimeSlider);
+    withWidth(),
+)(TimeSlider);

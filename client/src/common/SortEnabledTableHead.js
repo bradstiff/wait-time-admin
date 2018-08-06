@@ -13,7 +13,7 @@ class SortEnabledTableHead extends Component {
     };
 
     render() {
-        const { columns, order, orderBy } = this.props;
+        const { columns, order, orderBy, padding } = this.props;
         const orderByCol = columns.find(column => column.field === orderBy);
         return (
             <TableHead>
@@ -23,7 +23,7 @@ class SortEnabledTableHead extends Component {
                             <TableCell
                                 key={column.field}
                                 numeric={column.numeric || false}
-                                padding={column.disablePadding ? 'none' : 'default'}
+                                padding={column.padding || 'default'}
                                 sortDirection={orderByCol === column ? order : false}
                             >
                                 <Tooltip
@@ -56,9 +56,9 @@ class SortEnabledTableHead extends Component {
                 field: PropTypes.string.isRequired,
                 label: PropTypes.string.isRequired,
                 numeric: PropTypes.bool,
-                disablePadding: PropTypes.bool,
+                padding: PropTypes.oneOf(['default', 'dense', 'none',]),
                 compareField: PropTypes.string,
-            })).isRequired
+            })).isRequired,
     };
 }
 

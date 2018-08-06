@@ -76,15 +76,15 @@ class ResortStats extends Component {
         const { order, orderBy } = this.state;
         const { upliftGroupings } = resort;
         const columnData = [
-            { field: 'groupDescription', label: groupBy, keyField: 'groupKey', compareField: groupBy === 'Lift' ? 'groupDescription' : 'groupKey' },
-            { field: 'upliftCount', label: 'Uplifts', keyField: 'groupKey' },
-            { field: 'waitTimeAverage', label: 'Avg Wait (s)', keyField: 'groupKey' },
+            { field: 'groupDescription', label: groupBy, keyField: 'groupKey', compareField: groupBy === 'Lift' ? 'groupDescription' : 'groupKey', padding: 'dense' },
+            { field: 'upliftCount', label: 'Uplifts', keyField: 'groupKey', numeric: true , padding: 'dense' },
+            { field: 'waitTimeAverage', label: 'Avg Wait (s)', keyField: 'groupKey', numeric: true , padding: 'dense' },
         ];
         return (
             <Paper>
                 <Toolbar className={classes.toolbar}>
                     <div className={classes.title}>
-                        <Typography variant="headline" gutterBottom>
+                        <Typography variant="subheading">
                             {resort.name} Stats
                         </Typography>
                     </div>
@@ -119,14 +119,14 @@ class ResortStats extends Component {
                                     .sort(makeCompareFn(order, orderBy, columnData, 'groupKey'))
                                     .map(grouping => (
                                         <TableRow key={grouping.groupKey}>
-                                            <TableCell component="th" scope="row">
+                                            <TableCell component="th" scope="row" padding='dense'>
                                                 {groupBy === 'Lift' && !loading
                                                     ? <LinkButton to={Locations.Lift.toUrl({ id: grouping.groupKey })}>{grouping.groupDescription}</LinkButton>
                                                     : grouping.groupDescription
                                                 }
                                             </TableCell>
-                                            <TableCell>{grouping.upliftCount}</TableCell>
-                                            <TableCell>{grouping.waitTimeAverage}</TableCell>
+                                            <TableCell numeric padding='dense'>{grouping.upliftCount}</TableCell>
+                                            <TableCell numeric padding='dense'>{grouping.waitTimeAverage}</TableCell>
                                         </TableRow>
                                     ))}
                             </TableBody>

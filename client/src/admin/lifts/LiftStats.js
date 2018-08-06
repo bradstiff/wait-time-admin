@@ -61,7 +61,7 @@ class LiftStats extends React.Component {
             <Paper>
                 <Toolbar className={classes.toolbar}>
                     <div className={classes.title}>
-                        <Typography variant="headline" gutterBottom>
+                        <Typography variant="subheading">
                             {lift.name} Stats
                         </Typography>
                     </div>
@@ -85,17 +85,17 @@ class LiftStats extends React.Component {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>{groupBy}</TableCell>
-                                    <TableCell>Uplifts</TableCell>
-                                    <TableCell>Avg Wait (s)</TableCell>
+                                    <TableCell padding='dense'>{groupBy}</TableCell>
+                                    <TableCell numeric padding='dense'>Uplifts</TableCell>
+                                    <TableCell numeric padding='dense'>Avg Wait (s)</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {upliftGroupings.map(grouping => (
                                     <TableRow key={grouping.groupKey}>
-                                        <TableCell component="th" scope="row">{grouping.groupDescription}</TableCell>
-                                        <TableCell>{grouping.upliftCount}</TableCell>
-                                        <TableCell>{grouping.waitTimeAverage}</TableCell>
+                                        <TableCell component="th" scope="row" padding='dense'>{grouping.groupDescription}</TableCell>
+                                        <TableCell numeric padding='dense'>{grouping.upliftCount}</TableCell>
+                                        <TableCell numeric padding='dense'>{grouping.waitTimeAverage}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { compose } from 'react-apollo';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -10,6 +11,7 @@ import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
+import withWidth from '@material-ui/core/withWidth';
 import { withStyles } from '@material-ui/core/styles';
 
 import TimezoneData from '../../common/TimezoneData';
@@ -20,7 +22,7 @@ const styles = theme => ({
     }
 })
 
-const ResortForm = ({ resort, title, canEdit, submit, close, classes }) => {
+const ResortForm = ({ resort, title, canEdit, submit, close, classes, width }) => {
     const model = {
         name: Yup.string().min(2).max(100).required().label('Name'),
         slug: Yup.string().min(2).max(100).required().label('Slug'),
@@ -28,6 +30,12 @@ const ResortForm = ({ resort, title, canEdit, submit, close, classes }) => {
         trailMapFilename: Yup.string().min(2).max(50).label('Trail map filename'),
         latitude: Yup.number().min(-90).max(90).required().label('Latitude'),
         longitude: Yup.number().min(-180).max(180).required().label('Longitude'),
+    };
+    const fieldStyle = {
+        width: Math.min(200, window.innerWidth - 16)
+    };
+    const wideFieldStyle = {
+        width: Math.min(400, window.innerWidth - 16)
     };
     return <Paper className={classes.root}>
         <Formik
@@ -41,6 +49,10 @@ const ResortForm = ({ resort, title, canEdit, submit, close, classes }) => {
                     disabled: !canEdit,
                 };
                 const textFieldPropKeys = ['value', 'error', 'helperText', 'onChange', 'onBlur', 'disabled',];
+                const otherProps = {
+                    margin: 'normal',
+                    fullWidth: true,
+                };
                 return (
                     <form onSubmit={handleSubmit}>
                         <Toolbar>
@@ -48,20 +60,20 @@ const ResortForm = ({ resort, title, canEdit, submit, close, classes }) => {
                             <Button color='primary' disabled={isSubmitting} onClick={close}>{canEdit ? 'Cancel' : 'Close'}</Button>
                             {canEdit && <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Save</Button>}
                         </Toolbar>
-                        <div>
-                            <TextField {...bindProps('name', textFieldPropKeys, formProps) } label="Name" required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' />
+                        <div style={wideFieldStyle}>
+                            <TextField {...bindProps('name', textFieldPropKeys, formProps, otherProps) } label="Name" required inputProps={{ maxLength: 100 }} />
                         </div>
-                        <div>
-                            <TextField {...bindProps('slug', textFieldPropKeys, formProps) } label='Slug' required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' />
+                        <div style={wideFieldStyle}>
+                            <TextField {...bindProps('slug', textFieldPropKeys, formProps, otherProps) } label='Slug' required inputProps={{ maxLength: 100 }} />
                         </div>
-                        <div>
-                            <TextField {...bindProps('logoFilename', textFieldPropKeys, formProps) } label="Logo filename" style={{ width: 200 }} inputProps={{ maxLength: 50 }} margin='normal' />
+                        <div style={fieldStyle}>
+                            <TextField {...bindProps('logoFilename', textFieldPropKeys, formProps, otherProps) } label="Logo filename" inputProps={{ maxLength: 50 }} />
                         </div>
-                        <div>
-                            <TextField {...bindProps('trailMapFilename', textFieldPropKeys, formProps) } label="Trail map filename" style={{ width: 200 }} inputProps={{ maxLength: 50 }} margin='normal' />
+                        <div style={fieldStyle}>
+                            <TextField {...bindProps('trailMapFilename', textFieldPropKeys, formProps, otherProps) } label="Trail map filename" inputProps={{ maxLength: 50 }} />
                         </div>
-                        <div>
-                            <TextField {...bindProps('timezone', textFieldPropKeys, formProps) } label="Time zone" select style={{ width: 400 }} margin='normal' >
+                        <div style={wideFieldStyle}>
+                            <TextField {...bindProps('timezone', textFieldPropKeys, formProps, otherProps) } label="Time zone" select >
                                 {TimezoneData.map(timezone => (
                                     <MenuItem key={timezone.id} value={timezone.id}>
                                         {timezone.description}
@@ -69,11 +81,11 @@ const ResortForm = ({ resort, title, canEdit, submit, close, classes }) => {
                                 ))}
                             </TextField>
                         </div>
-                        <div>
-                            <TextField {...bindProps('latitude', textFieldPropKeys, formProps) } label="Latitude" style={{ width: 200 }} margin='normal' />
+                        <div style={fieldStyle}>
+                            <TextField {...bindProps('latitude', textFieldPropKeys, formProps, otherProps) } label="Latitude" />
                         </div>
-                        <div>
-                            <TextField {...bindProps('longitude', textFieldPropKeys, formProps) } label="Longitude" style={{ width: 200 }} margin='normal' />
+                        <div style={fieldStyle}>
+                            <TextField {...bindProps('longitude', textFieldPropKeys, formProps, otherProps) } label="Longitude" />
                         </div>
                     </form>
                 )
@@ -82,4 +94,7 @@ const ResortForm = ({ resort, title, canEdit, submit, close, classes }) => {
     </Paper>
 };
 
-export default withStyles(styles)(ResortForm);
+export default compose(
+    withStyles(styles),
+    withWidth()
+)(ResortForm);

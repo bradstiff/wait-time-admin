@@ -27,14 +27,14 @@ export const resortsQuery = gql`
 const styles = theme => ({
     logoContainer: {
         textAlign: 'center',
-        width: 180,
+        width: 170,
     },
     logo: {
-        height: 60,
+        height: 50,
         width: 'auto',
-        maxWidth: 200,
+        maxWidth: 170,
         padding: 5,
-        paddingRight: 20,
+        marginRight: 5,
         opacity: 0.75,
         cursor: 'pointer',
         '&:hover': {

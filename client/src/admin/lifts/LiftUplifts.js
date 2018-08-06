@@ -170,7 +170,7 @@ class LiftUplifts extends Component {
             <Paper>
                 <Toolbar className={classes.toolbar}>
                     <div className={classes.title}>
-                        <Typography variant="headline" gutterBottom>
+                        <Typography variant="subheading">
                             {lift.name} Uplifts
                         </Typography>
                     </div>

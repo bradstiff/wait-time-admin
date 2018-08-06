@@ -3,6 +3,7 @@ import { matchPath } from 'react-router';
 import { Switch, Route } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
+import Hidden from '@material-ui/core/Hidden';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -72,9 +73,9 @@ class Admin extends Component {
             <div className={classes.container}>
                 <AppBar position="static" color='default'>
                     <Toolbar>
-                        <Typography variant="title">
-                            Wait Time Admin
-                        </Typography>
+                        <Hidden xsDown>
+                            <Typography variant="title">Wait Time Admin</Typography>
+                        </Hidden>
                         <Tabs value={activeTab} className={classes.toolbarTabs}>
                             <Tab label="Resorts" component={Locations.Resorts.toLink()} />
                             <Tab label="Lifts" component={Locations.Lifts.toLink()} />

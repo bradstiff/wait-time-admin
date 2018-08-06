@@ -1,4 +1,5 @@
 import React from 'react';
+import { compose } from 'react-apollo';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -12,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import MenuItem from '@material-ui/core/MenuItem';
+import withWidth from '@material-ui/core/withWidth';
 import { withStyles } from '@material-ui/core/styles';
 
 import LiftTypeData from '../../common/LiftTypeData';
@@ -23,7 +25,7 @@ const styles = theme => ({
     },
 })
 
-const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
+const LiftForm = ({ lift, title, canEdit, submit, close, classes, width }) => {
     const model = {
         name: Yup.string().min(2).max(100).required().label('Name'),
         typeID: Yup.number().integer().required().label('Type'),
@@ -32,6 +34,7 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
     };
     const stationMeta = lift.stations
         .map(station => ({
+            number: station.number,
             name: station.name,
             latField: `station${station.number}Lat`,
             latLabel: station.name + ' latitude',
@@ -44,7 +47,12 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
         model[station.latField] = Yup.number().min(-90).max(90).required().label(station.latLabel);
         model[station.lngField] = Yup.number().min(-180).max(180).required().label(station.lngLabel);
     });
-
+    const fieldStyle = {
+        width: Math.min(200, window.innerWidth - 16)
+    };
+    const wideFieldStyle = {
+        width: Math.min(400, window.innerWidth - 16)
+    };
     return <Paper className={classes.root}>
         <Formik
             initialValues={lift}
@@ -57,6 +65,10 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
                     ...formikProps,
                     disabled: !canEdit,
                 };
+                const otherProps = {
+                    margin: 'normal',
+                    fullWidth: true,
+                };
                 return (
                     <form onSubmit={handleSubmit}>
                         <Toolbar>
@@ -64,9 +76,9 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
                             <Button color='primary' disabled={isSubmitting} onClick={close}>{canEdit ? 'Cancel' : 'Close'}</Button>
                             {canEdit && <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Save</Button>}
                         </Toolbar>
-                        <div><TextField {...bindProps('name', textFieldPropKeys, formProps) } label='Name' required style={{ width: 400 }} inputProps={{ maxLength: 100 }} margin='normal' /></div>
-                        <div>
-                            <TextField {...bindProps('typeID', textFieldPropKeys, formProps) } label='Type' select required style={{ width: 200 }} margin='normal' > 
+                        <div style={wideFieldStyle}><TextField {...bindProps('name', textFieldPropKeys, formProps, otherProps) } label='Name' required inputProps={{ maxLength: 100 }} /></div>
+                        <div style={fieldStyle}>
+                            <TextField {...bindProps('typeID', textFieldPropKeys, formProps, otherProps) } label='Type' select required > 
                                 {LiftTypeData.map(type => (
                                     <MenuItem key={type.id} value={type.id}>
                                         {type.description}
@@ -74,11 +86,11 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
                                 ))}
                             </TextField>
                         </div>
-                        <div><TextField {...bindProps('occupancy', textFieldPropKeys, formProps) } label='Occupancy' style={{ width: 200 }} margin='normal' /></div>
-                        <div>
+                        <div style={fieldStyle}><TextField {...bindProps('occupancy', textFieldPropKeys, formProps, otherProps) } label='Occupancy' /></div>
+                        <div style={wideFieldStyle}>
                             <ResortData>
                                 {({ options }) => (
-                                    <TextField {...bindProps('resortID', textFieldPropKeys, formProps) } label='Resort' select style={{ width: 400 }} margin='normal' >
+                                    <TextField {...bindProps('resortID', textFieldPropKeys, formProps, otherProps) } label='Resort' select >
                                         {options && options.map(option => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.text}
@@ -89,12 +101,17 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
                             </ResortData>
                         </div>
                         {stationMeta.map(station => (
-                            <div key={station.name}>
-                                <TextField {...bindProps(station.latField, textFieldPropKeys, formProps) } label={station.latLabel} required style={{ width: 195 }} margin='normal' />
-                                <TextField {...bindProps(station.lngField, textFieldPropKeys, formProps) } label={station.lngLabel} required style={{ width: 195, marginLeft: 10 }} margin='normal' />
+                            <div key={station.number} style={{ ...wideFieldStyle, display: 'flex' }}>
+                                <div style={{ flex: 'auto' }}>
+                                    <TextField {...bindProps(station.latField, textFieldPropKeys, formProps, otherProps) } label={station.latLabel} required />
+                                </div>
+                                <div style={{flex: 'none', width: 8}}></div>
+                                <div style={{ flex: 'auto' }}>
+                                    <TextField {...bindProps(station.lngField, textFieldPropKeys, formProps, otherProps) } label={station.lngLabel} required />
+                                </div>
                             </div>
                         ))}
-                        <div><FormControlLabel control={<Checkbox {...bindProps('isActive', ['checked', 'onChange', 'disabled'], formProps) } />} label='Active' margin='normal'/></div>
+                        <div style={fieldStyle}><FormControlLabel control={<Checkbox {...bindProps('isActive', ['checked', 'onChange', 'disabled'], formProps, otherProps) } />} label='Active' /></div>
                     </form>
                 );
             }}
@@ -102,4 +119,7 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes }) => {
     </Paper>
 };
 
-export default withStyles(styles)(LiftForm);
+export default compose(
+    withStyles(styles),
+    withWidth()
+)(LiftForm);

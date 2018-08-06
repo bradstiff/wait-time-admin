@@ -2,9 +2,10 @@ import warning from 'warning';
 
 //Automatically bind requested Mui field props to Formik API props. Reduces boilerplate.
 
-export default (name, fieldPropKeys, formProps) => {
+export default (name, fieldPropKeys, formProps, otherProps) => {
     const boundProps = {
         name,
+        ...(otherProps || {}),
     };
     for (const propKey of fieldPropKeys) {
         if (['value', 'checked'].includes(propKey)) {

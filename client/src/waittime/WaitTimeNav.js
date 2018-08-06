@@ -66,16 +66,20 @@ class WaitTimeNav extends Component {
         const { resort, date, classes, width } = this.props;
         const dateDisplayFormat = isWidthUp('sm', width)
             ? 'dddd, LL'
-            : 'ddd, LL';
+            : 'ddd, ll';
         const dateNavStyle = isWidthUp('sm', width)
             ? { minWidth: 400, display: 'inline-flex' }
-            : { padding: 10 };
+            : { padding: '0px 10px' };
 
         return (
             <div>
                 <AppBar position="static" color='default'>
                     <Toolbar>
-                        <IconButton className={classes.menuButton} aria-label="Menu" onClick={() => this.handleToggleMenu(true)}>
+                        <IconButton
+                            className={classes.menuButton}
+                            aria-label="Menu"
+                            onClick={() => this.handleToggleMenu(true)}
+                        >
                             <MenuIcon />
                         </IconButton>
                         <ResortName>{(resort && resort.name) || 'Loading'} Wait Times</ResortName>
