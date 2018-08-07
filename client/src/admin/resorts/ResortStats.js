@@ -35,9 +35,6 @@ const query = gql`
 `;
 
 const styles = theme => ({
-    toolbar: {
-        //        paddingRight: theme.spacing.unit,
-    },
     spacer: {
         flex: 'auto',
     },
@@ -47,6 +44,9 @@ const styles = theme => ({
     },
     title: {
         flex: 'none',
+    },
+    tableContainer: {
+        overflowY: 'scroll',
     },
 });
 
@@ -82,7 +82,7 @@ class ResortStats extends Component {
         ];
         return (
             <Paper>
-                <Toolbar className={classes.toolbar}>
+                <Toolbar>
                     <div className={classes.title}>
                         <Typography variant="subheading">
                             {resort.name} Stats
@@ -105,7 +105,7 @@ class ResortStats extends Component {
                     </div>
                 </Toolbar>
                 {upliftGroupings && (
-                    <div>
+                    <div className={classes.tableContainer}>
                         <Table>
                             <SortEnabledTableHead
                                 order={order}

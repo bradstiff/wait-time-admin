@@ -48,19 +48,13 @@ const query = gql`
 `;
 
 const columnData = [
-    { field: 'name', label: 'Name' },
-    { field: 'typeID', label: 'Type' },
-    { field: 'resortID', label: 'Resort' },
-    { field: 'isActive', label: 'Active' },
+    { field: 'name', label: 'Name', padding: 'dense', },
+    { field: 'typeID', label: 'Type', padding: 'dense',  },
+    { field: 'resortID', label: 'Resort', padding: 'dense',  },
+    { field: 'isActive', label: 'Active', padding: 'dense',  },
 ];
 
 const styles = theme => ({
-    paper: {
-        //backgroundColor: '#2F2F2F',
-    },
-    toolbar: {
-        //paddingRight: theme.spacing.unit,
-    },
     spacer: {
         flex: 'auto',
     },
@@ -71,9 +65,8 @@ const styles = theme => ({
     title: {
         flex: 'none',
     },
-    table: {
-    },
-    row: {
+    tableContainer: {
+        overflowY: 'scroll',
     },
 });
 
@@ -148,8 +141,8 @@ class Lifts extends Component {
         ];
 
         return (
-            <Paper className={classes.paper}>
-                <Toolbar className={classes.toolbar}>
+            <Paper>
+                <Toolbar>
                     <div className={classes.title}>
                         <Typography variant="headline">
                             Lifts
@@ -178,8 +171,8 @@ class Lifts extends Component {
                     </Collapse>
                 </Hidden>
                 {liftList.count && (
-                    <div>
-                        <Table className={classes.table}>
+                    <div className={classes.tableContainer}>
+                        <Table>
                             <SortEnabledTableHead
                                 order={order}
                                 orderBy={orderBy}
@@ -190,11 +183,11 @@ class Lifts extends Component {
                                 {liftList.lifts
                                     .slice()
                                     .map(lift => (
-                                        <TableRow key={lift.id} className={classes.row}>
-                                            <TableCell component="th" scope="row"><LinkButton to={Locations.Lift.toUrl({ id: lift.id })}>{lift.name}</LinkButton></TableCell>
-                                            <TableCell>{lift.type.description}</TableCell>
-                                            <TableCell>{lift.resort ? lift.resort.name : ''}</TableCell>
-                                            <TableCell>{lift.isActive ? '✓' : ''}</TableCell>
+                                        <TableRow key={lift.id}>
+                                            <TableCell component="th" scope="row" padding='dense'><LinkButton to={Locations.Lift.toUrl({ id: lift.id })}>{lift.name}</LinkButton></TableCell>
+                                            <TableCell padding='dense'>{lift.type.description}</TableCell>
+                                            <TableCell padding='dense'>{lift.resort ? lift.resort.name : ''}</TableCell>
+                                            <TableCell padding='dense'>{lift.isActive ? '✓' : ''}</TableCell>
                                         </TableRow>
                                     ))
                                 }

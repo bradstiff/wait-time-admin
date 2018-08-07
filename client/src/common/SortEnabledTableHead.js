@@ -13,7 +13,7 @@ class SortEnabledTableHead extends Component {
     };
 
     render() {
-        const { columns, order, orderBy, padding } = this.props;
+        const { columns, order, orderBy } = this.props;
         const orderByCol = columns.find(column => column.field === orderBy);
         return (
             <TableHead>

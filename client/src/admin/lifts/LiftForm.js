@@ -48,10 +48,12 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes, width }) => {
         model[station.lngField] = Yup.number().min(-180).max(180).required().label(station.lngLabel);
     });
     const fieldStyle = {
-        width: Math.min(200, window.innerWidth - 16)
+        width: 200,
+        maxWidth: '100%',
     };
     const wideFieldStyle = {
-        width: Math.min(400, window.innerWidth - 16)
+        width: 400,
+        maxWidth: '100%',
     };
     return <Paper className={classes.root}>
         <Formik
@@ -111,7 +113,9 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes, width }) => {
                                 </div>
                             </div>
                         ))}
-                        <div style={fieldStyle}><FormControlLabel control={<Checkbox {...bindProps('isActive', ['checked', 'onChange', 'disabled'], formProps, otherProps) } />} label='Active' /></div>
+                        <div style={fieldStyle}>
+                            <FormControlLabel control={<Checkbox {...bindProps('isActive', ['checked', 'onChange', 'disabled'], formProps, otherProps) } />} label='Active' />
+                        </div>
                     </form>
                 );
             }}

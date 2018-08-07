@@ -33,9 +33,6 @@ const query = gql`
 `;
 
 const styles = theme => ({
-    toolbar: {
-//        paddingRight: theme.spacing.unit,
-    },
     spacer: {
         flex: 'auto',
     },
@@ -45,6 +42,9 @@ const styles = theme => ({
     },
     title: {
         flex: 'none',
+    },
+    tableContainer: {
+        overflowY: 'scroll',
     },
 });
 
@@ -59,7 +59,7 @@ class LiftStats extends React.Component {
         const { upliftGroupings } = lift;
         return (
             <Paper>
-                <Toolbar className={classes.toolbar}>
+                <Toolbar>
                     <div className={classes.title}>
                         <Typography variant="subheading">
                             {lift.name} Stats
@@ -81,7 +81,7 @@ class LiftStats extends React.Component {
                     </div>
                 </Toolbar>
                 {upliftGroupings && (
-                    <div>
+                    <div className={classes.tableContainer}>
                         <Table>
                             <TableHead>
                                 <TableRow>
