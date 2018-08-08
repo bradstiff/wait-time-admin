@@ -104,11 +104,11 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes, width }) => {
                         </div>
                         {stationMeta.map(station => (//setting minWidth below enables fullWidth to work
                             <div key={station.number} style={{ ...wideFieldStyle, display: 'flex' }}>
-                                <div style={{ flex: 'auto', minWidth: 100 }}>
+                                <div style={{ flex: 'auto', minWidth: 160 }}>
                                     <TextField {...bindProps(station.latField, textFieldPropKeys, formProps, otherProps) } label={station.latLabel} required />
                                 </div>
                                 <div style={{flex: 'none', width: 8}}></div>
-                                <div style={{ flex: 'auto', minWidth: 100 }}>
+                                <div style={{ flex: 'auto', minWidth: 160 }}>
                                     <TextField {...bindProps(station.lngField, textFieldPropKeys, formProps, otherProps) } label={station.lngLabel} required />
                                 </div>
                             </div>
