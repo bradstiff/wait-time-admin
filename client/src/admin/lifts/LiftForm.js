@@ -102,7 +102,7 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes, width }) => {
                                 )}
                             </ResortData>
                         </div>
-                        {stationMeta.map(station => (//setting minWidth below causes mui to not override flex item width
+                        {stationMeta.map(station => (//setting minWidth below enables fullWidth to work
                             <div key={station.number} style={{ ...wideFieldStyle, display: 'flex' }}>
                                 <div style={{ flex: 'auto', minWidth: 0 }}>
                                     <TextField {...bindProps(station.latField, textFieldPropKeys, formProps, otherProps) } label={station.latLabel} required />
