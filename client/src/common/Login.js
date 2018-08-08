@@ -20,6 +20,10 @@ const styles = theme => ({
     root: {
         padding: theme.spacing.unit,
     },
+    textField: {
+        width: 400,
+        maxWidth: '100%',
+    },
 })
 
 class Login extends React.Component {
@@ -92,10 +96,18 @@ const LoginDialog = ({ open, message, onSubmit, onCancel, classes }) => {
                 const formProps = {
                     ...formikProps,
                 };
+                const otherProps = {
+                    margin: 'normal',
+                    fullWidth: true,
+                };
                 return (
                     <form onSubmit={handleSubmit}>
-                        <div><TextField {...bindProps('username', textFieldPropKeys, formProps) } label='Username' style={{ width: 400 }} inputProps={{ maxLength: 100, autoComplete: 'off' }} margin='normal' /></div>
-                        <div><TextField {...bindProps('password', textFieldPropKeys, formProps) } label='Password' style={{ width: 400 }} inputProps={{ maxLength: 100, autoComplete: 'off' }} margin='normal' /></div>
+                        <div className={classes.textField}>
+                            <TextField {...bindProps('username', textFieldPropKeys, formProps, otherProps) } label='Username' inputProps={{ maxLength: 100, autoComplete: 'off' }} />
+                        </div>
+                        <div className={classes.textField}>
+                            <TextField {...bindProps('password', textFieldPropKeys, formProps, otherProps) } label='Password' inputProps={{ maxLength: 100, autoComplete: 'off' }} type='password' />
+                        </div>
                         <div>
                             <Button color='primary' onClick={onCancel} disabled={isSubmitting}>Cancel</Button>
                             <Button color='primary' variant='outlined' type='submit' disabled={isSubmitting}>Login</Button>
