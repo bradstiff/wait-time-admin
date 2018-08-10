@@ -37,9 +37,9 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes, width }) => {
             number: station.number,
             name: station.name,
             latField: `station${station.number}Lat`,
-            latLabel: station.name + ' latitude',
+            latLabel: station.name + ' lat',
             lngField: `station${station.number}Lng`,
-            lngLabel: station.name + ' longitude',
+            lngLabel: station.name + ' long',
         }));
     stationMeta.forEach(station => {
         //a lift has between two and five stations, each with lat and lng
@@ -104,11 +104,11 @@ const LiftForm = ({ lift, title, canEdit, submit, close, classes, width }) => {
                         </div>
                         {stationMeta.map(station => (//setting minWidth below enables fullWidth to work
                             <div key={station.number} style={{ ...wideFieldStyle, display: 'flex' }}>
-                                <div style={{ flex: 'auto', minWidth: 160 }}>
+                                <div style={{ flex: 'auto', minWidth: 0 }}>
                                     <TextField {...bindProps(station.latField, textFieldPropKeys, formProps, otherProps) } label={station.latLabel} required />
                                 </div>
                                 <div style={{flex: 'none', width: 8}}></div>
-                                <div style={{ flex: 'auto', minWidth: 160 }}>
+                                <div style={{ flex: 'auto', minWidth: 0 }}>
                                     <TextField {...bindProps(station.lngField, textFieldPropKeys, formProps, otherProps) } label={station.lngLabel} required />
                                 </div>
                             </div>
