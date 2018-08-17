@@ -137,6 +137,8 @@ class Location {
         for (const key in qsParams) {
             if (qsParams[key] === 'null') {
                 qsParams[key] = null;
+            } else if (qsParams[key] === 'undefined') {
+                qsParams[key] = undefined;
             }
         }
         let pathValues, qsValues;

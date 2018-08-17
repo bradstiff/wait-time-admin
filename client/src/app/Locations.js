@@ -25,7 +25,7 @@ const Locations = {
         order: order,
         orderBy: Yup.string().oneOf(['name', 'typeID', 'resortID', 'isActive']).default('name'),
         showFilter: Yup.boolean().default(false),
-        isActive: Yup.boolean().default(true),
+        isActive: Yup.boolean(), 
         typeID: wholeNbr,
         resortID: wholeNbr.nullable(), //'No resort assigned' is equivalent to ResortID=null
         name: Yup.string(),

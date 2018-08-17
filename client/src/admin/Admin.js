@@ -80,7 +80,7 @@ class Admin extends Component {
                         </Hidden>
                         <Tabs value={activeTab} className={classes.toolbarTabs}>
                             <Tab label="Resorts" component={Locations.Resorts.toLink()} />
-                            <Tab label="Lifts" component={Locations.Lifts.toLink()} />
+                            <Tab label="Lifts" component={Locations.Lifts.toLink({ isActive: true })} />
                         </Tabs>
                         <UserConsumer>
                             {({ user, onLogout }) => user
