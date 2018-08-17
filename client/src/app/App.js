@@ -1,8 +1,11 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import Rollbar from 'rollbar';
+import moment from 'moment';
+import 'moment/min/locales';
+import browserLocale from 'browser-locale';
 
 import styled from 'styled-components';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -23,6 +26,28 @@ import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 
 let client;
 try {
+    Rollbar.init({
+        accessToken: "77405bf881c942f5a153ceb6b8be9081",
+        captureUncaught: true,
+        captureUnhandledRejections: true,
+        payload: {
+            environment: process.env.NODE_ENV
+        }
+    });
+
+    //window.addEventListener('error', function (event) {
+    //    let { error } = event;
+    //    console.log(error.stack);
+    //    // Ignore errors that will be processed by componentDidCatch: https://github.com/facebook/react/issues/10474
+    //    if (error.stack && error.stack.indexOf('invokeGuardedCallbackDev') >= 0) {
+    //        return true;
+    //    }
+    //    Rollbar.error(error);
+    //    ReactDOM.render(<Error />, document.getElementById('root'));
+    //});
+
+    moment.locale(browserLocale());
+
     client = new ApolloClient({
         clientState: {
             resolvers: {
@@ -92,16 +117,18 @@ class App extends React.Component {
                     <MuiThemeProvider theme={theme}>
                         <Background>
                             <ErrorBoundary component={ErrorPage}>
-                                <UserProvider>
-                                    <QueryProgressProvider>
-                                        <Switch>
-                                            <Route path='/admin' component={Admin} />
-                                            {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
-                                            <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
-                                            <Route component={NotFound} />
-                                        </Switch>
-                                    </QueryProgressProvider>
-                                </UserProvider>
+                                <BrowserRouter>
+                                    <UserProvider>
+                                        <QueryProgressProvider>
+                                            <Switch>
+                                                <Route path='/admin' component={Admin} />
+                                                {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
+                                                <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
+                                                <Route component={NotFound} />
+                                            </Switch>
+                                        </QueryProgressProvider>
+                                    </UserProvider>
+                                </BrowserRouter>
                             </ErrorBoundary>
                         </Background>
                     </MuiThemeProvider>

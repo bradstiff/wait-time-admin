@@ -39,9 +39,11 @@ const styles = theme => ({
     content: {
         marginTop: theme.spacing.unit * 2,
     },
+    title: {
+        paddingRight: theme.spacing.unit * 2,
+    },
     toolbarTabs: {
         flex: 'auto',
-        paddingLeft: theme.spacing.unit * 2,
     },
 });
 
@@ -74,7 +76,7 @@ class Admin extends Component {
                 <AppBar position="static" color='default'>
                     <Toolbar>
                         <Hidden xsDown>
-                            <Typography variant="title">Wait Time Admin</Typography>
+                            <Typography variant="title" className={classes.title}>Wait Time Admin</Typography>
                         </Hidden>
                         <Tabs value={activeTab} className={classes.toolbarTabs}>
                             <Tab label="Resorts" component={Locations.Resorts.toLink()} />

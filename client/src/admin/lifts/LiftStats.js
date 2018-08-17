@@ -44,7 +44,7 @@ const styles = theme => ({
         flex: 'none',
     },
     tableContainer: {
-        overflowY: 'scroll',
+        overflowX: 'auto',
     },
 });
 
