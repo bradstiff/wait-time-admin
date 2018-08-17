@@ -62,7 +62,7 @@ const WaitTime = ({ slug, date: searchDate, resort, loading }) => {
             : !resort.dates.length
                 ? { text: 'No wait time data exists for the selected resort. Please select either Serre Chevalier Vallee, Steamboat or Winter Park.', severity: 2 }
                 : searchDate && !resort.dates.find(entry => Date.parse(entry.date) === Date.parse(searchDate))
-                    ? { text: 'No wait time data exists for the selected date. Please select a highlighted date from the calendar.', severity: 2 }
+                    ? { text: 'No wait time data exists for the selected date. Please select a date from the calendar.', severity: 2 }
                     : null;
 
     return (

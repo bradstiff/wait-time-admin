@@ -63,7 +63,14 @@ try {
                     },
                 },
                 WaitTimeDate: {
-                    selectedTimestamp: (waitTimeDate) => waitTimeDate.timePeriods && waitTimeDate.timePeriods.length && waitTimeDate.timePeriods[0].timestamp,
+                    selectedTimestamp: waitTimeDate => {
+                        if (!waitTimeDate.timePeriods || !waitTimeDate.timePeriods.length) {
+                            return null;
+                        }
+                        //default to middle time period
+                        const middleIndex = Math.round(waitTimeDate.timePeriods.length / 2);
+                        return waitTimeDate.timePeriods[middleIndex].timestamp;
+                    },
                 },
             },
         },

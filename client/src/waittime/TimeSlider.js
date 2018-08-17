@@ -7,13 +7,24 @@ import withWidth from '@material-ui/core/withWidth';
 
 import 'rc-slider/assets/index.css';
 
+const handleStyle = {
+    borderColor: '#D44126',
+};
+const containerStyle = {
+    padding: '5px 25px 20px 25px',
+    overflow: 'hidden',
+};
+
 class TimeSlider extends Component {
     handleSelectedTimePeriodChange = timestamp => {
         this.props.selectTimePeriod(this.props.waitTimeDate, timestamp);
     }
 
     render() {
-        const { timePeriods, selectedTimestamp } = this.props.waitTimeDate || {};
+        if (!this.props.waitTimeDate) {
+            return null;
+        }
+        const { timePeriods, selectedTimestamp } = this.props.waitTimeDate;
         if (!timePeriods || !timePeriods.length) {
             return null;
         }
@@ -28,7 +39,7 @@ class TimeSlider extends Component {
         let minutesAtPreviousMark = 0;
         const endTimePeriod = timePeriods[timePeriods.length - 1];
         const minutesAtEndMark = endTimePeriod.timestamp / 60;
-        const marks = timePeriods.reduce((result, timePeriod) => {
+        const marks = timePeriods.reduce((acc, timePeriod) => {
             const minutes = timePeriod.timestamp / 60;
             const makeMark = minutesAtPreviousMark === 0 || // first timeslot
                 timePeriod === endTimePeriod || // end timeslot
@@ -36,22 +47,11 @@ class TimeSlider extends Component {
                     minutesAtEndMark - minutes >= minutesPerMark / 2); // and this mark would not be too close to end mark
 
             if (makeMark) {
-                result = {
-                    [timePeriod.timestamp.toString()]: moment.unix(timePeriod.timestamp).utc().format(timeFormat),
-                    ...result,
-                };
+                acc[timePeriod.timestamp.toString()] = moment.unix(timePeriod.timestamp).utc().format(timeFormat);
                 minutesAtPreviousMark = minutes;
             }
-            return result;
+            return acc;
         }, {});
-
-        const handleStyle = {
-            borderColor: '#D44126',
-        };
-        const containerStyle = {
-            padding: '5px 25px 20px 25px',
-            overflow: 'hidden',
-        };
 
         return (
             <div style={containerStyle}>
