@@ -129,7 +129,7 @@ class App extends React.Component {
                                         <QueryProgressProvider>
                                             <Switch>
                                                 <Route path='/admin' component={Admin} />
-                                                {Locations.WaitTime.toRoute({ component: WaitTime, notFound: NotFound }, true)}
+                                                {Locations.WaitTime.toRoute({ component: WaitTime, noMatch: NotFound }, true)}
                                                 <Redirect from='/' to={Locations.WaitTime.toUrl({ slug: 'serre-chevalier-vallee' })} exact />
                                                 <Route component={NotFound} />
                                             </Switch>

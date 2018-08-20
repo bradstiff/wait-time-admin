@@ -31,7 +31,7 @@ class Location {
     }
 
     toRoute = (renderOption, exact = false, strict = false, sensitive = false) => {
-        const { component, render, children, notFound } = renderOption;
+        const { component, render, children, noMatch } = renderOption;
         //same warnings as Route
         warning(
             !(component && render),
@@ -74,30 +74,30 @@ class Location {
             sensitive,
         };
 
-            if (component) {
-                routeProps.render = props => {
-                    const propsWithParams = withParams(props);
-                    return propsWithParams
-                        ? React.createElement(component, propsWithParams)
-                        : React.createElement(notFound);
-                }
-            } else if (render) {
-                routeProps.render = props => {
-                    const propsWithParams = withParams(props);
-                    return propsWithParams
-                        ? render(propsWithParams)
-                        : React.createElement(notFound);
-                }
-            } else if (typeof children === "function") {
-                routeProps.children = props => {
-                    const propsWithParams = withParams(props);
-                    return propsWithParams
-                        ? children(propsWithParams)
-                        : React.createElement(notFound);
-                }
-            } else if (children && !isEmptyChildren(children)) {
-                routeProps.children = children;
+        if (component) {
+            routeProps.render = props => {
+                const propsWithParams = withParams(props);
+                return propsWithParams
+                    ? React.createElement(component, propsWithParams)
+                    : React.createElement(noMatch);
             }
+        } else if (render) {
+            routeProps.render = props => {
+                const propsWithParams = withParams(props);
+                return propsWithParams
+                    ? render(propsWithParams)
+                    : React.createElement(noMatch);
+            }
+        } else if (typeof children === "function") {
+            routeProps.children = props => {
+                const propsWithParams = withParams(props);
+                return propsWithParams
+                    ? children(propsWithParams)
+                    : React.createElement(noMatch);
+            }
+        } else if (children && !isEmptyChildren(children)) {
+            routeProps.children = children;
+        }
 
         return <Route {...routeProps} />;
     }

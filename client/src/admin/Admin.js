@@ -92,16 +92,16 @@ class Admin extends Component {
                 </AppBar>
                 <div className={classes.content}>
                     <Switch>
-                        {Locations.Resorts.toRoute({ component: Resorts, notFound: NotFound }, true)}
-                        {Locations.Resort.toRoute({ component: Resort, notFound: NotFound }, true)}
-                        {Locations.ResortDetails.toRoute({ component: ResortDetails, notFound: NotFound }, true)}
-                        {Locations.ResortLifts.toRoute({ component: ResortLifts, notFound: NotFound }, true)}
-                        {Locations.ResortStats.toRoute({ component: ResortStats, notFound: NotFound }, true)}
-                        {Locations.Lifts.toRoute({ component: Lifts, notFound: NotFound }, true)}
-                        {Locations.Lift.toRoute({ component: Lift, notFound: NotFound }, true)}
-                        {Locations.LiftDetails.toRoute({ component: LiftDetails, notFound: NotFound }, true)}
-                        {Locations.LiftUplifts.toRoute({ component: LiftUplifts, notFound: NotFound }, true)}
-                        {Locations.LiftStats.toRoute({ component: LiftStats, notFound: NotFound }, true)}
+                        {Locations.Resorts.toRoute({ component: Resorts, noMatch: NotFound }, true)}
+                        {Locations.Resort.toRoute({ component: Resort, noMatch: NotFound }, true)}
+                        {Locations.ResortDetails.toRoute({ component: ResortDetails, noMatch: NotFound }, true)}
+                        {Locations.ResortLifts.toRoute({ component: ResortLifts, noMatch: NotFound }, true)}
+                        {Locations.ResortStats.toRoute({ component: ResortStats, noMatch: NotFound }, true)}
+                        {Locations.Lifts.toRoute({ component: Lifts, noMatch: NotFound }, true)}
+                        {Locations.Lift.toRoute({ component: Lift, noMatch: NotFound }, true)}
+                        {Locations.LiftDetails.toRoute({ component: LiftDetails, noMatch: NotFound }, true)}
+                        {Locations.LiftUplifts.toRoute({ component: LiftUplifts, noMatch: NotFound }, true)}
+                        {Locations.LiftStats.toRoute({ component: LiftStats, noMatch: NotFound }, true)}
                         <Route component={NotFound} />
                     </Switch>
                 </div>
