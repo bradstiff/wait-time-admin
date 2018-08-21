@@ -1,7 +1,7 @@
 import React from 'react';
 import ModalCircularProgress from '../common/ModalCircularProgress';
 
-const QueryProgressContext = React.createContext({
+export const QueryProgressContext = React.createContext({
     inProgress: false,
     onStart: () => { },
     onEnd: () => { },

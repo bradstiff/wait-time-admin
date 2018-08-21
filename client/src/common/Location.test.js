@@ -62,7 +62,7 @@ function LocationTest() {
             <Link to={Locations.About.toUrl()}>About</Link>
             <Switch>
                 {Locations.Home.toRoute({ component: Home, noMatch: NoMatch }, true)}
-                {Locations.About.toRoute({ component: About, noMatch: NoMatch }, true)}
+                {Locations.About.toRoute({ render: () => <About />, noMatch: NoMatch }, true)}
                 {Locations.ResourceList.toRoute({ component: ResourceList, noMatch: NoMatch }, true)}
                 {Locations.Resource.toRoute({ component: Resource, noMatch: NoMatch }, true)}
                 <Route component={NoMatch} />
@@ -79,11 +79,12 @@ afterEach(() => {
 function renderWithRouter(ui, url = '/') {
     const history = createMemoryHistory({ initialEntries: [url] });
     return {
-        ...render(<Router history={history}>{ui}</Router>), history,
+        ...render(<Router history={history}>{ui}</Router>),
+        history,
     }
 }
 
-test('Navigating from one location to another', () => {
+test('navigating from one matched location to another, first uses component prop, second uses render prop', () => {
     const { container, getByText } = renderWithRouter(<LocationTest />);
     expect(container.innerHTML).toMatch('Home');
     const leftClick = { button: 0 };
@@ -91,12 +92,12 @@ test('Navigating from one location to another', () => {
     expect(container.innerHTML).toMatch('About');
 })
 
-test('Non-matching URL', () => {
+test('navigating to non-matching URL', () => {
     const { container } = renderWithRouter(<LocationTest />, '/should-not-match');
     expect(container.innerHTML).toMatch('No match');
 })
 
-test('Int path param and supplied optional qs param', () => {
+test('building and parsing URL with int path param and supplied optional qs param', () => {
     const locationParams = { id: 1, date: '2018-08-20' };
     const serializedUrl = Locations.Resource.toUrl(locationParams);
     expect(serializedUrl).toBe('/resources/1?date=2018-08-20');
@@ -107,7 +108,7 @@ test('Int path param and supplied optional qs param', () => {
     expect(receivedProps.date).toBe('2018-08-20');
 })
 
-test('Int path param and omitted optional qs param', () => {
+test('building and parsing URL with int path param and omitted optional qs param', () => {
     const locationParams = { id: 1 };
     const serializedUrl = Locations.Resource.toUrl(locationParams);
     expect(serializedUrl).toBe('/resources/1');
@@ -118,17 +119,17 @@ test('Int path param and omitted optional qs param', () => {
     expect(receivedProps.date).toBe(undefined);
 })
 
-test('Invalid int path param', () => {
+test('parsing URL with invalid int path param', () => {
     const { container } = renderWithRouter(<LocationTest />, '/resources/a');
     expect(container.innerHTML).toMatch('No match');
 })
 
-test('Invalid date qs param', () => {
+test('parsing URL with invalid date qs param', () => {
     const { container } = renderWithRouter(<LocationTest />, '/resources/1?date=2018-123-123');
     expect(container.innerHTML).toMatch('No match');
 })
 
-test('Omitted-with-default qs params', () => {
+test('building and parsing URL with omitted-with-default qs params', () => {
     const serializedUrl = Locations.ResourceList.toUrl();
     expect(serializedUrl).toBe('/resources'); //to avoid clutter, omitted-with-default qs params are not written to the url
 
@@ -141,7 +142,7 @@ test('Omitted-with-default qs params', () => {
     expect(receivedProps.isActive).toBe(undefined);
 })
 
-test('Supplied qs params', () => {
+test('building and parsing URL with supplied qs params', () => {
     const locationParams = {
         page: 1,
         rowsPerPage: 50,
@@ -159,7 +160,7 @@ test('Supplied qs params', () => {
     expect(receivedProps.isActive).toBe(true);
 })
 
-test('Invalid qs params', () => {
+test('parsing URL with invalid qs params', () => {
     const { container } = renderWithRouter(<LocationTest />, '/resources?rowsPerPage=10');
     expect(container.innerHTML).toMatch('No match');
 })
