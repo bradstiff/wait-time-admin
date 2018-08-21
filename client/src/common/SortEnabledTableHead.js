@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import warning from 'warning';
 
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
@@ -75,7 +76,7 @@ const valueCompare = (val1, val2) => {
         return 1;
     } else {
         return (typeof val1 === 'string' && typeof val2 === 'string')
-            ? val1.localeCompare(val2)
+            ? val1.localeCompare(val2, 'en', { sensitivity: 'base' })
             : val1 - val2;
     }
 }
@@ -91,6 +92,10 @@ const objectCompare = (obj1, obj2, compareField, keyField) => {
 
 export const makeCompareFn = (order, orderBy, columns, keyField) => (a, b) => {
     const orderByCol = columns.find(column => column.field === orderBy);
+    if (!orderByCol) {
+        warning(orderByCol, `SortEnabledTableHead columns prop does not contain a column named '${orderBy}'.`);
+        return false;
+    }
     const compareField = orderByCol.compareField || orderByCol.field;
     return order === 'asc'
         ? objectCompare(a, b, compareField, keyField)
