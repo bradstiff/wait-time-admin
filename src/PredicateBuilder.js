@@ -40,8 +40,8 @@ export default class PredicateBuilder {
         }
         return 'WHERE ' + this.predicatesWithValues
             .map(predicate => {
-                return predicate.value === null
-                    ? `${predicate.queryFieldName} is null`
+                return predicate.value === null ? `${predicate.queryFieldName} is null`
+                    : predicate.operator.toUpperCase() === 'LIKE' ? `${predicate.queryFieldName} COLLATE Latin1_general_CI_AI LIKE @${predicate.parameterName} COLLATE Latin1_general_CI_AI`
                     : `${predicate.queryFieldName} ${predicate.operator} @${predicate.parameterName}`;
             })
             .join(' AND ');
