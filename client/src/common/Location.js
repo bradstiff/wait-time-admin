@@ -5,6 +5,8 @@ import warning from 'warning';
 import * as Yup from 'yup';
 import qs from 'querystringify';
 
+import Log from './Log';
+
 const isEmptyObject = obj => Object.keys(obj).length === 0 && obj.constructor === Object;
 const isEmptyChildren = children => React.Children.count(children) === 0;
 
@@ -150,7 +152,7 @@ class Location {
                 ? this._qsSchema.validateSync(qsParams)
                 : {};
         } catch (err) {
-            console.log(err);
+            Log.error(err, 'Location.parseParams');
             return null;
         }
 

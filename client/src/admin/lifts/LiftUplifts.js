@@ -92,6 +92,7 @@ class LiftUplifts extends Component {
         const filterControls = [
             <SelectMenu
                 id='season'
+                key='season'
                 options={[
                     { text: 'All seasons' },
                     { text: '2014 - 2015', value: 2014 },
@@ -104,6 +105,7 @@ class LiftUplifts extends Component {
             />,
             <SelectMenu
                 id='month'
+                key='month'
                 options={[
                     { text: 'All months' },
                     { text: 'January', value: 1 },
@@ -124,6 +126,7 @@ class LiftUplifts extends Component {
             />,
             <SelectMenu
                 id='day'
+                key='day'
                 options={[
                     { text: 'All days' },
                     { text: 'Sunday', value: 1 },
@@ -139,6 +142,7 @@ class LiftUplifts extends Component {
             />,
             <SelectMenu
                 id='hour'
+                key='hour'
                 options={[
                     { text: 'All hours' },
                     { text: '8AM - 9AM', value: 8 },
