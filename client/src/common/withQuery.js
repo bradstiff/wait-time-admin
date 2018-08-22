@@ -20,6 +20,7 @@ const withQuery = (query, options, notFound) => component => {
         render() {
             const { data, loading, error } = this.props;
             if (error) {
+                console.log(error);
                 throw error;
             }
 

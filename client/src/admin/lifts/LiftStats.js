@@ -17,7 +17,7 @@ import LiftNotFound from '../../app/LiftNotFound';
 import Locations from '../../app/Locations';
 import withQuery from '../../common/withQuery';
 
-const query = gql`
+export const UPLIFT_STATS_BY_LIFT_QUERY = gql`
     query UpliftStatsByLift($id: Int!, $groupBy: UpliftGroupBy!) {
         lift(id: $id) { 
             id,
@@ -107,7 +107,12 @@ class LiftStats extends React.Component {
     };
 }
 
+const mapPropsToVariables = props => ({
+    id: props.id,
+    groupBy: props.groupBy
+});
+
 export default compose(
     withStyles(styles),
-    withQuery(query, 'lift', LiftNotFound),
+    withQuery(UPLIFT_STATS_BY_LIFT_QUERY, { selector: 'lift', variables: mapPropsToVariables }, LiftNotFound),
 )(LiftStats);
