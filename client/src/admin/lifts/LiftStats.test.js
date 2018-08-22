@@ -1,13 +1,11 @@
 import React from 'react';
 import { render, cleanup, wait, fireEvent } from 'react-testing-library';
-import gql from 'graphql-tag';
 import { MockedProvider } from 'react-apollo/test-utils';
-import { Route, Router, Switch } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 
+import { IntegrationTestContainer } from '../../app/App.test';
 import Locations from '../../app/Locations';
-import NotFound from '../../app/NotFound';
-import LiftStats, { UPLIFT_STATS_BY_LIFT_QUERY } from './LiftStats';
+import { UPLIFT_STATS_BY_LIFT_QUERY } from './LiftStats';
 
 const mocks = [
     {
@@ -149,25 +147,18 @@ const mocks = [
         },
     },];
 
-const history = createMemoryHistory({ initialEntries: [Locations.LiftStats.toUrl({ id: 1 })] });
-
-const TestContainer = () => (
-    <MockedProvider mocks={mocks} addTypename={false}>
-        <Router history={history}>
-            <Switch>
-                {Locations.LiftStats.toRoute({ component: LiftStats, noMatch: NotFound }, true)}
-                <Route component={NotFound} />
-            </Switch>
-        </Router>
-    </MockedProvider>
-);
-
 afterEach(cleanup);
 
+const history = createMemoryHistory({ initialEntries: [Locations.LiftStats.toUrl({ id: 1 })] });
+const TestApp = () => (
+    <MockedProvider mocks={mocks} addTypename={false}>
+        <IntegrationTestContainer history={history} />
+    </MockedProvider>
+);
 const firstColumn = container => [...container.querySelectorAll('tr > th:first-of-type')].map(th => th.innerHTML);
 
 test('renders stats table by selected group', async () => {
-    const { container, debug, getByText } = render(<TestContainer />);
+    const { container, debug, getByText } = render(<TestApp  />);
     //defaults to By Season
     await wait(() => expect(firstColumn(container)).toEqual(['Season', '2016 - 2017', '2017 - 2018']));
 
@@ -188,7 +179,7 @@ test('renders stats table by selected group', async () => {
 });
 
 test('renders LiftNotFound when mocked result is null for lift id', async () => {
-    history.push(Locations.LiftStats.toUrl({id: 2}))
-    const { container, debug, getByText } = render(<TestContainer />);
+    history.push(Locations.LiftStats.toUrl({ id: 2 }));
+    const { container, debug, getByText } = render(<TestApp />);
     await wait(() => expect(getByText('Page Not Found').toBeTruthy));
 });
