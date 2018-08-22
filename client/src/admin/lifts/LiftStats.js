@@ -114,5 +114,8 @@ const mapPropsToVariables = props => ({
 
 export default compose(
     withStyles(styles),
-    withQuery(UPLIFT_STATS_BY_LIFT_QUERY, { selector: 'lift', variables: mapPropsToVariables }, LiftNotFound),
+    withQuery(UPLIFT_STATS_BY_LIFT_QUERY, {
+        selector: 'lift',
+        variables: mapPropsToVariables
+    }, LiftNotFound),
 )(LiftStats);

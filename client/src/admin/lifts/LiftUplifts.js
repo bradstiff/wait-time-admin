@@ -24,7 +24,7 @@ import LiftNotFound from '../../app/LiftNotFound';
 import withQuery from '../../common/withQuery';
 import ToggleIconButton from '../../common/ToggleIconButton';
 
-const query = gql`
+export const UPLIFTS_BY_LIFT_QUERY = gql`
     query UpliftsByLift($id: Int!, $offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
         lift(id: $id) { 
             id,
@@ -219,19 +219,28 @@ class LiftUplifts extends Component {
                         />
                     </div>
                 )}
+                {upliftList.count === 0 && <Typography>No uplifts found.</Typography>}
             </Paper>
         );
     };
 }
 
+const mapPropsToVariables = props => ({
+    id: props.id,
+    offset: props.page * props.rowsPerPage,
+    limit: props.rowsPerPage,
+    orderBy: props.orderBy,
+    order: props.order,
+    seasonYear: props.seasonYear,
+    month: props.month,
+    day: props.day,
+    hour: props.hour,
+});
+
 export default compose(
     withStyles(styles),
-    withQuery(query, {
+    withQuery(UPLIFTS_BY_LIFT_QUERY, {
         selector: 'lift',
-        variables: props => ({
-            ...props,
-            offset: props.page * props.rowsPerPage,
-            limit: props.rowsPerPage,
-        }),
+        variables: mapPropsToVariables,
     }, LiftNotFound),
 )(LiftUplifts);

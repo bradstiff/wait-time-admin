@@ -6,6 +6,7 @@ import { Route, Router, Switch } from 'react-router-dom';
 import App from './App';
 import Locations from './Locations';
 import NotFound from './NotFound';
+import LiftUplifts from '../admin/lifts/LiftUplifts';
 import LiftStats from '../admin/lifts/LiftStats';
 
 it('renders without crashing', () => {
@@ -19,6 +20,7 @@ export const IntegrationTestContainer = ({ history }) => {
     return (
         <Router history={history}>
             <Switch>
+                {Locations.LiftUplifts.toRoute({ component: LiftUplifts, noMatch: NotFound }, true)}
                 {Locations.LiftStats.toRoute({ component: LiftStats, noMatch: NotFound }, true)}
                 <Route component={NotFound} />
             </Switch>
