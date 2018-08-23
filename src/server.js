@@ -67,7 +67,7 @@ if (isProduction) {
 }
 else {
     app.use(cors());
-    app.use('graphiql', graphiqlExpress({ endpointURL: config.app.graphqlPath }));
+    app.use('/graphiql', graphiqlExpress({ endpointURL: config.app.graphqlPath }));
 } 
 
 // MSSQL ConnectionPool establishes a 'probe connection' to verify the config. This is asynchronous.
