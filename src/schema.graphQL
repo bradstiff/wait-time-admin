@@ -1,35 +1,88 @@
 type Query {
+	"Retrieve all Resorts"
     resorts: [Resort!]!
+
+	"Retrieve a single Resort by ID"
     resort(id: Int!): Resort
+
+	"Retrieve a single Resort by Slug"
     resortBySlug(slug: String!): Resort
+
+	"Retrieve Wait Time data for a Resort and Date"
     waitTimeDate(resortSlug: String!, date: Date!): WaitTimeDate
-	liftList(offset: Int!, limit: Int!, orderBy: String!, order: String!, name: String, typeID: Int, resortID: Int, isActive: Boolean): LiftList!
+
+	"Retrieve a set of ordered Lifts, optionally filtering by Lift Type, Resort, Name, and Active status"
+	liftList(
+		"Number of Lifts to skip before retrieving"
+		offset: Int!, 
+
+		"Maximum number of Lifts to retrieve"
+		limit: Int!, 
+
+		orderBy: LiftOrderBy!, 
+		order: Order!, 
+		name: String, 
+		typeID: Int, 
+		resortID: Int, 
+		isActive: Boolean
+	): LiftList!
+
+	"Retrieve all Lifts that intersect a Bounding Box"
 	intersectingLifts(topLeft: LocationInput!, bottomRight: LocationInput!): [Lift!]
+
+	"Retrieve a single Lift by ID"
 	lift(id: Int!): Lift
-	uplifts(liftID: Int!, seasonYear: Int, month: Int, day: Int, hour: Int): [Uplift!]
 }
+
 type Mutation {
+	"Create a Resort"
 	createResort(name: String!, slug: String!, logoFilename: String!, trailMapFilename: String!, latitude: Float!, longitude: Float!, timezone: String!) : Resort
+
+	"Update a Resort"
 	updateResort(id: Int!, name: String!, slug: String!, logoFilename: String!, trailMapFilename: String!, latitude: Float!, longitude: Float!, timezone: String!) : Resort
-	updateResortAssignedLifts(id: Int!, liftIDs: [Int!]) : Resort
+
+	"Update the set of Lifts assigned to a Resort"
+	updateResortAssignedLifts(
+		"Resort ID"
+		id: Int!, 
+
+		"The complete set of Lift IDs that should be assigned to the Resort. "
+		liftIDs: [Int!]
+	) : Resort
+
+	"Update a Lift"
 	updateLift(id: Int!, name: String!, typeID: Int!, resortID: Int, occupancy: Int, isActive: Boolean!, station1Lat: Float!, station1Lng: Float!, station2Lat: Float!, station2Lng: Float!, station3Lat: Float, station3Lng: Float, station4Lat: Float, station4Lng: Float, station5Lat: Float, station5Lng: Float): Lift
 }
+
 type Resort {
     id: Int!
     name: String!
+
+	"A URL-friendly version of the Resort name"
     slug: String!
+
     logoFilename: String!
     trailMapFilename: String!
 	timezone: String!
 	location: Location
+
+	"The bounding polygon that encompasses all assigned Lifts"
 	liftEnvelope: [Location!]
+
+	"Does the Resort have Wait Time data"
 	hasWaitTimes: Boolean!
     sortOrder: Int!
+
+	"The dates for which Wait Time data exists"
     dates: [WaitTimeDate!]
+
+	"The most recent date for which Wait Time data exists"
 	lastDate: WaitTimeDate
+
     lifts: [Lift!]
 	upliftGroupings(groupBy: UpliftGroupBy!, groupBy2: UpliftGroupBy): [UpliftGrouping!]
 }
+
 type Lift {
     id: Int!
     name: String
@@ -37,25 +90,71 @@ type Lift {
 	type: LiftType!
 	occupancy: Int
 	isActive: Boolean!
+
+	"The Load and Unload stations, and any Mid stations if they exist."
 	stations: [LiftStation!]!
-	upliftList(offset: Int!, limit: Int!, orderBy: String!, order: String!, seasonYear: Int, month: Int, day: Int, hour: Int): UpliftList!
+
+	"A set of ordered Uplifts, optionally filtered by Season, Month, Day and Hour"
+	upliftList(
+		"Number of Uplifts to skip"
+		offset: Int!, 
+
+		"Maximum number of Uplifts to retrieve"
+		limit: Int!, 
+
+		"How the Uplifts should be ordered"
+		orderBy: UpliftOrderBy!, 
+
+		order: Order!, 
+
+		"The Season by which to filter, e.g., 2016 = '2016 - 2017'"
+		seasonYear: Int, 
+
+		"The Month by which to filter, e.g., 1 = 'January'"
+		month: Int, 
+
+		"The Day by which to filter, e.g., 1 = 'Sunday'"
+		day: Int, 
+
+		"The Hour by which to filter, e.g., 13 = '1PM - 2PM'"
+		hour: Int
+	): UpliftList!
+
+	"Aggregate Uplift Statistics, grouped by up to two dimensions"
 	upliftGroupings(groupBy: UpliftGroupBy!, groupBy2: UpliftGroupBy): [UpliftGrouping!]
 }
+
+"""
+Wait Time data for a given Resort and Date
+"""
 type WaitTimeDate {
 	id: String!
     resort: Resort!
     date: Date!
     timePeriods: [WaitTimePeriod!]
 }
+
+"""
+Wait Time data for a given Resort, Date, and 15 minute interval
+"""
 type WaitTimePeriod {
     timestamp: Int!
     resortID: Int!
     waitTimes: [WaitTime!]!
 }
+
+"""
+Average Wait Time for a given Resort, Date, 15 minute interval, and Lift
+"""
 type WaitTime {
     liftID: Int!
     seconds: Int!
 } 
+
+
+"""
+Number of Uplifts and Average Wait Time cross-tabbed by up to two UpliftGroupBys.
+"""
 type UpliftGrouping {
 	groupKey: Int!
 	groupDescription: String!
@@ -64,6 +163,7 @@ type UpliftGrouping {
 	upliftCount: Int!
 	waitTimeAverage: Int!
 }
+
 type Uplift {
 	id: Int!
 	lift: Lift!
@@ -84,28 +184,63 @@ input LocationInput {
 	lat: Float!
 	lng: Float!
 }
+
+"""
+A page of retrieved Lifts
+"""
 type LiftList {
+	"The total number of Lifts meeting the filter conditions. Can be more than the number of Lifts in the page."
 	count: Int!
 	lifts: [Lift!]!
 }
+
+"""
+A page of retrieved Uplifts
+"""
 type UpliftList {
+	"The total number of Uplifts meeting the filter conditions. Can be more than the number of Uplifts in the page."
 	count: Int!
 	uplifts: [Uplift!]!
 }
+
 type Season {
 	year: Int!
+	
+	"e.g., 2016 would be formatted as '2016 - 2017'"
 	description: String!
 }
+
 type LiftType {
 	id: Int!
 	description: String!
 }
+
+"""
+How to group the arregated Uplifts
+"""
 enum UpliftGroupBy {
-  Season
-  Month
-  Day
-  Hour
-  Lift
+	Season
+	Month
+	Day
+	Hour
+	Lift
+}
+
+enum LiftOrderBy {
+	NAME
+	TYPEID
+	RESORTID
+	ISACTIVE
+}
+
+enum UpliftOrderBy {
+	DATE
+	WAITSECONDS
+}
+
+enum Order {
+	ASC
+	DESC
 }
 
 scalar Date

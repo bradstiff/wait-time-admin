@@ -27,7 +27,7 @@ import NotFound from '../../app/NotFound';
 import withQuery from '../../common/withQuery';
 
 const query = gql`
-    query LiftList($offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $name: String, $typeID: Int, $resortID: Int, $isActive: Boolean) {
+    query LiftList($offset: Int!, $limit: Int!, $orderBy: LiftOrderBy!, $order: Order!, $name: String, $typeID: Int, $resortID: Int, $isActive: Boolean) {
         liftList(offset: $offset, limit: $limit, orderBy: $orderBy, order: $order, name: $name, typeID: $typeID, resortID: $resortID, isActive: $isActive) {
             count,
             lifts {
@@ -215,14 +215,21 @@ class Lifts extends Component {
     }
 }
 
+const mapPropsToVariables = props => ({
+    offset: props.page * props.rowsPerPage,
+    limit: props.rowsPerPage,
+    orderBy: props.orderBy.toUpperCase(),
+    order: props.order.toUpperCase(),
+    name: props.name,
+    typeID: props.typeID,
+    resortID: props.resortID,
+    isActive: props.isActive,
+});
+
 export default compose(
     withQuery(query, {
         selector: 'liftList',
-        variables: props => ({
-            ...props,
-            offset: props.page * props.rowsPerPage,
-            limit: props.rowsPerPage,
-        }),
+        variables: mapPropsToVariables,
     }, NotFound),
     withStyles(styles)
 )(Lifts);

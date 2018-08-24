@@ -52,10 +52,15 @@ const getUplifts = (seasonYear, month, day, hour) => uplifts
     .filter(uplift => !hour || hour === uplift.date.getUTCHours())
 
 const getUpliftsCount = (seasonYear, month, day, hour) => getUplifts(seasonYear, month, day, hour).length;
-const getUpliftsPage = (offset = 0, orderBy = 'date', order = 'asc', seasonYear, month, day, hour) =>
-    getUplifts(seasonYear, month, day, hour)
-        .sort(makeCompareFn(order, orderBy, columns, 'id'))
+const getUpliftsPage = (offset = 0, orderBy = 'DATE', order = 'ASC', seasonYear, month, day, hour) => {
+    //adjust to match row prop name
+    const adjustedOrderBy = orderBy === 'DATE'
+        ? 'date'
+        : 'waitSeconds';
+    return getUplifts(seasonYear, month, day, hour)
+        .sort(makeCompareFn(order, adjustedOrderBy, columns, 'id'))
         .slice(offset * 25, offset * 25 + 25);
+}
 
 const mocks = [
     {
@@ -65,8 +70,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 25,
-                orderBy: 'date',
-                order: 'asc',
+                orderBy: 'DATE',
+                order: 'ASC',
                 seasonYear: undefined,
                 month: undefined,
                 day: undefined,
@@ -93,8 +98,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 25,
-                orderBy: 'waitSeconds',
-                order: 'asc',
+                orderBy: 'WAITSECONDS',
+                order: 'ASC',
                 seasonYear: undefined,
                 month: undefined,
                 day: undefined,
@@ -108,7 +113,7 @@ const mocks = [
                     name: 'Test Lift',
                     upliftList: {
                         count: getUpliftsCount(),
-                        uplifts: getUpliftsPage(0, 'waitSeconds'),
+                        uplifts: getUpliftsPage(0, 'WAITSECONDS'),
                     }
                 },
             },
@@ -121,8 +126,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 25,
-                orderBy: 'waitSeconds',
-                order: 'desc',
+                orderBy: 'WAITSECONDS',
+                order: 'DESC',
                 seasonYear: undefined,
                 month: undefined,
                 day: undefined,
@@ -136,7 +141,7 @@ const mocks = [
                     name: 'Test Lift',
                     upliftList: {
                         count: getUpliftsCount(),
-                        uplifts: getUpliftsPage(0, 'waitSeconds', 'desc'),
+                        uplifts: getUpliftsPage(0, 'WAITSECONDS', 'DESC'),
                     }
                 },
             },
@@ -149,8 +154,8 @@ const mocks = [
                 id: 1,
                 offset: 25,
                 limit: 25,
-                orderBy: 'waitSeconds',
-                order: 'desc',
+                orderBy: 'WAITSECONDS',
+                order: 'DESC',
                 seasonYear: undefined,
                 month: undefined,
                 day: undefined,
@@ -164,7 +169,7 @@ const mocks = [
                     name: 'Test Lift',
                     upliftList: {
                         count: getUpliftsCount(),
-                        uplifts: getUpliftsPage(1, 'waitSeconds', 'desc'),
+                        uplifts: getUpliftsPage(1, 'WAITSECONDS', 'DESC'),
                     }
                 },
             },
@@ -178,8 +183,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 50,
-                orderBy: 'date',
-                order: 'asc',
+                orderBy: 'DATE',
+                order: 'ASC',
                 seasonYear: undefined,
                 month: undefined,
                 day: undefined,
@@ -207,8 +212,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 25,
-                orderBy: 'date',
-                order: 'asc',
+                orderBy: 'DATE',
+                order: 'ASC',
                 seasonYear: 2014,
                 month: undefined,
                 day: undefined,
@@ -236,8 +241,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 25,
-                orderBy: 'date',
-                order: 'asc',
+                orderBy: 'DATE',
+                order: 'ASC',
                 seasonYear: 2016,
                 month: undefined,
                 day: undefined,
@@ -251,7 +256,7 @@ const mocks = [
                     name: 'Test Lift',
                     upliftList: {
                         count: getUpliftsCount(2016),
-                        uplifts: getUpliftsPage(0, 'date', 'asc', 2016),
+                        uplifts: getUpliftsPage(0, 'DATE', 'ASC', 2016),
                     }
                 },
             },
@@ -264,8 +269,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 25,
-                orderBy: 'date',
-                order: 'asc',
+                orderBy: 'DATE',
+                order: 'ASC',
                 seasonYear: 2016,
                 month: 3,
                 day: undefined,
@@ -279,7 +284,7 @@ const mocks = [
                     name: 'Test Lift',
                     upliftList: {
                         count: getUpliftsCount(2016, 3),
-                        uplifts: getUpliftsPage(0, 'date', 'asc', 2016, 3),
+                        uplifts: getUpliftsPage(0, 'DATE', 'ASC', 2016, 3),
                     }
                 },
             },
@@ -292,8 +297,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 25,
-                orderBy: 'date',
-                order: 'asc',
+                orderBy: 'DATE',
+                order: 'ASC',
                 seasonYear: 2016,
                 month: 3,
                 day: 5,
@@ -307,7 +312,7 @@ const mocks = [
                     name: 'Test Lift',
                     upliftList: {
                         count: getUpliftsCount(2016, 3, 5),
-                        uplifts: getUpliftsPage(0, 'date', 'asc', 2016, 3, 5),
+                        uplifts: getUpliftsPage(0, 'DATE', 'ASC', 2016, 3, 5),
                     }
                 },
             },
@@ -320,8 +325,8 @@ const mocks = [
                 id: 1,
                 offset: 0,
                 limit: 25,
-                orderBy: 'date',
-                order: 'asc',
+                orderBy: 'DATE',
+                order: 'ASC',
                 seasonYear: 2016,
                 month: 3,
                 day: 5,
@@ -335,7 +340,7 @@ const mocks = [
                     name: 'Test Lift',
                     upliftList: {
                         count: getUpliftsCount(2016, 3, 5, 15),
-                        uplifts: getUpliftsPage(0, 'date', 'asc', 2016, 3, 5, 15),
+                        uplifts: getUpliftsPage(0, 'DATE', 'ASC', 2016, 3, 5, 15),
                     }
                 },
             },

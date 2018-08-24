@@ -25,7 +25,7 @@ import withQuery from '../../common/withQuery';
 import ToggleIconButton from '../../common/ToggleIconButton';
 
 export const UPLIFTS_BY_LIFT_QUERY = gql`
-    query UpliftsByLift($id: Int!, $offset: Int!, $limit: Int!, $orderBy: String!, $order: String!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
+    query UpliftsByLift($id: Int!, $offset: Int!, $limit: Int!, $orderBy: UpliftOrderBy!, $order: Order!, $seasonYear: Int, $month: Int, $day: Int, $hour: Int) {
         lift(id: $id) { 
             id,
             name,
@@ -233,8 +233,8 @@ const mapPropsToVariables = props => ({
     id: props.id,
     offset: props.page * props.rowsPerPage,
     limit: props.rowsPerPage,
-    orderBy: props.orderBy,
-    order: props.order,
+    orderBy: props.orderBy.toUpperCase(),
+    order: props.order.toUpperCase(),
     seasonYear: props.seasonYear,
     month: props.month,
     day: props.day,
