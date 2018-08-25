@@ -5,8 +5,6 @@ import warning from 'warning';
 import * as Yup from 'yup';
 import qs from 'querystringify';
 
-import Log from './Log';
-
 const isEmptyObject = obj => Object.keys(obj).length === 0 && obj.constructor === Object;
 const isEmptyChildren = children => React.Children.count(children) === 0;
 
@@ -32,7 +30,7 @@ class Location {
         return this._path;
     }
 
-    toRoute = (renderOption, exact = false, strict = false, sensitive = false) => {
+    toRoute(renderOption, exact = false, strict = false, sensitive = false) {
         const { component, render, children, noMatch } = renderOption;
         //same warnings as Route
         warning(
@@ -104,7 +102,7 @@ class Location {
         return <Route {...routeProps} />;
     }
 
-    toUrl = tokens => {
+    toUrl(tokens) {
         const path = generatePath(this._path, tokens);
 
         const qsTokens = this._qsTokenKeys
@@ -130,7 +128,7 @@ class Location {
 
     toLink = tokens => props => <Link {...props} to={this.toUrl(tokens)} />;
 
-    parseParams = location => {
+    parseParams(location) {
         const match = matchPath(location.pathname, { path: this._path });
         if (!match) {
             return null;
@@ -152,7 +150,9 @@ class Location {
                 ? this._qsSchema.validateSync(qsParams)
                 : {};
         } catch (err) {
-            Log.error(err, 'Location.parseParams');
+            if (process.env.NODE_ENV !== 'production') {
+                console.log(err);
+            }
             return null;
         }
 

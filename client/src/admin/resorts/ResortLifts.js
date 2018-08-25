@@ -86,17 +86,17 @@ class ResortLifts extends React.Component {
         });
     };
 
-    navigateBack = () => {
-        const { id, history } = this.props;
-        history.push(Locations.Resort.toUrl({ id }));
-    }
-
     handleSave = () => {
         this.props.saveAssignedLifts(this.props.id, this.state.assignedLiftIDs);
         this.navigateBack();
     }
 
     handleCancel = this.navigateBack;
+
+    navigateBack() {
+        const { id, history } = this.props;
+        history.push(Locations.Resort.toUrl({ id }));
+    }
 
     render() {
         const { id, resort, classes } = this.props;

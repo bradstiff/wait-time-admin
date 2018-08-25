@@ -72,7 +72,7 @@ const styles = theme => ({
 
 
 class Lifts extends Component {
-    replaceLocation = qsParams => {
+    replaceLocation(qsParams) {
         const nextLocation = Locations.Lifts.toUrl({
             ...this.props,
             ...qsParams
