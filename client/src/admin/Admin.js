@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { matchPath } from 'react-router';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Link } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
 import Hidden from '@material-ui/core/Hidden';
@@ -9,7 +9,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 
 import Resorts from './resorts/Resorts';
@@ -79,8 +78,8 @@ class Admin extends Component {
                             <Typography variant="title" className={classes.title}>Wait Time Admin</Typography>
                         </Hidden>
                         <Tabs value={activeTab} className={classes.toolbarTabs}>
-                            <Tab label="Resorts" component={Locations.Resorts.toLink()} />
-                            <Tab label="Lifts" component={Locations.Lifts.toLink({ isActive: true })} />
+                            <Tab label="Resorts" component={Link} to={Locations.Resorts.toUrl()} />
+                            <Tab label="Lifts" component={Link} to={Locations.Lifts.toUrl({ isActive: true })} />
                         </Tabs>
                         <UserConsumer>
                             {({ user, onLogout }) => user
@@ -92,16 +91,16 @@ class Admin extends Component {
                 </AppBar>
                 <div className={classes.content}>
                     <Switch>
-                        {Locations.Resorts.toRoute({ component: Resorts, noMatch: NotFound }, true)}
-                        {Locations.Resort.toRoute({ component: Resort, noMatch: NotFound }, true)}
-                        {Locations.ResortDetails.toRoute({ component: ResortDetails, noMatch: NotFound }, true)}
-                        {Locations.ResortLifts.toRoute({ component: ResortLifts, noMatch: NotFound }, true)}
-                        {Locations.ResortStats.toRoute({ component: ResortStats, noMatch: NotFound }, true)}
-                        {Locations.Lifts.toRoute({ component: Lifts, noMatch: NotFound }, true)}
-                        {Locations.Lift.toRoute({ component: Lift, noMatch: NotFound }, true)}
-                        {Locations.LiftDetails.toRoute({ component: LiftDetails, noMatch: NotFound }, true)}
-                        {Locations.LiftUplifts.toRoute({ component: LiftUplifts, noMatch: NotFound }, true)}
-                        {Locations.LiftStats.toRoute({ component: LiftStats, noMatch: NotFound }, true)}
+                        {Locations.Resorts.toRoute({ component: Resorts, invalid: NotFound }, true)}
+                        {Locations.Resort.toRoute({ component: Resort, invalid: NotFound }, true)}
+                        {Locations.ResortDetails.toRoute({ component: ResortDetails, invalid: NotFound }, true)}
+                        {Locations.ResortLifts.toRoute({ component: ResortLifts, invalid: NotFound }, true)}
+                        {Locations.ResortStats.toRoute({ component: ResortStats, invalid: NotFound }, true)}
+                        {Locations.Lifts.toRoute({ component: Lifts, invalid: NotFound }, true)}
+                        {Locations.Lift.toRoute({ component: Lift, invalid: NotFound }, true)}
+                        {Locations.LiftDetails.toRoute({ component: LiftDetails, invalid: NotFound }, true)}
+                        {Locations.LiftUplifts.toRoute({ component: LiftUplifts, invalid: NotFound }, true)}
+                        {Locations.LiftStats.toRoute({ component: LiftStats, invalid: NotFound }, true)}
                         <Route component={NotFound} />
                     </Switch>
                 </div>

@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import Location from '../common/Location';
+import Location from 'react-app-location';
 
 const isNullableDate = Yup.string().test('is-date', '${path}:${value} is not a valid date', date => !date || !isNaN(Date.parse(date))); 
 const string = Yup.string();
