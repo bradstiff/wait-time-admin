@@ -88,12 +88,13 @@ const Resort = {
             .input('resortID', mssql.Int, waitTimeDate.resortID)
             .input('date', mssql.Date, waitTimeDate.date)
             .query(`
-	            select  LocalMinutes / 15 as timeperiod, u.liftID, WaitSeconds as seconds
+	            select  LocalMinutes / 15 as timeperiod, u.liftID, AVG(WaitSeconds) as seconds
 	            from	Uplift u 
 	            join	Lift l on l.LiftID = u.LiftID
                 where   l.ResortID = @resortID
                 and     u.LocalDate = @date
-                order by LocalMinutes
+                group by LocalMinutes / 15, u.LiftID
+                order by LocalMinutes / 15
             `);
         const waitTimes = result.recordset;
         const periods = waitTimes.map(uplift => uplift.timeperiod);
