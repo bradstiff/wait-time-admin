@@ -1,5 +1,6 @@
 import React from 'react';
 import { compose } from 'react-apollo';
+import { Link } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { Polyline } from 'react-leaflet'
 
@@ -130,8 +131,8 @@ const Resort = ({ id, resort, classes, width }) => {
                                     </div>
                                 </CardContent>
                                 <CardActions className={classes.resortActions}>
-                                    <Button component={Locations.ResortDetails.toLink({ id })}>Details</Button>
-                                    {isAdmin && <Button component={Locations.ResortLifts.toLink({ id })}>Assign Lifts</Button>}
+                                    <Button component={Link} to={Locations.ResortDetails.toUrl({ id })}>Details</Button>
+                                    {isAdmin && <Button component={Link} to={Locations.ResortLifts.toUrl({ id })}>Assign Lifts</Button>}
                                 </CardActions>
                             </div>
                         </Card>
@@ -147,7 +148,7 @@ const Resort = ({ id, resort, classes, width }) => {
                                     <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='upliftCount' />
                                 </CardMedia>
                                 <CardActions>
-                                    <Button component={Locations.ResortStats.toLink({ id })}>More</Button>
+                                    <Button component={Link} to={Locations.ResortStats.toUrl({ id })}>More</Button>
                                 </CardActions>
                             </Card>
                         </Grid>,
@@ -161,7 +162,7 @@ const Resort = ({ id, resort, classes, width }) => {
                                     <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='waitTimeAverage' />
                                 </CardMedia>
                                 <CardActions>
-                                    <Button component={Locations.ResortStats.toLink({ id })}>More</Button>
+                                    <Button component={Link} to={Locations.ResortStats.toUrl({ id })}>More</Button>
                                 </CardActions>
                             </Card>
                         </Grid>

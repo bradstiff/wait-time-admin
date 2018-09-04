@@ -1,5 +1,6 @@
 import React from 'react';
 import { compose } from 'react-apollo';
+import { Link } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { Map, TileLayer, Polyline } from 'react-leaflet'
 
@@ -88,7 +89,7 @@ const Lift = ({ id, lift, classes }) => {
                                 <Typography color='textSecondary'>{lift.resort ? lift.resort.name : 'No resort assigned'}</Typography>
                             </CardContent>
                             <CardActions className={classes.liftActions}>
-                                <Button component={Locations.LiftDetails.toLink({ id })}>Details</Button>
+                                <Button component={Link} to={Locations.LiftDetails.toUrl({ id })}>Details</Button>
                             </CardActions>
                         </div>
                     </Card>
@@ -104,7 +105,7 @@ const Lift = ({ id, lift, classes }) => {
                                 <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='upliftCount' />
                             </CardMedia>
                             <CardActions>
-                                <Button component={Locations.LiftUplifts.toLink({ id })}>Uplifts</Button>
+                                <Button component={Link} to={Locations.LiftUplifts.toUrl({ id })}>Uplifts</Button>
                             </CardActions>
                         </Card>
                     </Grid>,
@@ -118,7 +119,7 @@ const Lift = ({ id, lift, classes }) => {
                                 <UpliftStatChart upliftGroupings={upliftGroupings} dataPoint='waitTimeAverage' />
                             </CardMedia>
                             <CardActions>
-                                <Button component={Locations.LiftStats.toLink({ id })}>Stats</Button>
+                                <Button component={Link} to={Locations.LiftStats.toUrl({ id })}>Stats</Button>
                             </CardActions>
                         </Card>
                     </Grid>

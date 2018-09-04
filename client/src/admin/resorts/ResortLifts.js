@@ -91,7 +91,7 @@ class ResortLifts extends React.Component {
         this.navigateBack();
     }
 
-    handleCancel = this.navigateBack;
+    handleCancel = () => this.navigateBack();
 
     navigateBack() {
         const { id, history } = this.props;
