@@ -1,11 +1,11 @@
-/**************************************************************************************************
+/* ********************************************************************************************************************************
  * An HOC that requests a query, selects a value from the resulting data, and passes it as a prop.
  * options.variables can be a function of props, a literal object, or undefined.
  * If variables is undefined, props will be passed as variables. Apollo ignores variable values that are not used by the query.
  * If the query runs and the selected value is null, renders the indicated NotFound component.
- * 
+ *
  * Eliminates a bunch of boilerplate.
- * ***********************************************************************************************/
+ * ********************************************************************************************************************************/
 
 import React from 'react';
 import { Query } from 'react-apollo';
@@ -26,7 +26,7 @@ const withQuery = (query, options, notFound) => component => {
 
             const root = data[options.selector];
             if (root === undefined) {
-                return null; 
+                return null;
             }
             if (!loading && root === null) {
                 return React.createElement(notFound);
@@ -74,6 +74,6 @@ const withQuery = (query, options, notFound) => component => {
             )}
         </Query>;
     };
-}
+};
 
 export default withQuery;

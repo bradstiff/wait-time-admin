@@ -27,12 +27,12 @@ import BackgroundImage from '../assets/resort-carousel-bg.jpg';
 let client;
 try {
     Rollbar.init({
-        accessToken: "77405bf881c942f5a153ceb6b8be9081",
+        accessToken: '77405bf881c942f5a153ceb6b8be9081',
         captureUncaught: true,
         captureUnhandledRejections: true,
         payload: {
-            environment: process.env.NODE_ENV
-        }
+            environment: process.env.NODE_ENV,
+        },
     });
 
     //window.addEventListener('error', function (event) {
@@ -67,7 +67,7 @@ try {
                         if (!waitTimeDate.timePeriods || !waitTimeDate.timePeriods.length) {
                             return null;
                         }
-                        //default to middle time period
+                        // default to middle time period
                         const middleIndex = Math.round(waitTimeDate.timePeriods.length / 2);
                         return waitTimeDate.timePeriods[middleIndex].timestamp;
                     },
@@ -92,7 +92,7 @@ try {
     });
 }
 catch (error) {
-    Rollbar.error(error)
+    Rollbar.error(error);
 }
 
 const theme = createMuiTheme({
@@ -105,7 +105,7 @@ const theme = createMuiTheme({
             default: '#282828',
         },
         divider: 'rgba(230, 230, 230, 0.12)',
-    }
+    },
 });
 
 const Background = styled.div`
