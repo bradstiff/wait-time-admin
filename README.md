@@ -16,4 +16,4 @@ Administer resorts and lifts.
 * Docker
 * Linux
 ## API
-[GraphQL Schema](httpshttps://github.com/bradstiff/wait-time-admin/blob/master/src/schema.md)
+[GraphQL Schema](https://github.com/bradstiff/wait-time-admin/blob/master/src/schema.md)
