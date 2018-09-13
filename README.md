@@ -1,17 +1,19 @@
 # wait-time-admin
-View lift wait time statistics by resort and lift. Administer resorts and lifts.
+View aggregated wait time statistics by resort, lift, season, month, day, and time of day. 
+
+Administer resorts and lifts.
 ## Tech Stack
 ### Front-end
 * React
 * Apollo GraphQL
-* Javascript ES6
 * Material UI
 ### Back-end
-* Apollo GraphQL
-* Javascript ES6
 * Express
+* Apollo GraphQL
 * MS SQL Server 2012
 ### Hosting Platform
 * Node
 * Docker
 * Linux
+## API
+[GraphQL Schema](httpshttps://github.com/bradstiff/wait-time-admin/blob/master/src/schema.md)

@@ -11,15 +11,14 @@ const order = Yup.string().oneOf(['asc', 'desc']).default('asc');
 
 const Locations = {
     Home: new Location('/'),
-    WaitTime: new Location('/resorts/:slug?', { slug: string.required() }, { date: isNullableDate }), //validate the date but don't parse it; we will parse it later as utc
-    Resorts: new Location('/admin/resorts'),
-    Resort: new Location('/admin/resorts/:id', { id: identity }),
-    ResortDetails: new Location('/admin/resorts/:id/details', { id: identity }),
-    ResortLifts: new Location('/admin/resorts/:id/lifts', { id: identity }),
-    ResortStats: new Location('/admin/resorts/:id/stats', { id: identity }, {
+    Resorts: new Location('/resorts'),
+    Resort: new Location('/resorts/:id', { id: identity }),
+    ResortDetails: new Location('/resorts/:id/details', { id: identity }),
+    ResortLifts: new Location('/resorts/:id/lifts', { id: identity }),
+    ResortStats: new Location('/resorts/:id/stats', { id: identity }, {
         groupBy: Yup.string().oneOf(['Season', 'Month', 'Day', 'Hour', 'Lift']).default('Season')
     }),
-    Lifts: new Location('/admin/lifts', null, {
+    Lifts: new Location('/lifts', null, {
         page: naturalNbr.default(0),
         rowsPerPage: Yup.number().oneOf([25, 50, 75, 100]).default(25),
         order: order,
@@ -30,9 +29,9 @@ const Locations = {
         resortID: wholeNbr.nullable(), //'No resort assigned' is equivalent to ResortID=null
         name: Yup.string(),
     }),
-    Lift: new Location('/admin/lifts/:id', { id: identity }),
-    LiftDetails: new Location('/admin/lifts/:id/details', { id: identity }),
-    LiftUplifts: new Location('/admin/lifts/:id/uplifts', { id: identity }, {
+    Lift: new Location('/lifts/:id', { id: identity }),
+    LiftDetails: new Location('/lifts/:id/details', { id: identity }),
+    LiftUplifts: new Location('/lifts/:id/uplifts', { id: identity }, {
         page: naturalNbr.default(0),
         rowsPerPage: Yup.number().oneOf([25, 50, 75, 100]).default(25),
         order: order,
@@ -43,9 +42,10 @@ const Locations = {
         day: wholeNbr,
         hour: wholeNbr,
     }),
-    LiftStats: new Location('/admin/lifts/:id/stats', { id: identity }, {
+    LiftStats: new Location('/lifts/:id/stats', { id: identity }, {
         groupBy: Yup.string().oneOf(['Season', 'Month', 'Day', 'Hour']).default('Season')
     }),
+    WaitTime: new Location('/waittime/:slug?', { slug: string.required() }, { date: isNullableDate }), //graphQL implementation of wait-time site
 };
 
 export default Locations;
