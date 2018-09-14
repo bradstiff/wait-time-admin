@@ -20,8 +20,8 @@ export const IntegrationTestContainer = ({ history }) => {
     return (
         <Router history={history}>
             <Switch>
-                {Locations.LiftUplifts.toRoute({ component: LiftUplifts, noMatch: NotFound }, true)}
-                {Locations.LiftStats.toRoute({ component: LiftStats, noMatch: NotFound }, true)}
+                {Locations.LiftUplifts.toRoute({ component: LiftUplifts, invalid: NotFound }, true)}
+                {Locations.LiftStats.toRoute({ component: LiftStats, invalid: NotFound }, true)}
                 <Route component={NotFound} />
             </Switch>
         </Router>
