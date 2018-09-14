@@ -64,9 +64,9 @@ class Admin extends Component {
         const { showLogin } = this.state;
 
         let activeTab = null;
-        if (matchPath(location.pathname, '/admin/resorts')) {
+        if (matchPath(location.pathname, '/resorts')) {
             activeTab = 0;
-        } else if (matchPath(location.pathname, '/admin/lifts')) {
+        } else if (matchPath(location.pathname, '/lifts')) {
             activeTab = 1;
         }
 
