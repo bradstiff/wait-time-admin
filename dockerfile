@@ -9,7 +9,7 @@ RUN npm install --silent
 COPY ./client ./
 RUN npm run build
 
-# server build (babel transpilation)
+# server build with dev dependencies
 FROM node as server-build
 WORKDIR /app
 
@@ -20,7 +20,8 @@ RUN npm install --dev --silent
 COPY ./server ./
 RUN npm run build
 
-# integrated build
+# integrated build with prod dependencies only
+# results in smaller image
 FROM node 
 WORKDIR /home/node/app
 
@@ -29,6 +30,7 @@ RUN npm install --prod --silent
 
 COPY --from=server-build /app/build .
 
+# copy React app to public, corresponding to Express static config
 RUN mkdir ./public
 COPY --from=client-build /app/build ./public/
 

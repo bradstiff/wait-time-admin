@@ -4,32 +4,25 @@ import path from 'path';
 import express from 'express';
 import config from './config';
 import bodyParser from 'body-parser';
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import { graphiqlExpress } from 'apollo-server-express';
 // import { ApolloEngine } from 'apollo-engine';
 import cors from 'cors';
 import compression from 'compression';
 
-import makeRollbar from './rollbar';
-import makeDB from './db';
-import makeExecutableSchema from './graphQL/executableSchema';
-import makeDataLoaders from './db/dataLoaders';
+import configureRollbar from './rollbar';
+import configureDB from './db';
+import configureGraphQLExpress from './graphQL';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-const rollbar = makeRollbar();
-const schema = makeExecutableSchema();
-const db = makeDB(rollbar);
-const dataLoaders = makeDataLoaders(db);
+const rollbar = configureRollbar();
+const db = configureDB(rollbar);
+const graphQLExpress = configureGraphQLExpress(db, isProduction);
 
 const app = express()
     .use(rollbar.errorHandler())
     .use(compression())
-    .use('/graphql', bodyParser.json(), graphqlExpress(() => ({
-        schema,
-        context: { db, dataLoaders },
-        tracing: !isProduction,
-        cacheControl: !isProduction,
-    })))
+    .use('/graphql', bodyParser.json(), graphQLExpress)
     .use(bodyParser.json())
     .post('/authenticate', (req, res) => {
         //just a placeholder to support the client workflow (which is also a placeholder)
