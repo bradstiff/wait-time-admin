@@ -10,8 +10,8 @@ COPY ./client ./
 RUN npm run build
 
 # server build 
-FROM node 
-WORKDIR /app
+FROM node
+WORKDIR /home/node/app
 
 # if package.json doesn't change, this will be pulled from cache
 COPY package.json .
@@ -24,14 +24,13 @@ RUN mkdir ./build/client
 COPY --from=client-build /app/build ./build/client/
 
 # production environment
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH /home/node/app/node_modules/.bin:$PATH
 ENV NODE_ENV=production
 ENV PORT=80
 EXPOSE 80
 
 # don't run as root
-RUN groupadd -r nodejs 
-RUN useradd -m -r -g nodejs nodejs
-USER nodejs
+# RUN chown -R node:node ./build
+# USER node
 
 ENTRYPOINT ["node","./build/server.js"]
