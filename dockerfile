@@ -33,6 +33,7 @@ RUN mkdir ./public
 COPY --from=client-build /app/build ./public/
 
 # production environment
+COPY .env .
 ENV PATH /home/node/app/node_modules/.bin:$PATH
 ENV NODE_ENV=production
 ENV PORT=80
