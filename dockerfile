@@ -9,16 +9,25 @@ RUN npm install --silent
 COPY ./client ./
 RUN npm run build
 
-# server build 
-FROM node 
-WORKDIR /home/node/app
+# server build (babel transpilation)
+FROM node as server-build
+WORKDIR /app
 
 # if package.json doesn't change, this will be pulled from cache
 COPY ./server/package.json .
-RUN npm install --silent
+RUN npm install --dev --silent
 
 COPY ./server ./
 RUN npm run build
+
+# integrated build
+FROM node 
+WORKDIR /home/node/app
+
+COPY ./server/package.json .
+RUN npm install --prod --silent
+
+COPY --from=server-build /app/build .
 
 RUN mkdir ./public
 COPY --from=client-build /app/build ./public/
