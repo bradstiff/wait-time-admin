@@ -10,18 +10,18 @@ COPY ./client ./
 RUN npm run build
 
 # server build 
-FROM node
+FROM node 
 WORKDIR /home/node/app
 
 # if package.json doesn't change, this will be pulled from cache
-COPY package.json .
+COPY ./server/package.json .
 RUN npm install --silent
 
-COPY . ./
+COPY ./server ./
 RUN npm run build
 
-RUN mkdir ./build/client
-COPY --from=client-build /app/build ./build/client/
+RUN mkdir ./public
+COPY --from=client-build /app/build ./public/
 
 # production environment
 ENV PATH /home/node/app/node_modules/.bin:$PATH
@@ -33,4 +33,4 @@ EXPOSE 80
 # RUN chown -R node:node ./build
 # USER node
 
-ENTRYPOINT ["node","./build/server.js"]
+ENTRYPOINT ["node","./index.js"]

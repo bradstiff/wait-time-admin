@@ -3,3 +3,8 @@
 node_modules
 build
 sql
+dockerfile
+README.md
+.dockerignore
+.gitignore
+.eslintrc.json

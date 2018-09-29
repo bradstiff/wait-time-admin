@@ -1,12 +1,10 @@
 {
-  "name": "wait-time",
+  "name": "wait-time-admin",
   "version": "1.0.0",
   "scripts": {
-    "client": "cd client && npm run start_ip",
-    "server": "cross-env NODE_ENV=development nodemon ./src/server.js --inspect --exec babel-node\"",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "start": "cross-env NODE_ENV=development nodemon ./src/index.js --inspect --exec babel-node\"",
     "build": "babel src -d build -s inline --copy-files",
-    "prod": "cross-env NODE_ENV=production node ./build/server.js",
+    "prod": "cross-env NODE_ENV=production node ./build/index.js",
     "pretest": "eslint --ignore-path .gitignore ."
   },
   "dependencies": {

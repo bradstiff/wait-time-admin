@@ -1,10 +1,10 @@
 import { GraphQLScalarType, GraphQLError } from 'graphql';
 import { Kind } from 'graphql/language';
-import slugify from 'slugify';
 import moment from 'moment';
 
-import { Resort, Lift } from './connectors';
-import LiftTypes from './LiftTypes';
+import Resort from '../db/Resort';
+import Lift from '../db/Lift';
+import LiftTypes from '../db/LiftTypes';
 
 const validateDate = value => {
     if (isNaN(Date.parse(value))) {
