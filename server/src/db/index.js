@@ -16,6 +16,10 @@ export default (rollbar) => {
         password: process.env.DB_PWD,
         port: process.env.DB_PORT,
     });
-    db.on('error', error => rollbar.error(error));
+    db.on('error', error => {
+        rollbar.error(error);
+        console.log(error);
+        throw new Error('Database error');
+    });
     return db;
 };
