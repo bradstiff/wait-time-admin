@@ -87,7 +87,6 @@ try {
             if (networkError) {
                 logError(networkError, 'Network Error');
             }
-            throw new Error('ApolloClient.onError');
         },
     });
 }
