@@ -4,7 +4,7 @@ import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import Rollbar from 'rollbar';
 import moment from 'moment';
-import 'moment/min/locales';
+import 'moment/min/locales'; //all locales equals 14% of bundle size, revisit
 import browserLocale from 'browser-locale';
 
 import styled from 'styled-components';

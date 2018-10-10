@@ -18,7 +18,7 @@
     "rc-slider": "^8.6.1",
     "react": "^16.4.2",
     "react-apollo": "^2.1.11",
-    "react-app-location": "^1.0.7",
+    "react-app-location": "^1.1.1",
     "react-chartist": "^0.13.1",
     "react-datepicker": "^1.6.0",
     "react-debounce-input": "^3.2.0",

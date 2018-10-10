@@ -2,7 +2,10 @@
  * An HOC that requests a query, selects a value from the resulting data, and passes it as a prop.
  * options.variables can be a function of props, a literal object, or undefined.
  * If variables is undefined, props will be passed as variables. Apollo ignores variable values that are not used by the query.
- * If the query runs and the selected value is null, renders the indicated NotFound component.
+ * 
+ * If the query completes and the selected value is null, renders the indicated NotFound component.
+ * 
+ * If the query completes and the error prop is set, throws to ErrorBoundary.
  *
  * Eliminates a bunch of boilerplate.
  * ********************************************************************************************************************************/
