@@ -11,17 +11,18 @@
  * ********************************************************************************************************************************/
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Query } from 'react-apollo';
 import { QueryProgressConsumer } from '../app/QueryProgressContext';
 
-const withQuery = (query, options, notFound) => component => {
-    class WrappedComponent extends React.Component {
+const withQuery = (query, options, NotFound) => Component => {
+    class ComponentWithLoadingEvents extends React.Component {
         state = {
             loading: false,
         };
 
         render() {
-            const { data, loading, error } = this.props;
+            const { data, loading, error, wrappedComponentRef, ...remainingProps } = this.props;
             if (error) {
                 console.log(error);
                 throw error;
@@ -32,13 +33,15 @@ const withQuery = (query, options, notFound) => component => {
                 return null;
             }
             if (!loading && root === null) {
-                return React.createElement(notFound);
+                return <NotFound />;
             }
 
-            return React.createElement(component, {
-                ...this.props,
+            const wrappedComponentProps = {
+                ...remainingProps,
                 [options.selector]: root,
-            });
+                ref: wrappedComponentRef
+            };
+            return <Component  {...wrappedComponentProps} />;
         }
 
         static getDerivedStateFromProps = (props, state) => {
@@ -53,7 +56,7 @@ const withQuery = (query, options, notFound) => component => {
         }
     }
 
-    return props => {
+    const ComponentWithQuery = props => {
         if (typeof options === 'string') {
             options = { selector: options };
         }
@@ -64,7 +67,7 @@ const withQuery = (query, options, notFound) => component => {
             {({ data, loading, error }) => (
                 <QueryProgressConsumer>
                     {({ onStart, onEnd }) => (
-                        <WrappedComponent
+                        <ComponentWithLoadingEvents
                             {...props}
                             data={data}
                             loading={loading}
@@ -77,6 +80,14 @@ const withQuery = (query, options, notFound) => component => {
             )}
         </Query>;
     };
+
+    ComponentWithQuery.displayName = `withQuery(${Component.displayName || Component.name})`;
+    ComponentWithQuery.WrappedComponent = Component;
+    ComponentWithQuery.propTypes = {
+        wrappedComponentRef: PropTypes.func
+    };
+
+    return ComponentWithQuery;
 };
 
 export default withQuery;
