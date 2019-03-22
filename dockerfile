@@ -1,4 +1,16 @@
-# client build
+# SERVER BUILD
+FROM node as server-build
+WORKDIR /app
+
+# install Dev dependencies needed for build, e.g., Babel
+# if package.json doesn't change, this will be pulled from cache
+COPY ./server/package.json .
+RUN npm install --dev --silent
+
+COPY ./server ./
+RUN npm run build
+
+# CLIENT BUILD
 FROM node as client-build
 WORKDIR /app
 
@@ -9,22 +21,11 @@ RUN npm install --silent
 COPY ./client ./
 RUN npm run build
 
-# server build with dev dependencies
-FROM node as server-build
-WORKDIR /app
-
-# if package.json doesn't change, this will be pulled from cache
-COPY ./server/package.json .
-RUN npm install --dev --silent
-
-COPY ./server ./
-RUN npm run build
-
-# integrated build with prod dependencies only
-# results in smaller image
+# COMBINED BUILD
 FROM node 
 WORKDIR /home/node/app
 
+# install prod dependencies only to reduce image size
 COPY ./server/package.json .
 RUN npm install --prod --silent
 
